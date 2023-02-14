@@ -211,6 +211,10 @@ export default function Home(props: any) {
         />
 
         <div className={styles.toolbar}>
+          <button onClick={originalClick} disabled={!!!selectedFile}>
+            Original
+          </button>
+
           <button
             disabled={!!!selectedFile}
             onClick={() =>
@@ -220,10 +224,6 @@ export default function Home(props: any) {
             }
           >
             Play/Pause
-          </button>
-
-          <button onClick={originalClick} disabled={!!!selectedFile}>
-            Original
           </button>
 
           <button onClick={randomClick} disabled={!!!selectedFile}>
