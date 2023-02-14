@@ -18,6 +18,8 @@
 
 .info {
   padding: 0.25rem 0;
+  height: 1.5rem;
+  min-height: 1.5rem;
 }
 
 .slider {
@@ -30,6 +32,8 @@
   width: 100%;
   flex-direction: row;
   padding: 0.5rem 0 0.1rem;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .toolbar button {
@@ -56,6 +60,7 @@
   cursor: pointer;
   color: skyblue;
   margin-bottom: 0.2rem;
+  width: 100%;
 }
 
 .playlist li {
@@ -69,8 +74,7 @@
 
 .info,
 .slider,
-.toolbar,
 .playlist {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
 }
