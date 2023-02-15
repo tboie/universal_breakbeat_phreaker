@@ -36,8 +36,27 @@ a {
   }
 }
 
+.wavesurfer-region {
+  border-left: 1px solid blue !important;
+  border-right: 1px solid blue !important;
+}
+
 .wavesurfer-handle {
   background-color: blue !important;
+  height: 1.5rem !important;
+  width: 1.5rem !important;
+}
+
+.wavesurfer-handle-start {
+  bottom: 0 !important;
+  top: auto !important;
+  border-top-right-radius: 0.75rem !important;
+}
+
+.wavesurfer-handle-end {
+  bottom: 0 !important;
+  top: auto !important;
+  border-top-left-radius: 0.75rem !important;
 }
 
 .wavesurfer-marker > div {
