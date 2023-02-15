@@ -6,7 +6,7 @@
 
 ## Demo
 
-[https://phreaker.vercel.app](phreaker.vercel.app)
+[https://phreaker.vercel.app](https://phreaker.vercel.app)
 
 ## Install
 
