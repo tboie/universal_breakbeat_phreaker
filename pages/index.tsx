@@ -12,8 +12,8 @@ import toWav from "audiobuffer-to-wav";
 let wavesurfer: any;
 let init = false;
 let times: string[] = [];
-let audio: any;
-let finalAudio: any;
+let audio: AudioBuffer;
+let finalAudio: AudioBuffer;
 let wav: any;
 let blob: Blob;
 let blobUrl = "";
@@ -22,6 +22,8 @@ let selectedFolder = "";
 export default function Home(props: any) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
+  const [zoom, setZoom] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -57,11 +59,14 @@ export default function Home(props: any) {
           loop: true,
           color: "rgba(255, 215, 0, 0.15)",
         });
-        finalAudio = wavesurfer.backend.buffer;
+
         times.forEach((t) => {
           wavesurfer.addMarker({ time: t });
         });
-        setSelectedFile(selectedFolder);
+
+        finalAudio = wavesurfer.backend.buffer;
+
+        setLoading(false);
       });
     };
 
@@ -75,16 +80,21 @@ export default function Home(props: any) {
   }, []);
 
   const listClick = (folder: string) => {
+    setSelectedFile(folder);
+    setSpeed(1);
+    setZoom(0);
+    setLoading(true);
+
     fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
         selectedFolder = folder;
         times = text.split("\n");
+
         wavesurfer.clearMarkers();
         wavesurfer.load(`/drums/${folder}/audio.wav`);
         wavesurfer.setPlaybackRate(1);
-        setSpeed(1);
-        setSelectedFile("");
+        wavesurfer.zoom(0);
       });
   };
 
@@ -204,42 +214,56 @@ export default function Home(props: any) {
           className={styles.slider}
           onInput={(e: any) => {
             const speed = e.target.value as number;
-            setSpeed(speed);
             wavesurfer.setPlaybackRate(speed);
+            setSpeed(speed);
           }}
-          disabled={!!!selectedFile}
+          disabled={loading}
+        />
+
+        <input
+          id="zoom"
+          type="range"
+          step={25}
+          min={0}
+          max={500}
+          value={zoom}
+          className={styles.slider}
+          onInput={(e: any) => {
+            const zoom = e.target.value as number;
+            wavesurfer.zoom(zoom);
+            setZoom(zoom);
+          }}
+          disabled={loading}
         />
 
         <div className={styles.toolbar}>
-          <button onClick={originalClick} disabled={!!!selectedFile}>
+          <button onClick={originalClick} disabled={loading}>
             Original
           </button>
 
           <button
-            disabled={!!!selectedFile}
-            onClick={() =>
-              wavesurfer.isPlaying()
-                ? wavesurfer.pause()
-                : (Object.values(wavesurfer.regions.list)[0] as any).playLoop()
-            }
+            disabled={loading}
+            onClick={() => {
+              if (wavesurfer.isPlaying()) {
+                wavesurfer.pause();
+              } else {
+                (Object.values(wavesurfer.regions.list)[0] as any).playLoop();
+              }
+            }}
           >
             Play/Pause
           </button>
 
-          <button onClick={randomClick} disabled={!!!selectedFile}>
+          <button onClick={randomClick} disabled={loading}>
             <Image
-              src={!!!selectedFile ? "dice_disabled.svg" : "dice.svg"}
+              src={loading ? "dice_disabled.svg" : "dice.svg"}
               alt="dice"
               width={24}
               height={24}
             />
           </button>
 
-          <button
-            id="download"
-            onClick={downloadClick}
-            disabled={!!!selectedFile}
-          >
+          <button id="download" onClick={downloadClick} disabled={loading}>
             Download
           </button>
         </div>
