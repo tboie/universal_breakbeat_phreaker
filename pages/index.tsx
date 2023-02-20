@@ -23,6 +23,7 @@ export default function Home(props: any) {
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -186,6 +187,15 @@ export default function Home(props: any) {
     window.URL.revokeObjectURL(blobUrl);
   };
 
+  const playStopClick = () => {
+    if (playing) {
+      wavesurfer.stop();
+    } else {
+      (Object.values(wavesurfer.regions.list)[0] as any).playLoop();
+    }
+    setPlaying(!playing);
+  };
+
   return (
     <>
       <Head>
@@ -237,17 +247,8 @@ export default function Home(props: any) {
             Original
           </button>
 
-          <button
-            disabled={loading}
-            onClick={() => {
-              if (wavesurfer.isPlaying()) {
-                wavesurfer.pause();
-              } else {
-                (Object.values(wavesurfer.regions.list)[0] as any).playLoop();
-              }
-            }}
-          >
-            Play/Pause
+          <button disabled={loading} onClick={playStopClick}>
+            {playing ? "Stop" : "Play"}
           </button>
 
           <button onClick={randomClick} disabled={loading}>
