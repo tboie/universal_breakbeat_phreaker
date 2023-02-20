@@ -39,7 +39,7 @@ export default function Home(props: any) {
         container: "#waveform",
         height: 200,
         waveColor: "#39FF14",
-        progressColor: "darkgreen",
+        progressColor: "#39FF14",
         plugins: [
           regions.create({
             regionsMinLength: 0.1,
@@ -56,7 +56,7 @@ export default function Home(props: any) {
           start: 0,
           end: wavesurfer.getDuration(),
           loop: true,
-          color: "rgba(255, 215, 0, 0.15)",
+          color: "rgba(255, 215, 0, 0.2)",
         });
 
         times.forEach((t) => {
