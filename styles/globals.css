@@ -37,16 +37,16 @@ a {
 }
 
 #waveform > wave > wave {
-  border-right: 1px solid skyblue !important;
+  border-right: 1px solid #ff10f0 !important;
 }
 
 .wavesurfer-region {
-  border-left: 1px solid blue !important;
-  border-right: 1px solid blue !important;
+  border-left: 1px solid skyblue !important;
+  border-right: 1px solid skyblue !important;
 }
 
 .wavesurfer-handle {
-  background-color: blue !important;
+  background-color: skyblue !important;
   height: 1.75rem !important;
   width: 2.1rem !important;
 }
