@@ -56,7 +56,7 @@ export default function Home(props: any) {
           start: 0,
           end: wavesurfer.getDuration(),
           loop: true,
-          color: "rgba(255, 215, 0, 0.2)",
+          color: "rgba(255, 255, 255, 0.2)",
         });
 
         times.forEach((t) => {
