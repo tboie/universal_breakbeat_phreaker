@@ -231,7 +231,7 @@ export default function Home(props: any) {
           type="range"
           step={25}
           min={0}
-          max={750}
+          max={800}
           value={zoom}
           className={styles.slider}
           onInput={(e: any) => {
