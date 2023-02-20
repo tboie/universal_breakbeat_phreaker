@@ -17,7 +17,6 @@ let finalAudio: AudioBuffer;
 let wav: any;
 let blob: Blob;
 let blobUrl = "";
-let selectedFolder = "";
 
 export default function Home(props: any) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -99,9 +98,7 @@ export default function Home(props: any) {
     fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        selectedFolder = folder;
         times = text.split("\n");
-
         wavesurfer.load(`/drums/${folder}/audio.wav`);
       });
   };
