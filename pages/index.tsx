@@ -202,9 +202,7 @@ export default function Home(props: any) {
 
         <div id="waveform" className={styles.waveform} />
 
-        <span className={styles.info}>
-          {`${selectedFile} ${selectedFile ? `[speed: ${speed}]` : ""}`}
-        </span>
+        <span className={styles.info}>{`speed: ${speed}`}</span>
 
         <input
           type="range"
