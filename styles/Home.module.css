@@ -70,7 +70,7 @@
 
 /* hacky fix to show all playlist items for now */
 .playlist li:last-child {
-  margin-bottom: 8rem;
+  margin-bottom: 12rem;
 }
 
 .selected {
