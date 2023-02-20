@@ -88,6 +88,7 @@ export default function Home(props: any) {
 
     setSpeed(1);
     setZoom(0);
+    setPlaying(false);
   };
 
   const listClick = (folder: string) => {
