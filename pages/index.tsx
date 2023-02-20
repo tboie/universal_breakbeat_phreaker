@@ -107,9 +107,8 @@ export default function Home(props: any) {
   };
 
   const originalClick = () => {
+    resetWaveSurfer();
     wavesurfer.load(`/drums/${selectedFile}/audio.wav`);
-    wavesurfer.setPlaybackRate(1);
-    setSpeed(1);
   };
 
   const randomClick = async () => {
