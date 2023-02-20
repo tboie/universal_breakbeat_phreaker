@@ -52,7 +52,6 @@ export default function Home(props: any) {
       });
 
       wavesurfer.on("ready", function () {
-        wavesurfer.clearRegions();
         wavesurfer.addRegion({
           start: 0,
           end: wavesurfer.getDuration(),
@@ -79,10 +78,22 @@ export default function Home(props: any) {
     }
   }, []);
 
-  const listClick = (folder: string) => {
-    setSelectedFile(folder);
+  const resetWaveSurfer = () => {
+    wavesurfer.stop();
+    wavesurfer.clearMarkers();
+    wavesurfer.clearRegions();
+    wavesurfer.setPlaybackRate(1);
+    wavesurfer.zoom(0);
+    wavesurfer.empty();
+
     setSpeed(1);
     setZoom(0);
+  };
+
+  const listClick = (folder: string) => {
+    resetWaveSurfer();
+
+    setSelectedFile(folder);
     setLoading(true);
 
     fetch(`/drums/${folder}/times.txt`)
@@ -91,10 +102,7 @@ export default function Home(props: any) {
         selectedFolder = folder;
         times = text.split("\n");
 
-        wavesurfer.clearMarkers();
         wavesurfer.load(`/drums/${folder}/audio.wav`);
-        wavesurfer.setPlaybackRate(1);
-        wavesurfer.zoom(0);
       });
   };
 
@@ -112,6 +120,9 @@ export default function Home(props: any) {
       }
       return a;
     }
+
+    resetWaveSurfer();
+    setLoading(true);
 
     const ctx = new AudioContext();
     times = [];
@@ -161,16 +172,7 @@ export default function Home(props: any) {
             blob = new window.Blob([new DataView(wav)], {
               type: "audio/wav",
             });
-
-            wavesurfer.clearMarkers();
-            wavesurfer.clearRegions();
             wavesurfer.loadBlob(blob);
-            wavesurfer.addRegion({
-              start: 0,
-              end: wavesurfer.getDuration(),
-              loop: true,
-              color: "rgba(255, 215, 0, 0.15)",
-            });
           });
       });
   };
