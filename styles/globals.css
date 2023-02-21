@@ -82,10 +82,10 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-runnable-track {
   width: 300px;
-  height: 4px;
+  height: 1px;
   border: none;
   border-radius: 3px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -95,7 +95,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   border: 2px solid #000;
   background: skyblue;
-  margin-top: -0.75rem;
+  margin-top: -0.87rem;
 }
 
 input[type="range"]:focus {
