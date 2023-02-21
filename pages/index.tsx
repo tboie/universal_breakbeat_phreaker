@@ -100,7 +100,11 @@ export default function Home(props: any) {
     await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        times = text.split("\n").map((t) => parseFloat(t));
+        times = text
+          .split("\n")
+          .filter((t) => t)
+          .map((t) => parseFloat(t));
+
         wavesurfer.load(`/drums/${folder}/audio.wav`);
       });
   };
@@ -130,7 +134,10 @@ export default function Home(props: any) {
     await fetch(`/drums/${selectedFile}/times.txt`)
       .then((response) => response.text())
       .then(async (text) => {
-        times = text.split("\n").map((t) => parseFloat(t));
+        times = text
+          .split("\n")
+          .filter((t) => t)
+          .map((t) => parseFloat(t));
 
         await fetch(`/drums/${selectedFile}/audio.wav`)
           .then((data) => data.arrayBuffer())
@@ -138,33 +145,32 @@ export default function Home(props: any) {
           .then((decodedAudio) => {
             audio = decodedAudio;
 
-            const buffers = times.map((t, idx) => {
-              if (idx < times.length) {
-                return {
-                  buffer: util.slice(
-                    audio,
-                    audio.sampleRate * t,
-                    audio.sampleRate * times[idx + 1]
-                  ),
-                  duration: times[idx + 1] - t,
-                };
-              }
-            });
+            const buffers = times
+              .map((t, idx) => {
+                if (idx < times.length - 1) {
+                  return {
+                    buffer: util.slice(
+                      audio,
+                      audio.sampleRate * t,
+                      audio.sampleRate * times[idx + 1]
+                    ),
+                    duration: times[idx + 1] - t,
+                  };
+                }
+              })
+              .filter((b) => b);
 
             const shuffled = arrShuffle(buffers);
-            shuffled.forEach((b, idx) => {
-              if (b) {
-                finalAudio = util.concat(finalAudio, b.buffer);
-              }
+            shuffled.forEach((b) => {
+              finalAudio = util.concat(finalAudio, b.buffer);
             });
 
             let durTotal = 0;
-            times = shuffled.map((obj: any, idx) => {
-              if (obj && obj.duration) {
-                durTotal += obj.duration;
-              }
+            times = shuffled.map((obj) => {
+              durTotal += obj.duration;
               return durTotal;
             });
+            times.unshift(0);
 
             wav = toWav(finalAudio);
             blob = new window.Blob([new DataView(wav)], {
