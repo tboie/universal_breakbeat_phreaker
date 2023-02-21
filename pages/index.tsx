@@ -91,13 +91,13 @@ export default function Home(props: any) {
     setPlaying(false);
   };
 
-  const listClick = (folder: string) => {
+  const listClick = async (folder: string) => {
     resetWaveSurfer();
 
     setSelectedFile(folder);
     setLoading(true);
 
-    fetch(`/drums/${folder}/times.txt`)
+    await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
         times = text.split("\n").map((t) => parseFloat(t));
@@ -127,15 +127,15 @@ export default function Home(props: any) {
     audio = util.create();
     finalAudio = util.create();
 
-    fetch(`/drums/${selectedFile}/times.txt`)
+    await fetch(`/drums/${selectedFile}/times.txt`)
       .then((response) => response.text())
-      .then((text) => {
+      .then(async (text) => {
         times = text.split("\n").map((t) => parseFloat(t));
 
-        fetch(`/drums/${selectedFile}/audio.wav`)
+        await fetch(`/drums/${selectedFile}/audio.wav`)
           .then((data) => data.arrayBuffer())
           .then((arrayBuffer) => ctx.decodeAudioData(arrayBuffer))
-          .then(async (decodedAudio) => {
+          .then((decodedAudio) => {
             audio = decodedAudio;
 
             const buffers = times.map((t, idx) => {
