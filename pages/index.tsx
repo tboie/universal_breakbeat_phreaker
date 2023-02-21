@@ -197,6 +197,57 @@ export default function Home(props: any) {
     setPlaying(!playing);
   };
 
+  const moveRegion = (pos: "start" | "end", dir: "left" | "right") => {
+    const closest = (array: number[], goal: number) =>
+      array.reduce((prev, curr) =>
+        Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
+      );
+
+    const region = Object.values(wavesurfer.regions.list)[0] as any;
+    const handle = pos === "start" ? region.start : region.end;
+    const result = closest(
+      times.map((t) => parseFloat(t)),
+      handle
+    );
+    let newPos = handle;
+
+    if (dir === "left") {
+      if (handle <= result) {
+        if (handle > times[1]) {
+          newPos = times[times.findIndex((t) => parseFloat(t) === result) - 1];
+        } else {
+          if (pos === "start") {
+            newPos = 0;
+          }
+        }
+      } else {
+        newPos = result;
+      }
+    } else if (dir === "right") {
+      if (handle >= result) {
+        if (handle < times[times.length - 2]) {
+          newPos = times[times.findIndex((t) => parseFloat(t) === result) + 1];
+        } else {
+          if (pos === "end") {
+            newPos = wavesurfer.getDuration();
+          }
+        }
+      } else {
+        newPos = result;
+      }
+    }
+
+    if (
+      (pos === "start" && newPos < region.end) ||
+      (pos === "end" && newPos > region.start)
+    ) {
+      region.update({
+        start: pos === "start" ? newPos : region.start,
+        end: pos === "end" ? newPos : region.end,
+      });
+    }
+  };
+
   return (
     <>
       <Head>
@@ -210,7 +261,27 @@ export default function Home(props: any) {
 
         <div id="waveform" className={styles.waveform} />
 
-        <span className={styles.info}>{`speed: ${speed}`}</span>
+        <div className={styles.controls}>
+          <button
+            onClick={() => moveRegion("start", "left")}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={() => moveRegion("start", "right")}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+          <span className={styles.info}>{speed + "x"}</span>
+          <button onClick={() => moveRegion("end", "left")} disabled={loading}>
+            {"<"}
+          </button>
+          <button onClick={() => moveRegion("end", "right")} disabled={loading}>
+            {">"}
+          </button>
+        </div>
 
         <input
           type="range"

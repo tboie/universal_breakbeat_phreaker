@@ -17,13 +17,18 @@
 }
 
 .info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
 }
 
 .slider {
   width: 95%;
 }
 
-.toolbar {
+.toolbar,
+.controls {
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -32,9 +37,9 @@
   margin: 0 auto;
 }
 
-.toolbar button {
+.toolbar button,
+.controls button {
   height: 2rem;
-  width: 25%;
   text-align: center;
   cursor: pointer;
   border: 1px solid skyblue;
@@ -42,9 +47,12 @@
   color: skyblue;
   background-color: black;
   margin: 0.2rem 0;
+  flex-grow: 1;
+  font-size: 0.9rem;
 }
 
-.toolbar button:disabled {
+.toolbar button:disabled,
+.controls button:disabled {
   color: gray;
 }
 
