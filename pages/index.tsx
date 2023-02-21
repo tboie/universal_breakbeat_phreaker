@@ -11,7 +11,7 @@ import toWav from "audiobuffer-to-wav";
 
 let wavesurfer: any;
 let init = false;
-let times: string[] = [];
+let times: number[] = [];
 let audio: AudioBuffer;
 let finalAudio: AudioBuffer;
 let wav: any;
@@ -100,7 +100,7 @@ export default function Home(props: any) {
     fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        times = text.split("\n");
+        times = text.split("\n").map((t) => parseFloat(t));
         wavesurfer.load(`/drums/${folder}/audio.wav`);
       });
   };
@@ -130,7 +130,7 @@ export default function Home(props: any) {
     fetch(`/drums/${selectedFile}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        times = text.split("\n");
+        times = text.split("\n").map((t) => parseFloat(t));
 
         fetch(`/drums/${selectedFile}/audio.wav`)
           .then((data) => data.arrayBuffer())
@@ -143,10 +143,10 @@ export default function Home(props: any) {
                 return {
                   buffer: util.slice(
                     audio,
-                    audio.sampleRate * parseFloat(t),
-                    audio.sampleRate * parseFloat(times[idx + 1])
+                    audio.sampleRate * t,
+                    audio.sampleRate * times[idx + 1]
                   ),
-                  duration: parseFloat(times[idx + 1]) - parseFloat(t),
+                  duration: times[idx + 1] - t,
                 };
               }
             });
@@ -163,7 +163,7 @@ export default function Home(props: any) {
               if (obj && obj.duration) {
                 durTotal += obj.duration;
               }
-              return durTotal.toString();
+              return durTotal;
             });
 
             wav = toWav(finalAudio);
@@ -205,16 +205,13 @@ export default function Home(props: any) {
 
     const region = Object.values(wavesurfer.regions.list)[0] as any;
     const handle = pos === "start" ? region.start : region.end;
-    const result = closest(
-      times.map((t) => parseFloat(t)),
-      handle
-    );
+    const result = closest(times, handle);
     let newPos = handle;
 
     if (dir === "left") {
       if (handle <= result) {
         if (handle > times[1]) {
-          newPos = times[times.findIndex((t) => parseFloat(t) === result) - 1];
+          newPos = times[times.findIndex((t) => t === result) - 1];
         } else {
           if (pos === "start") {
             newPos = 0;
@@ -226,7 +223,7 @@ export default function Home(props: any) {
     } else if (dir === "right") {
       if (handle >= result) {
         if (handle < times[times.length - 2]) {
-          newPos = times[times.findIndex((t) => parseFloat(t) === result) + 1];
+          newPos = times[times.findIndex((t) => t === result) + 1];
         } else {
           if (pos === "end") {
             newPos = wavesurfer.getDuration();
