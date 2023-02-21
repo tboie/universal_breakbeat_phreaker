@@ -49,6 +49,7 @@
   margin: 0.2rem 0;
   flex-grow: 1;
   font-size: 0.9rem;
+  user-select: none;
 }
 
 .toolbar button:disabled,
