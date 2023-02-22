@@ -52,11 +52,11 @@ export default function Home(props: any) {
       });
 
       wavesurfer.on("ready", function () {
-        times.push(wavesurfer.getDuration());
+        times.push(parseFloat(wavesurfer.getDuration().toFixed(6)));
 
         wavesurfer.addRegion({
           start: 0,
-          end: wavesurfer.getDuration(),
+          end: times[times.length - 1],
           loop: true,
           color: "rgba(255, 255, 255, 0.15)",
         });
