@@ -49,18 +49,21 @@ a {
   background-color: skyblue !important;
   height: 1.75rem !important;
   width: 2.1rem !important;
+  border-top: 1px solid #000 !important;
 }
 
 .wavesurfer-handle-start {
   bottom: 0 !important;
   top: auto !important;
   border-top-right-radius: 0.75rem !important;
+  border-right: 1px solid #000 !important;
 }
 
 .wavesurfer-handle-end {
   bottom: 0 !important;
   top: auto !important;
   border-top-left-radius: 0.75rem !important;
+  border-left: 1px solid #000 !important;
 }
 
 .wavesurfer-marker > div {
