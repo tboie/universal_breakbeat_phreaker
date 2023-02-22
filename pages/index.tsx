@@ -12,11 +12,6 @@ import toWav from "audiobuffer-to-wav";
 let wavesurfer: any;
 let init = false;
 let times: number[] = [];
-let audio: AudioBuffer;
-let finalAudio: AudioBuffer;
-let wav: any;
-let blob: Blob;
-let blobUrl = "";
 
 export default function Home(props: any) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -64,8 +59,6 @@ export default function Home(props: any) {
         times.forEach((t) => {
           wavesurfer.addMarker({ time: t });
         });
-
-        finalAudio = wavesurfer.backend.buffer;
 
         setLoading(false);
       });
@@ -126,9 +119,8 @@ export default function Home(props: any) {
 
     setLoading(true);
 
-    audio = util.create();
-    finalAudio = util.create();
-    audio = wavesurfer.backend.buffer;
+    let finalAudio = util.create();
+    const audio = wavesurfer.backend.buffer;
 
     const buffers = times
       .map((t, idx) => {
@@ -158,22 +150,18 @@ export default function Home(props: any) {
     times.unshift(0);
     times.pop();
 
-    wav = toWav(finalAudio);
-    blob = new window.Blob([new DataView(wav)], {
-      type: "audio/wav",
-    });
-
     resetWaveSurfer();
-    wavesurfer.loadBlob(blob);
+    wavesurfer.loadDecodedBuffer(finalAudio);
   };
 
   const downloadClick = () => {
-    const anchor = document.createElement("a");
-    wav = toWav(finalAudio);
-    blob = new window.Blob([new DataView(wav)], {
+    const wav = toWav(wavesurfer.backend.buffer);
+    const blob = new window.Blob([new DataView(wav)], {
       type: "audio/wav",
     });
-    blobUrl = window.URL.createObjectURL(blob);
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const anchor = document.createElement("a");
     anchor.href = blobUrl;
     anchor.download = "audio.wav";
     anchor.click();
