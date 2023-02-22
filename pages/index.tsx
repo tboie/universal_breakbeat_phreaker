@@ -52,6 +52,8 @@ export default function Home(props: any) {
       });
 
       wavesurfer.on("ready", function () {
+        times.push(wavesurfer.getDuration());
+
         wavesurfer.addRegion({
           start: 0,
           end: wavesurfer.getDuration(),
@@ -110,11 +112,10 @@ export default function Home(props: any) {
   };
 
   const originalClick = () => {
-    resetWaveSurfer();
-    wavesurfer.load(`/drums/${selectedFile}/audio.wav`);
+    listClick(selectedFile);
   };
 
-  const randomClick = async () => {
+  const randomClick = () => {
     function arrShuffle(a: any[]) {
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -123,62 +124,47 @@ export default function Home(props: any) {
       return a;
     }
 
-    resetWaveSurfer();
     setLoading(true);
 
-    const ctx = new AudioContext();
-    times = [];
     audio = util.create();
     finalAudio = util.create();
+    audio = wavesurfer.backend.buffer;
 
-    await fetch(`/drums/${selectedFile}/times.txt`)
-      .then((response) => response.text())
-      .then(async (text) => {
-        times = text
-          .split("\n")
-          .filter((t) => t)
-          .map((t) => parseFloat(t));
+    const buffers = times
+      .map((t, idx) => {
+        if (idx < times.length - 1) {
+          return {
+            buffer: util.slice(
+              audio,
+              audio.sampleRate * t,
+              audio.sampleRate * times[idx + 1]
+            ),
+            duration: times[idx + 1] - t,
+          };
+        }
+      })
+      .filter((b) => b);
 
-        await fetch(`/drums/${selectedFile}/audio.wav`)
-          .then((data) => data.arrayBuffer())
-          .then((arrayBuffer) => ctx.decodeAudioData(arrayBuffer))
-          .then((decodedAudio) => {
-            audio = decodedAudio;
+    const shuffled = arrShuffle(buffers);
+    shuffled.forEach((b) => {
+      finalAudio = util.concat(finalAudio, b.buffer);
+    });
 
-            const buffers = times
-              .map((t, idx) => {
-                if (idx < times.length - 1) {
-                  return {
-                    buffer: util.slice(
-                      audio,
-                      audio.sampleRate * t,
-                      audio.sampleRate * times[idx + 1]
-                    ),
-                    duration: times[idx + 1] - t,
-                  };
-                }
-              })
-              .filter((b) => b);
+    let durTotal = 0;
+    times = shuffled.map((obj) => {
+      durTotal += obj.duration;
+      return durTotal;
+    });
+    times.unshift(0);
+    times.pop();
 
-            const shuffled = arrShuffle(buffers);
-            shuffled.forEach((b) => {
-              finalAudio = util.concat(finalAudio, b.buffer);
-            });
+    wav = toWav(finalAudio);
+    blob = new window.Blob([new DataView(wav)], {
+      type: "audio/wav",
+    });
 
-            let durTotal = 0;
-            times = shuffled.map((obj) => {
-              durTotal += obj.duration;
-              return durTotal;
-            });
-            times.unshift(0);
-
-            wav = toWav(finalAudio);
-            blob = new window.Blob([new DataView(wav)], {
-              type: "audio/wav",
-            });
-            wavesurfer.loadBlob(blob);
-          });
-      });
+    resetWaveSurfer();
+    wavesurfer.loadBlob(blob);
   };
 
   const downloadClick = () => {
