@@ -153,7 +153,7 @@ export default function Home(props: any) {
     let durTotal = 0;
     times = shuffled.map((obj) => {
       durTotal += obj.duration;
-      return durTotal;
+      return parseFloat(durTotal.toFixed(6));
     });
     times.unshift(0);
     times.pop();
