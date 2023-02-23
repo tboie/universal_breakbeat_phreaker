@@ -198,10 +198,12 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
+    const region: any = Object.values(wavesurfer.regions.list)[0];
     if (playing) {
-      wavesurfer.stop();
+      wavesurfer.pause();
+      wavesurfer.seekTo(region.start / wavesurfer.getDuration());
     } else {
-      (Object.values(wavesurfer.regions.list)[0] as any).playLoop();
+      region.playLoop();
     }
     setPlaying(!playing);
   };
