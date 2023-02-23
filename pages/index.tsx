@@ -330,6 +330,8 @@ export default function Home(props: { folders: string[] }) {
           value={zoom}
           className={styles.slider}
           onInput={(e: any) => {
+            e.preventDefault();
+            e.stopPropagation();
             const zoom = e.target.value as number;
             wavesurfer.zoom(zoom);
             setZoom(zoom);
