@@ -160,10 +160,10 @@ export default function Home(props: { folders: string[] }) {
       type: "audio/wav",
     });
     const blobUrl = window.URL.createObjectURL(blob);
-
     const anchor = document.createElement("a");
     anchor.href = blobUrl;
-    anchor.download = "audio.wav";
+
+    anchor.download = selectedFile + "_PHREAKED";
     anchor.click();
     window.URL.revokeObjectURL(blobUrl);
   };
