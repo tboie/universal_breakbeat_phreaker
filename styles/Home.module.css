@@ -59,6 +59,7 @@
 .toolbar button:disabled,
 .controls button:disabled {
   color: gray;
+  border-color: gray;
 }
 
 .playlist {
