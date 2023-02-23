@@ -86,7 +86,13 @@ export default function Home(props: { folders: string[] }) {
     setPlaying(false);
   };
 
-  const listClick = async (folder: string) => {
+  const listClick = async (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent> | undefined,
+    folder: string
+  ) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
     resetWaveSurfer();
 
     setSelectedFile(folder);
@@ -104,11 +110,15 @@ export default function Home(props: { folders: string[] }) {
       });
   };
 
-  const originalClick = () => {
-    listClick(selectedFile);
+  const originalClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    listClick(undefined, selectedFile);
   };
 
-  const randomClick = () => {
+  const randomClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     function arrShuffle(a: any[]) {
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -116,6 +126,9 @@ export default function Home(props: { folders: string[] }) {
       }
       return a;
     }
+
+    e.preventDefault();
+    e.stopPropagation();
 
     setLoading(true);
 
@@ -154,7 +167,12 @@ export default function Home(props: { folders: string[] }) {
     wavesurfer.loadDecodedBuffer(finalAudio);
   };
 
-  const downloadClick = () => {
+  const downloadClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const wav = toWav(wavesurfer.backend.buffer);
     const blob = new window.Blob([new DataView(wav)], {
       type: "audio/wav",
@@ -168,7 +186,12 @@ export default function Home(props: { folders: string[] }) {
     window.URL.revokeObjectURL(blobUrl);
   };
 
-  const playStopClick = () => {
+  const playStopClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (playing) {
       wavesurfer.stop();
     } else {
@@ -177,7 +200,14 @@ export default function Home(props: { folders: string[] }) {
     setPlaying(!playing);
   };
 
-  const moveRegion = (pos: "start" | "end", dir: "left" | "right") => {
+  const moveRegion = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    pos: "start" | "end",
+    dir: "left" | "right"
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const closest = (array: number[], goal: number) =>
       array.reduce((prev, curr) =>
         Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
@@ -240,22 +270,28 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.controls}>
           <button
-            onClick={() => moveRegion("start", "left")}
+            onClick={(e) => moveRegion(e, "start", "left")}
             disabled={loading}
           >
             {"<"}
           </button>
           <button
-            onClick={() => moveRegion("start", "right")}
+            onClick={(e) => moveRegion(e, "start", "right")}
             disabled={loading}
           >
             {">"}
           </button>
           <span className={styles.info}>{speed + "x"}</span>
-          <button onClick={() => moveRegion("end", "left")} disabled={loading}>
+          <button
+            onClick={(e) => moveRegion(e, "end", "left")}
+            disabled={loading}
+          >
             {"<"}
           </button>
-          <button onClick={() => moveRegion("end", "right")} disabled={loading}>
+          <button
+            onClick={(e) => moveRegion(e, "end", "right")}
+            disabled={loading}
+          >
             {">"}
           </button>
         </div>
@@ -292,15 +328,15 @@ export default function Home(props: { folders: string[] }) {
         />
 
         <div className={styles.toolbar}>
-          <button onClick={originalClick} disabled={loading}>
+          <button onClick={(e) => originalClick(e)} disabled={loading}>
             Original
           </button>
 
-          <button disabled={loading} onClick={playStopClick}>
+          <button disabled={loading} onClick={(e) => playStopClick(e)}>
             {playing ? "Stop" : "Play"}
           </button>
 
-          <button onClick={randomClick} disabled={loading}>
+          <button onClick={(e) => randomClick(e)} disabled={loading}>
             <Image
               src={loading ? "dice_disabled.svg" : "dice.svg"}
               alt="dice"
@@ -309,7 +345,11 @@ export default function Home(props: { folders: string[] }) {
             />
           </button>
 
-          <button id="download" onClick={downloadClick} disabled={loading}>
+          <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
             Download
           </button>
         </div>
@@ -320,7 +360,7 @@ export default function Home(props: { folders: string[] }) {
               <li
                 className={folder === selectedFile ? styles.selected : ""}
                 key={folder}
-                onClick={() => listClick(folder)}
+                onClick={(e) => listClick(e, folder)}
               >
                 {folder}
               </li>
