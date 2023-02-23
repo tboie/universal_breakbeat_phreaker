@@ -13,7 +13,7 @@ let wavesurfer: any;
 let init = false;
 let times: number[] = [];
 
-export default function Home(props: any) {
+export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
@@ -315,7 +315,7 @@ export default function Home(props: any) {
         </div>
 
         <ul className={styles.playlist}>
-          {props.folders.map((folder: string) => {
+          {props.folders.map((folder) => {
             return (
               <li
                 className={folder === selectedFile ? styles.selected : ""}
