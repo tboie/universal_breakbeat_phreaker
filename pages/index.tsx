@@ -46,6 +46,15 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
+      window.addEventListener("resize", (event) => {
+        wavesurfer.drawer.fireEvent("redraw");
+      });
+
+      // fixes ignored first click on mobile
+      wavesurfer.on("region-update-end", (e: any) => {
+        document.body.click();
+      });
+
       wavesurfer.on("ready", function () {
         times.push(parseFloat(wavesurfer.getDuration().toFixed(6)));
 
@@ -67,9 +76,6 @@ export default function Home(props: { folders: string[] }) {
     if (!init) {
       init = true;
       initWaveSurfer();
-      window.addEventListener("resize", (event) => {
-        wavesurfer.drawer.fireEvent("redraw");
-      });
     }
   }, []);
 
@@ -205,6 +211,8 @@ export default function Home(props: { folders: string[] }) {
     pos: "start" | "end",
     dir: "left" | "right"
   ) => {
+    console.log("test");
+
     e.preventDefault();
     e.stopPropagation();
 
