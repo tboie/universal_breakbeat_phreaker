@@ -49,6 +49,13 @@
   margin: 0.2rem 0;
   flex-grow: 1;
   font-size: 0.9rem;
+  border-left: none;
+}
+
+.controls button:nth-child(1),
+.controls button:nth-child(4),
+.toolbar button:nth-child(1) {
+  border-left: 1px solid skyblue;
 }
 
 .controls button {
