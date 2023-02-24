@@ -52,7 +52,7 @@ export default function Home(props: { folders: string[] }) {
 
       // fixes ignored first click after region resize on mobile
       wavesurfer.on("region-update-end", (e: any) => {
-        (document.getElementById("waveform") as HTMLDivElement).click();
+        //(document.getElementById("waveform") as HTMLDivElement).click();
       });
 
       wavesurfer.on("ready", function () {
