@@ -50,9 +50,9 @@ export default function Home(props: { folders: string[] }) {
         wavesurfer.drawer.fireEvent("redraw");
       });
 
-      // fixes ignored first click on mobile
+      // fixes ignored first click after region resize on mobile
       wavesurfer.on("region-update-end", (e: any) => {
-        document.body.click();
+        (document.getElementById("waveform") as HTMLDivElement).click();
       });
 
       wavesurfer.on("ready", function () {
