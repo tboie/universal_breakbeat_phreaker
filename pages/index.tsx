@@ -275,7 +275,7 @@ export default function Home(props: { folders: string[] }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <span className={styles.title}>Universal BreakBeat Phreaker</span>
+        <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
         <div id="waveform" className={styles.waveform} />
 
