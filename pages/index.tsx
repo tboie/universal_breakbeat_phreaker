@@ -50,9 +50,10 @@ export default function Home(props: { folders: string[] }) {
         wavesurfer.drawer.fireEvent("redraw");
       });
 
-      // fixes ignored first click after region resize on mobile
+      // fixes ignored first click after region resize on touch devices
+      // detect pointer vs touch event?
       wavesurfer.on("region-update-end", (e: any) => {
-        //(document.getElementById("waveform") as HTMLDivElement).click();
+        //document.body.click();
       });
 
       wavesurfer.on("ready", function () {
