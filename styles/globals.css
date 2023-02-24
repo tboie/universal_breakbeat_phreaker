@@ -14,12 +14,7 @@ body {
   margin: 0;
   overflow-x: hidden;
   overflow-y: hidden;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+  background-color: #121212;
 }
 
 #waveform > wave > wave {
