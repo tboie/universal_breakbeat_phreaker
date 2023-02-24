@@ -51,6 +51,8 @@ export default function Home(props: { folders: string[] }) {
       });
 
       // fixes ignored first click after region resize on touch devices
+      // but restarts loop on desktop
+      // ...
       // detect pointer vs touch event?
       wavesurfer.on("region-update-end", (e: any) => {
         //document.body.click();
