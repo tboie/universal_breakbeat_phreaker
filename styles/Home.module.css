@@ -39,7 +39,7 @@
 
 .toolbar button,
 .controls button {
-  height: 2rem;
+  height: 2.25rem;
   text-align: center;
   cursor: pointer;
   border: 1px solid skyblue;
