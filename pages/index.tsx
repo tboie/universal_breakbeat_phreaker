@@ -313,8 +313,8 @@ export default function Home(props: { folders: string[] }) {
           value={speed}
           step="0.05"
           className={styles.slider}
-          onInput={(e: any) => {
-            const speed = e.target.value as number;
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const speed = parseFloat(e.target.value);
             wavesurfer.setPlaybackRate(speed);
             setSpeed(speed);
           }}
@@ -329,10 +329,8 @@ export default function Home(props: { folders: string[] }) {
           max={800}
           value={zoom}
           className={styles.slider}
-          onInput={(e: any) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const zoom = e.target.value as number;
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const zoom = parseInt(e.target.value);
             wavesurfer.zoom(zoom);
             setZoom(zoom);
           }}
