@@ -213,8 +213,6 @@ export default function Home(props: { folders: string[] }) {
     pos: "start" | "end",
     dir: "left" | "right"
   ) => {
-    console.log("test");
-
     e.preventDefault();
     e.stopPropagation();
 
