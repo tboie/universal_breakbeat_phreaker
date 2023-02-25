@@ -251,7 +251,7 @@ export default function Home(props: { folders: string[] }) {
           newPos = times[times.findIndex((t) => t === result) + 1];
         } else {
           if (pos === "end") {
-            newPos = wavesurfer.getDuration();
+            newPos = times[times.length - 1];
           }
         }
       } else {
