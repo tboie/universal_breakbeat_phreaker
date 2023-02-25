@@ -329,6 +329,11 @@ export default function Home(props: { folders: string[] }) {
             const speed = parseFloat(e.target.value);
             wavesurfer.setPlaybackRate(speed);
             setSpeed(speed);
+
+            const region = Object.values(wavesurfer.regions.list)[0] as any;
+            if (wavesurfer.getCurrentTime() > region.end) {
+              region.playLoop();
+            }
           }}
           disabled={loading}
         />
