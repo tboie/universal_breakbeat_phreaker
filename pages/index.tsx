@@ -267,6 +267,10 @@ export default function Home(props: { folders: string[] }) {
         start: pos === "start" ? newPos : region.start,
         end: pos === "end" ? newPos : region.end,
       });
+
+      if (wavesurfer.getCurrentTime() > region.end) {
+        region.playLoop();
+      }
     }
   };
 
