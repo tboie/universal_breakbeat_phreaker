@@ -72,6 +72,13 @@ export default function Home(props: { folders: string[] }) {
           color: "rgba(255, 255, 255, 0.15)",
         });
 
+        const region: any = Object.values(wavesurfer.regions.list)[0];
+        region.on("out", (e: any) => {
+          if (wavesurfer.getCurrentTime() > region.end) {
+            region.playLoop();
+          }
+        });
+
         times.forEach((t) => {
           wavesurfer.addMarker({ time: t });
         });
@@ -267,10 +274,6 @@ export default function Home(props: { folders: string[] }) {
         start: pos === "start" ? newPos : region.start,
         end: pos === "end" ? newPos : region.end,
       });
-
-      if (wavesurfer.getCurrentTime() > region.end) {
-        region.playLoop();
-      }
     }
   };
 
@@ -329,11 +332,6 @@ export default function Home(props: { folders: string[] }) {
             const speed = parseFloat(e.target.value);
             wavesurfer.setPlaybackRate(speed);
             setSpeed(speed);
-
-            const region = Object.values(wavesurfer.regions.list)[0] as any;
-            if (wavesurfer.getCurrentTime() > region.end) {
-              region.playLoop();
-            }
           }}
           disabled={loading}
         />
