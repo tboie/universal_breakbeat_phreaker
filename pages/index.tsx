@@ -12,6 +12,7 @@ import toWav from "audiobuffer-to-wav";
 let wavesurfer: any;
 let init = false;
 let times: number[] = [];
+let touchMoved = false;
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -51,11 +52,14 @@ export default function Home(props: { folders: string[] }) {
       });
 
       // fixes ignored first click after region resize on touch devices
-      // but restarts loop on desktop
-      // ...
-      // detect pointer vs touch event?
+      document.body.addEventListener("touchmove", (event) => {
+        touchMoved = true;
+      });
       wavesurfer.on("region-update-end", (e: any) => {
-        //document.body.click();
+        if (touchMoved) {
+          document.body.click();
+          touchMoved = false;
+        }
       });
 
       wavesurfer.on("ready", function () {
