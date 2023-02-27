@@ -77,6 +77,13 @@ export default function Home(props: { folders: string[] }) {
         }
       });
 
+      wavesurfer.on("region-updated", (e: any) => {
+        const region: any = Object.values(wavesurfer.regions.list)[0];
+        console.log("region updated");
+        part.loopStart = region.start;
+        part.loopEnd = region.end;
+      });
+
       wavesurfer.on("ready", function () {
         times.push(parseFloat(wavesurfer.getDuration().toFixed(6)));
 
