@@ -9,10 +9,23 @@ import util from "audio-buffer-utils";
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
 
+import * as Tone from "tone";
+
 let wavesurfer: any;
 let init = false;
 let times: number[] = [];
 let touchMoved = false;
+
+let origBuffer: any;
+let players: any = [];
+let part: any;
+
+type TSequence = {
+  idx: number;
+  time: number;
+  duration: number;
+};
+let sequence: TSequence[] = [];
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -46,6 +59,8 @@ export default function Home(props: { folders: string[] }) {
           }),
         ],
       });
+
+      wavesurfer.setVolume(0);
 
       window.addEventListener("resize", (event) => {
         wavesurfer.drawer.fireEvent("redraw");
@@ -113,6 +128,7 @@ export default function Home(props: { folders: string[] }) {
     e?.preventDefault();
     e?.stopPropagation();
 
+    Tone.Transport.stop();
     resetWaveSurfer();
 
     setSelectedFile(folder);
@@ -126,7 +142,39 @@ export default function Home(props: { folders: string[] }) {
           .filter((t) => t)
           .map((t) => parseFloat(t));
 
-        wavesurfer.load(`/drums/${folder}/audio.wav`);
+        players.forEach((p: any) => p.dispose());
+        players = [];
+        sequence = [];
+
+        origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
+          const buff = origBuffer.get();
+          wavesurfer.loadDecodedBuffer(buff);
+
+          times.forEach((t, idx) => {
+            if (idx < times.length - 1) {
+              const b = util.slice(
+                buff,
+                buff.sampleRate * t,
+                buff.sampleRate * times[idx + 1]
+              );
+              players.push(new Tone.Player(b).toDestination());
+              sequence.push({
+                idx: idx,
+                time: t,
+                duration: times[idx + 1] - t,
+              });
+            }
+          });
+
+          part = part?.dispose();
+          part = new Tone.Part((time, value) => {
+            players[value.idx].start(time);
+          }, sequence).start(0);
+
+          part.loopStart = 0;
+          part.loopEnd = times[times.length - 1];
+          part.loop = true;
+        });
       });
   };
 
@@ -150,38 +198,33 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
+    Tone.Transport.stop();
+    part.clear();
     setLoading(true);
 
     let finalAudio = util.create();
-    const audio = wavesurfer.backend.buffer;
-
-    const buffers = times
-      .map((t, idx) => {
-        if (idx < times.length - 1) {
-          return {
-            buffer: util.slice(
-              audio,
-              audio.sampleRate * t,
-              audio.sampleRate * times[idx + 1]
-            ),
-            duration: times[idx + 1] - t,
-          };
-        }
-      })
-      .filter((b) => b);
-
-    const shuffled = arrShuffle(buffers);
-    shuffled.forEach((b) => {
-      finalAudio = util.concat(finalAudio, b.buffer);
-    });
-
     let durTotal = 0;
-    times = shuffled.map((obj) => {
-      durTotal += obj.duration;
-      return parseFloat(durTotal.toFixed(6));
+
+    const shuffled = arrShuffle([...sequence]);
+    sequence = shuffled.map((obj, idx) => {
+      if (idx) {
+        durTotal += shuffled[idx - 1].duration;
+      }
+
+      const ret = {
+        idx: obj.idx,
+        time: parseFloat(durTotal.toFixed(6)),
+        duration: obj.duration,
+      };
+
+      part.add(ret.time, { idx: ret.idx, duration: ret.duration });
+      finalAudio = util.concat(finalAudio, players[obj.idx].buffer);
+
+      return ret;
     });
-    times.unshift(0);
-    times.pop();
+
+    times = sequence.map((obj) => obj.time);
+    times.sort((a, b) => a - b);
 
     resetWaveSurfer();
     wavesurfer.loadDecodedBuffer(finalAudio);
@@ -206,19 +249,23 @@ export default function Home(props: { folders: string[] }) {
     window.URL.revokeObjectURL(blobUrl);
   };
 
-  const playStopClick = (
+  const playStopClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     e.stopPropagation();
 
+    await Tone.start();
     const region: any = Object.values(wavesurfer.regions.list)[0];
     if (playing) {
+      Tone.Transport.stop();
       wavesurfer.pause();
       wavesurfer.seekTo(region.start / wavesurfer.getDuration());
     } else {
+      Tone.Transport.start();
       region.playLoop();
     }
+
     setPlaying(!playing);
   };
 
