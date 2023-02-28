@@ -78,8 +78,7 @@ export default function Home(props: { folders: string[] }) {
 
       wavesurfer.on("region-updated", (e: any) => {
         const region: any = Object.values(wavesurfer.regions.list)[0];
-        part.loopStart = region.start;
-        part.loopEnd = region.end;
+        Tone.Transport.setLoopPoints(region.start, region.end);
       });
 
       wavesurfer.on("ready", function () {
@@ -177,10 +176,9 @@ export default function Home(props: { folders: string[] }) {
             players[value.idx].start(time);
           }, seq).start(0);
 
-          part.loopStart = 0;
-          part.loopEnd =
-            seq[seq.length - 1].time + seq[seq.length - 1].duration;
-          part.loop = true;
+          const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+          Tone.Transport.setLoopPoints(0, end);
+          Tone.Transport.loop = true;
 
           wavesurfer.loadDecodedBuffer(buff);
         });
