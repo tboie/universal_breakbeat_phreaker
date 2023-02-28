@@ -26,6 +26,11 @@ type TSeq = {
 };
 let seq: TSeq[] = [];
 
+const closest = (array: number[], goal: number) =>
+  array.reduce((prev, curr) =>
+    Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
+  );
+
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
@@ -63,15 +68,29 @@ export default function Home(props: { folders: string[] }) {
         wavesurfer.drawer.fireEvent("redraw");
       });
 
-      // fixes ignored first click after region resize on touch devices
       document.body.addEventListener("touchmove", (event) => {
         touchMoved = true;
       });
+
       wavesurfer.on("region-update-end", (e: any) => {
+        // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
           touchMoved = false;
         }
+
+        const region = Object.values(wavesurfer.regions.list)[0] as any;
+        const times = seq.map((s) => s.time);
+        times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
+
+        const snapStart = closest(times, region.start);
+        const snapEnd = closest(times, region.end);
+
+        Tone.Transport.setLoopPoints(snapStart, snapEnd);
+        region.update({
+          start: snapStart,
+          end: snapEnd,
+        });
       });
 
       wavesurfer.on("ready", function () {
@@ -282,11 +301,6 @@ export default function Home(props: { folders: string[] }) {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const closest = (array: number[], goal: number) =>
-      array.reduce((prev, curr) =>
-        Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
-      );
 
     const times = seq.map((s) => s.time);
     times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
