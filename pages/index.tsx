@@ -171,7 +171,7 @@ export default function Home(props: { folders: string[] }) {
             });
           });
 
-          part = part?.dispose();
+          part?.dispose();
           part = new Tone.Part((time, value) => {
             players[value.idx].start(time);
           }, seq).start(0);
