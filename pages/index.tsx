@@ -13,7 +13,6 @@ import * as Tone from "tone";
 
 let wavesurfer: any;
 let init = false;
-let times: number[] = [];
 let touchMoved = false;
 
 let origBuffer: any;
@@ -79,17 +78,14 @@ export default function Home(props: { folders: string[] }) {
 
       wavesurfer.on("region-updated", (e: any) => {
         const region: any = Object.values(wavesurfer.regions.list)[0];
-        console.log("region updated");
         part.loopStart = region.start;
         part.loopEnd = region.end;
       });
 
       wavesurfer.on("ready", function () {
-        times.push(parseFloat(wavesurfer.getDuration().toFixed(6)));
-
         wavesurfer.addRegion({
           start: 0,
-          end: times[times.length - 1],
+          end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
           loop: true,
           color: "rgba(255, 255, 255, 0.15)",
         });
@@ -101,8 +97,8 @@ export default function Home(props: { folders: string[] }) {
           }
         });
 
-        times.forEach((t) => {
-          wavesurfer.addMarker({ time: t });
+        seq.forEach((s) => {
+          wavesurfer.addMarker({ time: s.time });
         });
 
         setLoading(false);
@@ -144,7 +140,7 @@ export default function Home(props: { folders: string[] }) {
     await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        times = text
+        const times = text
           .split("\n")
           .filter((t) => t)
           .map((t) => parseFloat(t));
@@ -155,22 +151,25 @@ export default function Home(props: { folders: string[] }) {
 
         origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
           const buff = origBuffer.get();
-          wavesurfer.loadDecodedBuffer(buff);
 
           times.forEach((t, idx) => {
-            if (idx < times.length - 1) {
-              const b = util.slice(
-                buff,
-                buff.sampleRate * t,
-                buff.sampleRate * times[idx + 1]
-              );
-              players.push(new Tone.Player(b).toDestination());
-              seq.push({
-                idx: idx,
-                time: t,
-                duration: times[idx + 1] - t,
-              });
-            }
+            const dur =
+              idx === times.length - 1
+                ? parseFloat((buff.duration - t).toFixed(6))
+                : parseFloat((times[idx + 1] - t).toFixed(6));
+
+            const b = util.slice(
+              buff,
+              buff.sampleRate * t,
+              buff.sampleRate * (t + dur)
+            );
+            players.push(new Tone.Player(b).toDestination());
+
+            seq.push({
+              idx: idx,
+              time: t,
+              duration: dur,
+            });
           });
 
           part = part?.dispose();
@@ -179,8 +178,11 @@ export default function Home(props: { folders: string[] }) {
           }, seq).start(0);
 
           part.loopStart = 0;
-          part.loopEnd = times[times.length - 1];
+          part.loopEnd =
+            seq[seq.length - 1].time + seq[seq.length - 1].duration;
           part.loop = true;
+
+          wavesurfer.loadDecodedBuffer(buff);
         });
       });
   };
@@ -229,9 +231,6 @@ export default function Home(props: { folders: string[] }) {
 
       return ret;
     });
-
-    times = seq.map((obj) => obj.time);
-    times.sort((a, b) => a - b);
 
     resetWaveSurfer();
     wavesurfer.loadDecodedBuffer(finalAudio);
@@ -288,6 +287,9 @@ export default function Home(props: { folders: string[] }) {
       array.reduce((prev, curr) =>
         Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
       );
+
+    const times = seq.map((s) => s.time);
+    times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
 
     const region = Object.values(wavesurfer.regions.list)[0] as any;
     const handle = pos === "start" ? region.start : region.end;
