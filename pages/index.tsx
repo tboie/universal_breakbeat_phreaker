@@ -76,10 +76,7 @@ export default function Home(props: { folders: string[] }) {
         }
       });
 
-      wavesurfer.on("region-updated", (e: any) => {
-        const region: any = Object.values(wavesurfer.regions.list)[0];
-        Tone.Transport.setLoopPoints(region.start, region.end);
-      });
+      wavesurfer.on("region-updated", (e: any) => {});
 
       wavesurfer.on("ready", function () {
         wavesurfer.addRegion({
@@ -92,7 +89,7 @@ export default function Home(props: { folders: string[] }) {
         const region: any = Object.values(wavesurfer.regions.list)[0];
         region.on("out", (e: any) => {
           if (wavesurfer.getCurrentTime() > region.end) {
-            region.playLoop();
+            wavesurfer.play(region.start, region.end);
           }
         });
 
@@ -171,14 +168,24 @@ export default function Home(props: { folders: string[] }) {
             });
           });
 
-          part?.dispose();
-          part = new Tone.Part((time, value) => {
-            players[value.idx].start(time);
-          }, seq).start(0);
-
           const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
           Tone.Transport.setLoopPoints(0, end);
           Tone.Transport.loop = true;
+
+          part?.dispose();
+          part = new Tone.Part((time, value) => {
+            players[value.idx].start(time);
+
+            Tone.Draw.schedule(() => {
+              const firstPiece = seq.find(
+                (s) => s.time === Tone.Transport.loopStart
+              );
+              if (value.idx === firstPiece?.idx) {
+                const region: any = Object.values(wavesurfer.regions.list)[0];
+                wavesurfer.play(region.start, region.end);
+              }
+            }, time);
+          }, seq).start(0);
 
           wavesurfer.loadDecodedBuffer(buff);
         });
@@ -267,7 +274,6 @@ export default function Home(props: { folders: string[] }) {
       wavesurfer.seekTo(region.start / wavesurfer.getDuration());
     } else {
       Tone.Transport.start();
-      region.playLoop();
     }
 
     setPlaying(!playing);
@@ -324,9 +330,13 @@ export default function Home(props: { folders: string[] }) {
       (pos === "start" && newPos < region.end) ||
       (pos === "end" && newPos > region.start)
     ) {
+      const start = pos === "start" ? newPos : region.start;
+      const end = pos === "end" ? newPos : region.end;
+
+      Tone.Transport.setLoopPoints(start, end);
       region.update({
-        start: pos === "start" ? newPos : region.start,
-        end: pos === "end" ? newPos : region.end,
+        start: start,
+        end: end,
       });
     }
   };
