@@ -20,12 +20,12 @@ let origBuffer: any;
 let players: any = [];
 let part: any;
 
-type TSequence = {
+type TSeq = {
   idx: number;
   time: number;
   duration: number;
 };
-let sequence: TSequence[] = [];
+let seq: TSeq[] = [];
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -151,7 +151,7 @@ export default function Home(props: { folders: string[] }) {
 
         players.forEach((p: any) => p.dispose());
         players = [];
-        sequence = [];
+        seq = [];
 
         origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
           const buff = origBuffer.get();
@@ -165,7 +165,7 @@ export default function Home(props: { folders: string[] }) {
                 buff.sampleRate * times[idx + 1]
               );
               players.push(new Tone.Player(b).toDestination());
-              sequence.push({
+              seq.push({
                 idx: idx,
                 time: t,
                 duration: times[idx + 1] - t,
@@ -176,7 +176,7 @@ export default function Home(props: { folders: string[] }) {
           part = part?.dispose();
           part = new Tone.Part((time, value) => {
             players[value.idx].start(time);
-          }, sequence).start(0);
+          }, seq).start(0);
 
           part.loopStart = 0;
           part.loopEnd = times[times.length - 1];
@@ -212,8 +212,8 @@ export default function Home(props: { folders: string[] }) {
     let finalAudio = util.create();
     let durTotal = 0;
 
-    const shuffled = arrShuffle([...sequence]);
-    sequence = shuffled.map((obj, idx) => {
+    const shuffled = arrShuffle([...seq]);
+    seq = shuffled.map((obj, idx) => {
       if (idx) {
         durTotal += shuffled[idx - 1].duration;
       }
@@ -230,7 +230,7 @@ export default function Home(props: { folders: string[] }) {
       return ret;
     });
 
-    times = sequence.map((obj) => obj.time);
+    times = seq.map((obj) => obj.time);
     times.sort((a, b) => a - b);
 
     resetWaveSurfer();
