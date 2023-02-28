@@ -59,8 +59,6 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
-      wavesurfer.setVolume(0);
-
       window.addEventListener("resize", (event) => {
         wavesurfer.drawer.fireEvent("redraw");
       });
@@ -76,9 +74,8 @@ export default function Home(props: { folders: string[] }) {
         }
       });
 
-      wavesurfer.on("region-updated", (e: any) => {});
-
       wavesurfer.on("ready", function () {
+        wavesurfer.setVolume(0);
         wavesurfer.addRegion({
           start: 0,
           end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
@@ -177,11 +174,10 @@ export default function Home(props: { folders: string[] }) {
             players[value.idx].start(time);
 
             Tone.Draw.schedule(() => {
-              const firstPiece = seq.find(
-                (s) => s.time === Tone.Transport.loopStart
-              );
+              const region: any = Object.values(wavesurfer.regions.list)[0];
+
+              const firstPiece = seq.find((s) => s.time === region.start);
               if (value.idx === firstPiece?.idx) {
-                const region: any = Object.values(wavesurfer.regions.list)[0];
                 wavesurfer.play(region.start, region.end);
               }
             }, time);
@@ -273,7 +269,7 @@ export default function Home(props: { folders: string[] }) {
       wavesurfer.pause();
       wavesurfer.seekTo(region.start / wavesurfer.getDuration());
     } else {
-      Tone.Transport.start();
+      Tone.Transport.start(undefined, region.start);
     }
 
     setPlaying(!playing);
