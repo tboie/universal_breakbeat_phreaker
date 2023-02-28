@@ -86,7 +86,7 @@ export default function Home(props: { folders: string[] }) {
         const region: any = Object.values(wavesurfer.regions.list)[0];
         region.on("out", (e: any) => {
           if (wavesurfer.getCurrentTime() > region.end) {
-            wavesurfer.play(region.start, region.end);
+            wavesurfer.play(region.start);
           }
         });
 
@@ -171,14 +171,14 @@ export default function Home(props: { folders: string[] }) {
 
           part?.dispose();
           part = new Tone.Part((time, value) => {
-            players[value.idx].start(time);
+            players[value.idx]?.start(time);
 
             Tone.Draw.schedule(() => {
               const region: any = Object.values(wavesurfer.regions.list)[0];
 
-              const firstPiece = seq.find((s) => s.time === region.start);
+              const firstPiece = seq.find((s) => s.time === region?.start);
               if (value.idx === firstPiece?.idx) {
-                wavesurfer.play(region.start, region.end);
+                wavesurfer.play(region.start);
               }
             }, time);
           }, seq).start(0);
