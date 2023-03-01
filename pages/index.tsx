@@ -397,10 +397,10 @@ export default function Home(props: { folders: string[] }) {
 
         <input
           type="range"
-          min="0"
+          min="0.05"
           max="2"
           value={speed}
-          step="0.5"
+          step="0.05"
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseFloat(e.target.value);
