@@ -86,7 +86,7 @@ export default function Home(props: { folders: string[] }) {
         const snapStart = closest(times, region.start);
         const snapEnd = closest(times, region.end);
 
-        Tone.Transport.setLoopPoints(snapStart, snapEnd);
+        Tone.Transport.setLoopPoints(snapStart / speed, snapEnd / speed);
         region.update({
           start: snapStart,
           end: snapEnd,
@@ -288,7 +288,7 @@ export default function Home(props: { folders: string[] }) {
       wavesurfer.pause();
       wavesurfer.seekTo(region.start / wavesurfer.getDuration());
     } else {
-      Tone.Transport.start(undefined, region.start);
+      Tone.Transport.start(undefined, region.start / speed);
     }
 
     setPlaying(!playing);
@@ -343,7 +343,7 @@ export default function Home(props: { folders: string[] }) {
       const start = pos === "start" ? newPos : region.start;
       const end = pos === "end" ? newPos : region.end;
 
-      Tone.Transport.setLoopPoints(start, end);
+      Tone.Transport.setLoopPoints(start / speed, end / speed);
       region.update({
         start: start,
         end: end,
@@ -397,15 +397,20 @@ export default function Home(props: { folders: string[] }) {
 
         <input
           type="range"
-          min="0.05"
+          min="0"
           max="2"
           value={speed}
-          step="0.05"
+          step="0.5"
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const speed = parseFloat(e.target.value);
-            wavesurfer.setPlaybackRate(speed);
-            setSpeed(speed);
+            const val = parseFloat(e.target.value);
+            const region: any = Object.values(wavesurfer.regions.list)[0];
+
+            Tone.Transport.setLoopPoints(region.start / val, region.end / val);
+            part.playbackRate = val;
+            players.forEach((p: any) => (p.playbackRate = val));
+            wavesurfer.setPlaybackRate(val);
+            setSpeed(val);
           }}
           disabled={loading}
         />
