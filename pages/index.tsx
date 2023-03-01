@@ -355,10 +355,12 @@ export default function Home(props: { folders: string[] }) {
   };
 
   const changeSpeed = (val: number) => {
-    const region: any = Object.values(wavesurfer.regions.list)[0];
-    Tone.Transport.setLoopPoints(region.start / val, region.end / val);
     part.playbackRate = val;
     players.forEach((p: any) => (p.playbackRate = val));
+
+    const region: any = Object.values(wavesurfer.regions.list)[0];
+    Tone.Transport.setLoopPoints(region.start / val, region.end / val);
+
     wavesurfer.setPlaybackRate(val);
     setSpeed(val);
   };
