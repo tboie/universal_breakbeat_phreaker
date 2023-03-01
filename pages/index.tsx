@@ -117,6 +117,11 @@ export default function Home(props: { folders: string[] }) {
               wavesurfer.play(region.start);
             }
           });
+        } else {
+          wavesurfer.seekTo(
+            Tone.Time(Tone.Transport.position).toSeconds() /
+              wavesurfer.getDuration()
+          );
         }
 
         wavesurfer.clearMarkers();
@@ -235,8 +240,6 @@ export default function Home(props: { folders: string[] }) {
 
     e.preventDefault();
     e.stopPropagation();
-
-    setLoading(true);
 
     let finalAudio = util.create();
     let durTotal = 0;
