@@ -11,8 +11,10 @@ import toWav from "audiobuffer-to-wav";
 
 import * as Tone from "tone";
 
-let wavesurfer: any;
 let init = false;
+
+let wavesurfer: any;
+let region: any;
 let touchMoved = false;
 
 let origBuffer: any;
@@ -24,6 +26,7 @@ type TSeq = {
   time: number;
   duration: number;
 };
+
 let seq: TSeq[] = [];
 
 const closest = (array: number[], goal: number) =>
@@ -98,19 +101,23 @@ export default function Home(props: { folders: string[] }) {
 
       wavesurfer.on("ready", function () {
         wavesurfer.setVolume(0);
-        wavesurfer.addRegion({
-          start: 0,
-          end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
-          loop: true,
-          color: "rgba(255, 255, 255, 0.15)",
-        });
 
-        const region: any = Object.values(wavesurfer.regions.list)[0];
-        region.on("out", (e: any) => {
-          if (wavesurfer.getCurrentTime() > region.end) {
-            wavesurfer.play(region.start);
-          }
-        });
+        if (!region) {
+          wavesurfer.clearRegions();
+          wavesurfer.addRegion({
+            start: 0,
+            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
+            loop: true,
+            color: "rgba(255, 255, 255, 0.15)",
+          });
+
+          region = Object.values(wavesurfer.regions.list)[0];
+          region.on("out", (e: any) => {
+            if (wavesurfer.getCurrentTime() > region.end) {
+              wavesurfer.play(region.start);
+            }
+          });
+        }
 
         seq.forEach((s) => {
           wavesurfer.addMarker({ time: s.time });
@@ -129,7 +136,6 @@ export default function Home(props: { folders: string[] }) {
   const resetWaveSurfer = () => {
     wavesurfer.stop();
     wavesurfer.clearMarkers();
-    wavesurfer.clearRegions();
     wavesurfer.setPlaybackRate(1);
     wavesurfer.zoom(0);
     wavesurfer.empty();
@@ -196,15 +202,14 @@ export default function Home(props: { folders: string[] }) {
             players[value.idx]?.start(time);
 
             Tone.Draw.schedule(() => {
-              const region: any = Object.values(wavesurfer.regions.list)[0];
-
-              const firstPiece = seq.find((s) => s.time === region?.start);
+              const firstPiece = seq.find((s) => s.time === region.start);
               if (value.idx === firstPiece?.idx) {
                 wavesurfer.play(region.start);
               }
             }, time);
           }, seq).start(0);
 
+          region = undefined;
           wavesurfer.loadDecodedBuffer(buff);
         });
       });
@@ -236,7 +241,6 @@ export default function Home(props: { folders: string[] }) {
     let finalAudio = util.create();
     let durTotal = 0;
 
-    const region: any = Object.values(wavesurfer.regions.list)[0];
     const startIdx = seq.findIndex((s) => s.time === region.start);
     let endIdx = seq.findIndex((s) => s.time === region.end);
     if (endIdx === -1) {
@@ -294,7 +298,6 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
 
     await Tone.start();
-    const region: any = Object.values(wavesurfer.regions.list)[0];
     if (playing) {
       Tone.Transport.stop();
       wavesurfer.pause();
@@ -317,7 +320,6 @@ export default function Home(props: { folders: string[] }) {
     const times = seq.map((s) => s.time);
     times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
 
-    const region = Object.values(wavesurfer.regions.list)[0] as any;
     const handle = pos === "start" ? region.start : region.end;
     const result = closest(times, handle);
     let newPos = handle;
@@ -367,7 +369,6 @@ export default function Home(props: { folders: string[] }) {
     part.playbackRate = val;
     players.forEach((p: any) => (p.playbackRate = val));
 
-    const region: any = Object.values(wavesurfer.regions.list)[0];
     Tone.Transport.setLoopPoints(region.start / val, region.end / val);
 
     wavesurfer.setPlaybackRate(val);
