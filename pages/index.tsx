@@ -119,6 +119,7 @@ export default function Home(props: { folders: string[] }) {
           });
         }
 
+        wavesurfer.clearMarkers();
         seq.forEach((s) => {
           wavesurfer.addMarker({ time: s.time });
         });
@@ -154,6 +155,7 @@ export default function Home(props: { folders: string[] }) {
 
     Tone.Transport.stop();
     resetWaveSurfer();
+    region = undefined;
 
     setSelectedFile(folder);
     setLoading(true);
@@ -209,7 +211,6 @@ export default function Home(props: { folders: string[] }) {
             }, time);
           }, seq).start(0);
 
-          region = undefined;
           wavesurfer.loadDecodedBuffer(buff);
         });
       });
@@ -235,7 +236,6 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    Tone.Transport.stop();
     setLoading(true);
 
     let finalAudio = util.create();
@@ -268,7 +268,6 @@ export default function Home(props: { folders: string[] }) {
       return ret;
     });
 
-    resetWaveSurfer();
     wavesurfer.loadDecodedBuffer(finalAudio);
   };
 
