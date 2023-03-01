@@ -231,16 +231,25 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
 
     Tone.Transport.stop();
-    part.clear();
     setLoading(true);
 
     let finalAudio = util.create();
     let durTotal = 0;
 
-    const shuffled = arrShuffle([...seq]);
-    seq = shuffled.map((obj, idx) => {
+    const region: any = Object.values(wavesurfer.regions.list)[0];
+    const startIdx = seq.findIndex((s) => s.time === region.start);
+    let endIdx = seq.findIndex((s) => s.time === region.end);
+    if (endIdx === -1) {
+      endIdx = seq.length;
+    }
+
+    const shuffled = arrShuffle(seq.slice(startIdx, endIdx));
+    seq.splice(startIdx, shuffled.length, ...shuffled);
+
+    part.clear();
+    seq = seq.map((obj, idx) => {
       if (idx) {
-        durTotal += shuffled[idx - 1].duration;
+        durTotal += seq[idx - 1].duration;
       }
 
       const ret = {
