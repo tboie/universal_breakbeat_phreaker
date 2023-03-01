@@ -72,19 +72,22 @@ export default function Home(props: { folders: string[] }) {
         touchMoved = true;
       });
 
-      wavesurfer.on("region-update-end", (e: any) => {
+      wavesurfer.on("region-update-end", (region: any) => {
         // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
           touchMoved = false;
         }
 
-        const region = Object.values(wavesurfer.regions.list)[0] as any;
         const times = seq.map((s) => s.time);
         times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
 
         const snapStart = closest(times, region.start);
         const snapEnd = closest(times, region.end);
+        const speed =
+          parseFloat(
+            (document.getElementById("speed") as HTMLInputElement).value
+          ) || 1;
 
         Tone.Transport.setLoopPoints(snapStart / speed, snapEnd / speed);
         region.update({
@@ -351,6 +354,20 @@ export default function Home(props: { folders: string[] }) {
     }
   };
 
+  const changeSpeed = (val: number) => {
+    const region: any = Object.values(wavesurfer.regions.list)[0];
+    Tone.Transport.setLoopPoints(region.start / val, region.end / val);
+    part.playbackRate = val;
+    players.forEach((p: any) => (p.playbackRate = val));
+    wavesurfer.setPlaybackRate(val);
+    setSpeed(val);
+  };
+
+  const changeZoom = (val: number) => {
+    wavesurfer.zoom(val);
+    setZoom(val);
+  };
+
   return (
     <>
       <Head>
@@ -396,6 +413,7 @@ export default function Home(props: { folders: string[] }) {
         </div>
 
         <input
+          id="speed"
           type="range"
           min="0.05"
           max="2"
@@ -403,14 +421,7 @@ export default function Home(props: { folders: string[] }) {
           step="0.05"
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const val = parseFloat(e.target.value);
-            const region: any = Object.values(wavesurfer.regions.list)[0];
-
-            Tone.Transport.setLoopPoints(region.start / val, region.end / val);
-            part.playbackRate = val;
-            players.forEach((p: any) => (p.playbackRate = val));
-            wavesurfer.setPlaybackRate(val);
-            setSpeed(val);
+            changeSpeed(parseFloat(e.target.value));
           }}
           disabled={loading}
         />
@@ -424,9 +435,7 @@ export default function Home(props: { folders: string[] }) {
           value={zoom}
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const zoom = parseInt(e.target.value);
-            wavesurfer.zoom(zoom);
-            setZoom(zoom);
+            changeZoom(parseInt(e.target.value));
           }}
           disabled={loading}
         />
