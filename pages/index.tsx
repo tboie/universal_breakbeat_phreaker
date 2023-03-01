@@ -209,9 +209,11 @@ export default function Home(props: { folders: string[] }) {
             players[value.idx]?.start(time);
 
             Tone.Draw.schedule(() => {
-              const firstPiece = seq.find((s) => s.time === region.start);
-              if (value.idx === firstPiece?.idx) {
-                wavesurfer.play(region.start);
+              if (region) {
+                const firstPiece = seq.find((s) => s.time === region.start);
+                if (value.idx === firstPiece?.idx) {
+                  wavesurfer.play(region.start);
+                }
               }
             }, time);
           }, seq).start(0);
