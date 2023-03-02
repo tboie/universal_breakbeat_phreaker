@@ -27,12 +27,22 @@ body {
   border-right: 1px solid skyblue !important;
   height: 100px !important;
   top: 100px !important;
+  background-image: linear-gradient(
+    to top,
+    rgba(135, 206, 235, 0.2),
+    transparent
+  ) !important;
 }
 
 [data-id="selection"] {
   border-left: 1px solid #fff !important;
   border-right: 1px solid #fff !important;
   height: 100px !important;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  ) !important;
 }
 
 .wavesurfer-handle {

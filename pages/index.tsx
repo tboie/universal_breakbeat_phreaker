@@ -112,7 +112,6 @@ export default function Home(props: { folders: string[] }) {
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: false,
-            color: "rgba(255, 255, 255, 0.2)",
           });
           regionSel = Object.values(wavesurfer.regions.list)[0];
         }
@@ -123,7 +122,6 @@ export default function Home(props: { folders: string[] }) {
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: true,
-            color: "rgba(135, 206, 235, 0.2)",
           });
 
           regionLoop = Object.values(wavesurfer.regions.list)[1];
