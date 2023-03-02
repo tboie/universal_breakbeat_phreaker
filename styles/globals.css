@@ -22,9 +22,17 @@ body {
   border-right: 1px solid #ff10f0 !important;
 }
 
-.wavesurfer-region {
+[data-id="loop"] {
   border-left: 1px solid skyblue !important;
   border-right: 1px solid skyblue !important;
+  height: 100px !important;
+  top: 100px !important;
+}
+
+[data-id="selection"] {
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+  height: 100px !important;
 }
 
 .wavesurfer-handle {
@@ -32,18 +40,35 @@ body {
   height: 1.75rem !important;
   width: 2.1rem !important;
   border-top: 1px solid #000 !important;
+  border-bottom: 1px solid #000 !important;
 }
 
-.wavesurfer-handle-start {
+[data-id="selection"] .wavesurfer-handle {
+  background-color: #fff !important;
+  top: 0 !important;
+}
+
+[data-id="selection"] .wavesurfer-handle-start {
+  border-bottom-right-radius: 0.75rem !important;
+  border-right: 1px solid #000 !important;
+}
+
+[data-id="selection"] .wavesurfer-handle-end {
+  border-bottom-left-radius: 0.75rem !important;
+  border-left: 1px solid #000 !important;
+}
+
+[data-id="loop"] .wavesurfer-handle {
   bottom: 0 !important;
   top: auto !important;
+}
+
+[data-id="loop"] .wavesurfer-handle-start {
   border-top-right-radius: 0.75rem !important;
   border-right: 1px solid #000 !important;
 }
 
-.wavesurfer-handle-end {
-  bottom: 0 !important;
-  top: auto !important;
+[data-id="loop"] .wavesurfer-handle-end {
   border-top-left-radius: 0.75rem !important;
   border-left: 1px solid #000 !important;
 }
