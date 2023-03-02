@@ -4,12 +4,12 @@ import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
 import path from "path";
 import { useEffect, useState } from "react";
+
+import * as Tone from "tone";
 //@ts-ignore
 import util from "audio-buffer-utils";
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
-
-import * as Tone from "tone";
 
 let init = false;
 
