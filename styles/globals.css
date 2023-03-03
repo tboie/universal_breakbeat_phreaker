@@ -18,10 +18,6 @@ body {
   color: rgba(255, 255, 255, 0.96);
 }
 
-#waveform > wave > wave {
-  border-right: 1px solid #ff10f0 !important;
-}
-
 [data-id="loop"] {
   border-left: 1px solid skyblue !important;
   border-right: 1px solid skyblue !important;
