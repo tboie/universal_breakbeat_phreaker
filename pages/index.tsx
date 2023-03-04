@@ -18,7 +18,6 @@ let regionLoop: any;
 let regionSel: any;
 let touchMoved = false;
 
-let origBuffer: any;
 let players: any = [];
 let part: any;
 
@@ -193,48 +192,52 @@ export default function Home(props: { folders: string[] }) {
         players = [];
         seq = [];
 
-        origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
+        const origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
           const buff = origBuffer.get();
 
-          times.forEach((t, idx) => {
-            const dur =
-              idx === times.length - 1
-                ? parseFloat((buff.duration - t).toFixed(6))
-                : parseFloat((times[idx + 1] - t).toFixed(6));
+          if (buff) {
+            times.forEach((t, idx) => {
+              const dur =
+                idx === times.length - 1
+                  ? parseFloat((buff.duration - t).toFixed(6))
+                  : parseFloat((times[idx + 1] - t).toFixed(6));
 
-            const b = util.slice(
-              buff,
-              buff.sampleRate * t,
-              buff.sampleRate * (t + dur)
-            );
-            players.push(new Tone.Player(b).toDestination());
+              const b = util.slice(
+                buff,
+                buff.sampleRate * t,
+                buff.sampleRate * (t + dur)
+              );
+              players.push(new Tone.Player(b).toDestination());
 
-            seq.push({
-              idx: idx,
-              time: t,
-              duration: dur,
+              seq.push({
+                idx: idx,
+                time: t,
+                duration: dur,
+              });
             });
-          });
 
-          const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
-          Tone.Transport.setLoopPoints(0, end);
-          Tone.Transport.loop = true;
+            const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+            Tone.Transport.setLoopPoints(0, end);
+            Tone.Transport.loop = true;
 
-          part?.dispose();
-          part = new Tone.Part((time, value) => {
-            players[value.idx]?.start(time);
+            part?.dispose();
+            part = new Tone.Part((time, value) => {
+              players[value.idx]?.start(time);
 
-            Tone.Draw.schedule(() => {
-              if (regionLoop) {
-                const firstPiece = seq.find((s) => s.time === regionLoop.start);
-                if (value.idx === firstPiece?.idx) {
-                  wavesurfer.play(regionLoop.start);
+              Tone.Draw.schedule(() => {
+                if (regionLoop) {
+                  const firstPiece = seq.find(
+                    (s) => s.time === regionLoop.start
+                  );
+                  if (value.idx === firstPiece?.idx) {
+                    wavesurfer.play(regionLoop.start);
+                  }
                 }
-              }
-            }, time);
-          }, seq).start(0);
+              }, time);
+            }, seq).start(0);
 
-          wavesurfer.loadDecodedBuffer(buff);
+            wavesurfer.loadDecodedBuffer(buff);
+          }
         });
       });
   };
