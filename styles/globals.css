@@ -46,13 +46,12 @@ main {
   background-color: skyblue !important;
   height: 1.8rem !important;
   width: 2.2rem !important;
-  border-top: 1px solid #000 !important;
-  border-bottom: 1px solid #000 !important;
 }
 
 [data-id="selection"] .wavesurfer-handle {
   background-color: #fff !important;
   top: 0 !important;
+  border-bottom: 1px solid #000 !important;
 }
 
 [data-id="selection"] .wavesurfer-handle-start {
@@ -68,6 +67,7 @@ main {
 [data-id="loop"] .wavesurfer-handle {
   bottom: 0 !important;
   top: auto !important;
+  border-top: 1px solid #000 !important;
 }
 
 [data-id="loop"] .wavesurfer-handle-start {
