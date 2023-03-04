@@ -334,7 +334,7 @@ export default function Home(props: { folders: string[] }) {
       wavesurfer.pause();
       wavesurfer.seekTo(regionLoop.start / wavesurfer.getDuration());
     } else {
-      Tone.Transport.start(undefined, regionLoop.start / speed);
+      Tone.Transport.start("+0.5", regionLoop.start / speed);
     }
 
     setPlaying(!playing);
