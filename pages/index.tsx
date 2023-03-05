@@ -34,6 +34,14 @@ const closest = (array: number[], goal: number) =>
     Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
   );
 
+const arrShuffle = (a: any[]) => {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
@@ -104,7 +112,7 @@ export default function Home(props: { folders: string[] }) {
         });
       });
 
-      wavesurfer.on("ready", function () {
+      wavesurfer.on("ready", () => {
         wavesurfer.setVolume(0);
 
         if (!regionSel) {
@@ -252,14 +260,6 @@ export default function Home(props: { folders: string[] }) {
   };
 
   const randomClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    function arrShuffle(a: any[]) {
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
     e.preventDefault();
     e.stopPropagation();
 

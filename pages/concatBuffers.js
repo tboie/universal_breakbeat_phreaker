@@ -1,6 +1,6 @@
 import util from "audio-buffer-utils";
 
-onmessage = function (e) {
+onmessage = (e) => {
   let finalAudio = util.create();
 
   e.data.forEach((bufferArray) => {
