@@ -3,7 +3,7 @@ import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
 import path from "path";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import * as Tone from "tone";
 //@ts-ignore
@@ -40,6 +40,7 @@ export default function Home(props: { folders: string[] }) {
   const [zoom, setZoom] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const workerRef = useRef<Worker>();
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -262,9 +263,6 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    let finalAudio = util.create();
-    let durTotal = 0;
-
     const startIdx = seq.findIndex((s) => s.time === regionSel.start);
     let endIdx = seq.findIndex((s) => s.time === regionSel.end);
     if (endIdx === -1) {
@@ -273,6 +271,8 @@ export default function Home(props: { folders: string[] }) {
 
     const shuffled = arrShuffle(seq.slice(startIdx, endIdx));
     seq.splice(startIdx, shuffled.length, ...shuffled);
+
+    let durTotal = 0;
 
     part.clear();
     seq = seq.map((obj, idx) => {
@@ -287,8 +287,6 @@ export default function Home(props: { folders: string[] }) {
       };
 
       part.add(ret.time, { idx: ret.idx, duration: ret.duration });
-      finalAudio = util.concat(finalAudio, players[obj.idx].buffer);
-
       return ret;
     });
 
@@ -304,7 +302,7 @@ export default function Home(props: { folders: string[] }) {
       end: snapEnd,
     });
 
-    wavesurfer.loadDecodedBuffer(finalAudio);
+    concatBuffers();
   };
 
   const downloadClick = (
@@ -414,6 +412,25 @@ export default function Home(props: { folders: string[] }) {
     wavesurfer.zoom(val);
     setZoom(val);
   };
+
+  useEffect(() => {
+    // worker used to draw waveform after randomization
+    workerRef.current = new Worker(
+      new URL("./concatBuffers.js", import.meta.url)
+    );
+    workerRef.current.onmessage = (e: MessageEvent<[[number], [number]]>) => {
+      wavesurfer.loadDecodedBuffer(util.create(e.data));
+    };
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, []);
+
+  const concatBuffers = useCallback(async () => {
+    workerRef.current?.postMessage(
+      seq.map((obj) => players[obj.idx].buffer.toArray())
+    );
+  }, []);
 
   return (
     <>
