@@ -418,7 +418,7 @@ export default function Home(props: { folders: string[] }) {
     workerRef.current = new Worker(
       new URL("./concatBuffers.js", import.meta.url)
     );
-    workerRef.current.onmessage = (e: MessageEvent<[[number], [number]]>) => {
+    workerRef.current.onmessage = (e: MessageEvent<any[]>) => {
       wavesurfer.loadDecodedBuffer(util.create(e.data));
     };
     return () => {
