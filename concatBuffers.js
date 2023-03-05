@@ -1,6 +1,6 @@
 import util from "audio-buffer-utils";
 
-onmessage = (e) => {
+addEventListener("message", (e) => {
   let finalAudio = util.create();
 
   e.data.forEach((bufferArray) => {
@@ -8,4 +8,4 @@ onmessage = (e) => {
   });
 
   postMessage(util.data(finalAudio));
-};
+});

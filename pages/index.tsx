@@ -436,7 +436,7 @@ export default function Home(props: { folders: string[] }) {
   useEffect(() => {
     // worker used to draw waveform after randomization
     workerRef.current = new Worker(
-      new URL("./concatBuffers.js", import.meta.url)
+      new URL("../concatBuffers.js", import.meta.url)
     );
     workerRef.current.onmessage = (e: MessageEvent<any[]>) => {
       wavesurfer.loadDecodedBuffer(util.create(e.data));
