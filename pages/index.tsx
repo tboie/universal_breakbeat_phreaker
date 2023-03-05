@@ -66,8 +66,6 @@ export default function Home(props: { folders: string[] }) {
         waveColor: "#39FF14",
         progressColor: "#39FF14",
         cursorColor: "#FF10F0",
-        fillParent: false,
-        scrollParent: false,
         plugins: [
           regions.create({
             regionsMinLength: 0.01,
@@ -80,15 +78,6 @@ export default function Home(props: { folders: string[] }) {
       });
 
       window.addEventListener("resize", (event) => {
-        const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
-        if (zoomEle) {
-          const minZoom = window.innerWidth / wavesurfer.getDuration();
-          wavesurfer.zoom(minZoom);
-          zoomEle.min = minZoom.toString();
-          zoomEle.value = minZoom.toString();
-          setZoom(minZoom);
-        }
-
         wavesurfer.drawer.fireEvent("redraw");
       });
 
@@ -150,15 +139,6 @@ export default function Home(props: { folders: string[] }) {
               wavesurfer.play(regionLoop.start);
             }
           });
-
-          const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
-          if (zoomEle) {
-            const minZoom = window.innerWidth / wavesurfer.getDuration();
-            wavesurfer.zoom(minZoom);
-            zoomEle.min = minZoom.toString();
-            zoomEle.value = minZoom.toString();
-            setZoom(minZoom);
-          }
         } else {
           wavesurfer.seekTo(
             Tone.Time(Tone.Transport.position).toSeconds() /
