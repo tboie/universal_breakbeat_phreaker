@@ -168,6 +168,7 @@ export default function Home(props: { folders: string[] }) {
     wavesurfer.clearMarkers();
     wavesurfer.setPlaybackRate(1);
     wavesurfer.zoom(0);
+    wavesurfer.seekTo(0);
     wavesurfer.empty();
 
     setSpeed(1);
