@@ -66,6 +66,7 @@ export default function Home(props: { folders: string[] }) {
         waveColor: "#39FF14",
         progressColor: "#39FF14",
         cursorColor: "#FF10F0",
+        fillParent: true,
         plugins: [
           regions.create({
             regionsMinLength: 0.01,
