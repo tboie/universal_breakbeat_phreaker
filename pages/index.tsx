@@ -294,6 +294,7 @@ export default function Home(props: { folders: string[] }) {
 
     const times = seq.map((s) => s.time);
     times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
+
     const snapStart = closest(times, regionLoop.start);
     const snapEnd = closest(times, regionLoop.end);
 
