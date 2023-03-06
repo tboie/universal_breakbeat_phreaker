@@ -104,6 +104,12 @@ export default function Home(props: { folders: string[] }) {
 
         if (scrollEle && waveEle) {
           const scrollMax = waveEle.scrollWidth - window.innerWidth;
+
+          if (scrollMax <= parseInt(scrollEle.value)) {
+            scrollEle.value = scrollMax.toString();
+            setScroll(scrollMax);
+          }
+
           scrollEle.max = scrollMax.toString();
         }
       });
@@ -499,6 +505,7 @@ export default function Home(props: { folders: string[] }) {
             if (container) {
               container.scrollLeft = val;
             }
+
             setScroll(val);
           }}
           disabled={
