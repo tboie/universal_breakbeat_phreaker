@@ -51,33 +51,27 @@ main {
 [data-id="selection"] .wavesurfer-handle {
   background-color: #fff !important;
   top: 0 !important;
-  border-bottom: 1px solid #000 !important;
 }
 
 [data-id="selection"] .wavesurfer-handle-start {
   border-bottom-right-radius: 0.75rem !important;
-  border-right: 1px solid #000 !important;
 }
 
 [data-id="selection"] .wavesurfer-handle-end {
   border-bottom-left-radius: 0.75rem !important;
-  border-left: 1px solid #000 !important;
 }
 
 [data-id="loop"] .wavesurfer-handle {
   bottom: 0 !important;
   top: auto !important;
-  border-top: 1px solid #000 !important;
 }
 
 [data-id="loop"] .wavesurfer-handle-start {
   border-top-right-radius: 0.75rem !important;
-  border-right: 1px solid #000 !important;
 }
 
 [data-id="loop"] .wavesurfer-handle-end {
   border-top-left-radius: 0.75rem !important;
-  border-left: 1px solid #000 !important;
 }
 
 .wavesurfer-marker > div {
@@ -110,7 +104,6 @@ input[type="range"]::-webkit-slider-thumb {
   height: 2rem;
   width: 2rem;
   border-radius: 50%;
-  border: 1px solid #000;
   background: skyblue;
   margin-top: -1rem;
 }
