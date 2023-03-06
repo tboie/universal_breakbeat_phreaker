@@ -22,7 +22,7 @@ main {
 #waveform {
   overflow-x: hidden !important;
   min-height: 200px !important;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 [data-id="loop"] {

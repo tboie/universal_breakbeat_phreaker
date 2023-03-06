@@ -509,6 +509,20 @@ export default function Home(props: { folders: string[] }) {
           }
         />
 
+        <input
+          id="zoom"
+          type="range"
+          step={25}
+          min={0}
+          max={500}
+          value={zoom}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeZoom(parseInt(e.target.value));
+          }}
+          disabled={loading}
+        />
+
         <div className={styles.controls}>
           <button
             onClick={(e) => moveRegion(e, "start", "left")}
@@ -547,20 +561,6 @@ export default function Home(props: { folders: string[] }) {
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             changeSpeed(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-
-        <input
-          id="zoom"
-          type="range"
-          step={25}
-          min={0}
-          max={500}
-          value={zoom}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeZoom(parseInt(e.target.value));
           }}
           disabled={loading}
         />
