@@ -114,9 +114,28 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: -1rem;
 }
 
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]:disabled::-webkit-slider-thumb {
+  background-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#scroll::-webkit-slider-thumb {
+  background-image: url("/scroll.svg");
+}
+
+#zoom::-webkit-slider-thumb {
+  background-image: url("/zoom.svg");
+}
+
+#speed::-webkit-slider-thumb {
+  background-image: url("/speed.svg");
+}
+
 input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-webkit-slider-runnable-track {
-  background: gray;
+  background-color: gray;
 }
 
 input[type="range"]:focus {
