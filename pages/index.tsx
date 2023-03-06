@@ -466,8 +466,6 @@ export default function Home(props: { folders: string[] }) {
     );
   }, []);
 
-  const setScrollMin = () => {};
-
   return (
     <>
       <Head>
