@@ -510,9 +510,9 @@ export default function Home(props: { folders: string[] }) {
         <input
           id="zoom"
           type="range"
-          step={25}
+          step={10}
           min={0}
-          max={500}
+          max={300}
           value={zoom}
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
