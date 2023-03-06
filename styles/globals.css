@@ -19,6 +19,12 @@ main {
   color: rgba(255, 255, 255, 0.96);
 }
 
+#waveform {
+  overflow-x: hidden !important;
+  min-height: 200px !important;
+  margin-bottom: 0.25rem;
+}
+
 [data-id="loop"] {
   border-left: 1px solid skyblue !important;
   border-right: 1px solid skyblue !important;

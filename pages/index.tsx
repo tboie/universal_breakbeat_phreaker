@@ -46,6 +46,7 @@ export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
+  const [scroll, setScroll] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const workerRef = useRef<Worker>();
@@ -66,7 +67,8 @@ export default function Home(props: { folders: string[] }) {
         waveColor: "#39FF14",
         progressColor: "#39FF14",
         cursorColor: "#FF10F0",
-        fillParent: true,
+        fillParent: false,
+        scrollParent: false,
         plugins: [
           regions.create({
             regionsMinLength: 0.01,
@@ -79,11 +81,31 @@ export default function Home(props: { folders: string[] }) {
       });
 
       window.addEventListener("resize", (event) => {
+        const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
+        if (zoomEle) {
+          const minZoom = Math.floor(
+            window.innerWidth / wavesurfer.getDuration()
+          );
+          wavesurfer.zoom(minZoom);
+          zoomEle.min = minZoom.toString();
+          zoomEle.value = minZoom.toString();
+          setZoom(minZoom);
+        }
         wavesurfer.drawer.fireEvent("redraw");
       });
 
       document.body.addEventListener("touchmove", (event) => {
         touchMoved = true;
+      });
+
+      wavesurfer.on("zoom", (val: number) => {
+        const scrollEle = document.querySelector("#scroll") as HTMLInputElement;
+        const waveEle = document.querySelector("#waveform") as HTMLDivElement;
+
+        if (scrollEle && waveEle) {
+          const scrollMax = waveEle.scrollWidth - window.innerWidth;
+          scrollEle.max = scrollMax.toString();
+        }
       });
 
       wavesurfer.on("region-update-end", (region: any) => {
@@ -140,6 +162,17 @@ export default function Home(props: { folders: string[] }) {
               wavesurfer.play(regionLoop.start);
             }
           });
+
+          const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
+          if (zoomEle) {
+            const minZoom = Math.floor(
+              window.innerWidth / wavesurfer.getDuration()
+            );
+            wavesurfer.zoom(minZoom);
+            zoomEle.min = minZoom.toString();
+            zoomEle.value = minZoom.toString();
+            setZoom(minZoom);
+          }
         } else {
           wavesurfer.seekTo(
             Tone.Time(Tone.Transport.position).toSeconds() /
@@ -433,6 +466,8 @@ export default function Home(props: { folders: string[] }) {
     );
   }, []);
 
+  const setScrollMin = () => {};
+
   return (
     <>
       <Head>
@@ -448,6 +483,31 @@ export default function Home(props: { folders: string[] }) {
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
         <div id="waveform" className={styles.waveform} />
+
+        <input
+          id="scroll"
+          type="range"
+          min={0}
+          max={100}
+          value={scroll}
+          step={1}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const val = parseInt(e.target.value);
+            const container = document.querySelector(
+              "#waveform"
+            ) as HTMLDivElement;
+
+            if (container) {
+              container.scrollLeft = val;
+            }
+            setScroll(val);
+          }}
+          disabled={
+            loading ||
+            zoom === Math.floor(window.innerWidth / wavesurfer?.getDuration())
+          }
+        />
 
         <div className={styles.controls}>
           <button
