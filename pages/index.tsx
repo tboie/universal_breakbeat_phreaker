@@ -488,6 +488,34 @@ export default function Home(props: { folders: string[] }) {
 
         <div id="waveform" className={styles.waveform} />
 
+        <div className={styles.controls}>
+          <button
+            onClick={(e) => moveRegion(e, "start", "left")}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={(e) => moveRegion(e, "start", "right")}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+          <span className={styles.info}>{speed + "x"}</span>
+          <button
+            onClick={(e) => moveRegion(e, "end", "left")}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={(e) => moveRegion(e, "end", "right")}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+        </div>
+
         <input
           id="scroll"
           type="range"
@@ -528,48 +556,6 @@ export default function Home(props: { folders: string[] }) {
           disabled={loading}
         />
 
-        <div className={styles.controls}>
-          <button
-            onClick={(e) => moveRegion(e, "start", "left")}
-            disabled={loading}
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={(e) => moveRegion(e, "start", "right")}
-            disabled={loading}
-          >
-            {">"}
-          </button>
-          <span className={styles.info}>{speed + "x"}</span>
-          <button
-            onClick={(e) => moveRegion(e, "end", "left")}
-            disabled={loading}
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={(e) => moveRegion(e, "end", "right")}
-            disabled={loading}
-          >
-            {">"}
-          </button>
-        </div>
-
-        <input
-          id="speed"
-          type="range"
-          min="0.05"
-          max="2"
-          value={speed}
-          step="0.05"
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeSpeed(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-
         <div className={styles.toolbar}>
           <button onClick={(e) => originalClick(e)} disabled={loading}>
             Original
@@ -596,6 +582,20 @@ export default function Home(props: { folders: string[] }) {
             Download
           </button>
         </div>
+
+        <input
+          id="speed"
+          type="range"
+          min="0.05"
+          max="2"
+          value={speed}
+          step="0.05"
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeSpeed(parseFloat(e.target.value));
+          }}
+          disabled={loading}
+        />
 
         <ul className={styles.playlist}>
           {props.folders.map((folder) => {
