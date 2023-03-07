@@ -10,6 +10,13 @@
   font-size: 1.1rem;
 }
 
+.info,
+.slider,
+.playlist {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 .info {
   display: flex;
   align-items: center;
@@ -79,8 +86,8 @@
   flex-grow: 1;
   cursor: pointer;
   color: skyblue;
-  margin-bottom: 0.2rem;
   width: 100%;
+  margin: 0.25rem auto 0;
 }
 
 .playlist li {
@@ -95,11 +102,4 @@
 .selected {
   color: #39ff14;
   background-color: rgba(255, 255, 255, 0.15);
-}
-
-.info,
-.slider,
-.playlist {
-  max-width: 600px;
-  margin: 0 auto;
 }
