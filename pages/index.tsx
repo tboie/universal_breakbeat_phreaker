@@ -486,6 +486,20 @@ export default function Home(props: { folders: string[] }) {
       <main className={styles.main}>
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
+        <ul className={styles.playlist}>
+          {props.folders.map((folder) => {
+            return (
+              <li
+                className={folder === selectedFile ? styles.selected : ""}
+                key={folder}
+                onClick={(e) => listClick(e, folder)}
+              >
+                {folder}
+              </li>
+            );
+          })}
+        </ul>
+
         <div id="waveform" className={styles.waveform} />
 
         <div className={styles.controls}>
@@ -596,20 +610,6 @@ export default function Home(props: { folders: string[] }) {
           }}
           disabled={loading}
         />
-
-        <ul className={styles.playlist}>
-          {props.folders.map((folder) => {
-            return (
-              <li
-                className={folder === selectedFile ? styles.selected : ""}
-                key={folder}
-                onClick={(e) => listClick(e, folder)}
-              >
-                {folder}
-              </li>
-            );
-          })}
-        </ul>
       </main>
     </>
   );
