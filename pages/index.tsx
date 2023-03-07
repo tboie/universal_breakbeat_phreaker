@@ -86,9 +86,14 @@ export default function Home(props: { folders: string[] }) {
           const minZoom = Math.floor(
             window.innerWidth / wavesurfer.getDuration()
           );
+          // 2 seconds max
+          const maxZoom = Math.floor(window.innerWidth / 2);
+
           wavesurfer.zoom(minZoom);
           zoomEle.min = minZoom.toString();
+          zoomEle.max = maxZoom.toString();
           zoomEle.value = minZoom.toString();
+
           setZoom(minZoom);
         }
         wavesurfer.drawer.fireEvent("redraw");
@@ -174,9 +179,14 @@ export default function Home(props: { folders: string[] }) {
             const minZoom = Math.floor(
               window.innerWidth / wavesurfer.getDuration()
             );
+            // 2 seconds max
+            const maxZoom = Math.floor(window.innerWidth / 2);
+
             wavesurfer.zoom(minZoom);
             zoomEle.min = minZoom.toString();
+            zoomEle.max = maxZoom.toString();
             zoomEle.value = minZoom.toString();
+
             setZoom(minZoom);
           }
         } else {
@@ -547,13 +557,21 @@ export default function Home(props: { folders: string[] }) {
           type="range"
           step={10}
           min={0}
-          max={300}
+          max={100}
           value={zoom}
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             changeZoom(parseInt(e.target.value));
           }}
-          disabled={loading}
+          disabled={
+            loading ||
+            parseInt(
+              (document.querySelector("#zoom") as HTMLInputElement)?.min
+            ) >=
+              parseInt(
+                (document.querySelector("#zoom") as HTMLInputElement)?.max
+              )
+          }
         />
 
         <div className={styles.toolbar}>
