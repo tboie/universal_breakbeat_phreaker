@@ -80,7 +80,7 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
-      window.addEventListener("resize", (event) => {
+      const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
           const minZoom = Math.floor(
@@ -96,14 +96,9 @@ export default function Home(props: { folders: string[] }) {
 
           setZoom(minZoom);
         }
-        wavesurfer.drawer.fireEvent("redraw");
-      });
+      };
 
-      document.body.addEventListener("touchmove", (event) => {
-        touchMoved = true;
-      });
-
-      wavesurfer.on("zoom", (val: number) => {
+      const configScroll = () => {
         const scrollEle = document.querySelector("#scroll") as HTMLInputElement;
         const waveEle = document.querySelector("#waveform") as HTMLDivElement;
 
@@ -117,6 +112,20 @@ export default function Home(props: { folders: string[] }) {
 
           scrollEle.max = scrollMax.toString();
         }
+      };
+
+      window.addEventListener("resize", (event) => {
+        configScroll();
+        configZoom();
+        wavesurfer.drawer.fireEvent("redraw");
+      });
+
+      document.body.addEventListener("touchmove", (event) => {
+        touchMoved = true;
+      });
+
+      wavesurfer.on("zoom", (val: number) => {
+        configScroll();
       });
 
       wavesurfer.on("region-update-end", (region: any) => {
@@ -174,21 +183,7 @@ export default function Home(props: { folders: string[] }) {
             }
           });
 
-          const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
-          if (zoomEle) {
-            const minZoom = Math.floor(
-              window.innerWidth / wavesurfer.getDuration()
-            );
-            // 2 seconds max
-            const maxZoom = Math.floor(window.innerWidth / 2);
-
-            wavesurfer.zoom(minZoom);
-            zoomEle.min = minZoom.toString();
-            zoomEle.max = maxZoom.toString();
-            zoomEle.value = minZoom.toString();
-
-            setZoom(minZoom);
-          }
+          configZoom();
         } else {
           wavesurfer.seekTo(
             Tone.Time(Tone.Transport.position).toSeconds() /
