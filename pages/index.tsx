@@ -459,7 +459,7 @@ export default function Home(props: { folders: string[] }) {
   };
 
   useEffect(() => {
-    // worker used to draw waveform after randomization
+    // worker used to concat waveform after randomization
     workerRef.current = new Worker(
       new URL("../concatBuffers.js", import.meta.url)
     );

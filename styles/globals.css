@@ -82,7 +82,7 @@ main {
 
 .wavesurfer-marker > div {
   background: gray !important;
-  opacity: 0.6 !important;
+  opacity: 0.75 !important;
 }
 
 .marker-label {
