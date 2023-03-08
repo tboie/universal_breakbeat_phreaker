@@ -69,7 +69,6 @@ export default function Home(props: { folders: string[] }) {
         cursorColor: "#FF10F0",
         fillParent: false,
         scrollParent: false,
-        interact: false,
         plugins: [
           regions.create({
             regionsMinLength: 0.01,
