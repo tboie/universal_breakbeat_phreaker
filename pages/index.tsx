@@ -321,6 +321,7 @@ export default function Home(props: { folders: string[] }) {
 
     let durTotal = 0;
 
+    // could notes be scheduled more precisely to avoid dropouts?
     part.clear();
     seq = seq.map((obj, idx) => {
       if (idx) {
