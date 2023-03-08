@@ -185,6 +185,7 @@ export default function Home(props: { folders: string[] }) {
 
           configZoom();
         } else {
+          // sets playhead on randomize
           wavesurfer.seekTo(
             Tone.Time(Tone.Transport.position).toSeconds() /
               wavesurfer.getDuration()
@@ -278,6 +279,7 @@ export default function Home(props: { folders: string[] }) {
             part = new Tone.Part((time, value) => {
               players[value.idx]?.start(time);
 
+              // starts playhead if note is first piece
               Tone.Draw.schedule(() => {
                 if (regionLoop) {
                   const firstPiece = seq.find(
@@ -362,10 +364,11 @@ export default function Home(props: { folders: string[] }) {
     });
     const blobUrl = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
-    anchor.href = blobUrl;
 
+    anchor.href = blobUrl;
     anchor.download = selectedFile + "_PHREAKED";
     anchor.click();
+
     window.URL.revokeObjectURL(blobUrl);
   };
 
@@ -466,12 +469,11 @@ export default function Home(props: { folders: string[] }) {
     workerRef.current.onmessage = (e: MessageEvent<any[]>) => {
       wavesurfer.loadDecodedBuffer(util.create(e.data));
     };
-    return () => {
-      workerRef.current?.terminate();
-    };
+    return () => workerRef.current?.terminate();
   }, []);
 
   const concatBuffers = useCallback(async () => {
+    // should more stuff go in worker?
     workerRef.current?.postMessage(
       seq.map((obj) => players[obj.idx].buffer.toArray())
     );
