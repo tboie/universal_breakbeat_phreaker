@@ -602,10 +602,10 @@ export default function Home(props: { folders: string[] }) {
         <input
           id="speed"
           type="range"
-          min="0.05"
-          max="2"
+          min={0.05}
+          max={2}
           value={speed}
-          step="0.05"
+          step={0.05}
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             changeSpeed(parseFloat(e.target.value));
