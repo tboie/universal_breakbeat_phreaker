@@ -52,7 +52,6 @@ main {
   background-color: skyblue !important;
   height: 1.8rem !important;
   width: 2.2rem !important;
-  background-image: url("/grip.svg");
 }
 
 [data-id="selection"] .wavesurfer-handle {
@@ -118,7 +117,6 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: -1rem;
 }
 
-.wavesurfer-handle,
 input[type="range"]::-webkit-slider-thumb,
 input[type="range"]:disabled::-webkit-slider-thumb {
   background-size: 1rem;
