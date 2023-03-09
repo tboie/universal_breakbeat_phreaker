@@ -23,7 +23,7 @@ let part: any;
 
 type TSeq = {
   idx: number;
-  time: number;
+  time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
 };
 
