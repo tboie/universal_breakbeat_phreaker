@@ -3,8 +3,8 @@
 ## Goal
 - Create and explore rythms
 
-## Screenshot
-<img width="600" alt="screen" src="https://user-images.githubusercontent.com/26150152/224182403-1870bffd-1aa8-419a-8adb-ff82b769b04f.png">
+## Screnshot
+<img width="600" alt="screenshot" src="https://user-images.githubusercontent.com/26150152/224183606-46d27898-1b65-42d2-b68f-287b1c64ce26.png">
 
 ## Demo
 [https://phreaker.vercel.app](https://phreaker.vercel.app)
