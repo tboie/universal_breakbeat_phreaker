@@ -391,7 +391,7 @@ export default function Home(props: { folders: string[] }) {
     setPlaying(!playing);
   };
 
-  const moveRegion = (
+  const resizeRegion = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     pos: "start" | "end",
     dir: "left" | "right"
@@ -498,26 +498,26 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.controls}>
           <button
-            onClick={(e) => moveRegion(e, "start", "left")}
+            onClick={(e) => resizeRegion(e, "start", "left")}
             disabled={loading}
           >
             {"<"}
           </button>
           <button
-            onClick={(e) => moveRegion(e, "start", "right")}
+            onClick={(e) => resizeRegion(e, "start", "right")}
             disabled={loading}
           >
             {">"}
           </button>
           <span className={styles.info}>{speed + "x"}</span>
           <button
-            onClick={(e) => moveRegion(e, "end", "left")}
+            onClick={(e) => resizeRegion(e, "end", "left")}
             disabled={loading}
           >
             {"<"}
           </button>
           <button
-            onClick={(e) => moveRegion(e, "end", "right")}
+            onClick={(e) => resizeRegion(e, "end", "right")}
             disabled={loading}
           >
             {">"}
