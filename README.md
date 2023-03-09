@@ -16,7 +16,7 @@ npm run dev
 ```
 
 ## Onset Detection
-- [aubio.org](https://aubio.org)
+- [https://github.com/aubio/aubio](https://github.com/aubio/aubio)
 - command used to process a directory of .wav files:
 
 ```
