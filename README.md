@@ -1,9 +1,9 @@
 # Universal Breakbeat Phreaker (Prototype)
 
 ## Goal
-- Create and explore rythms
+- Create and explore rhythms
 
-## Screnshot
+## Screenshot
 <img width="600" alt="screenshot" src="https://user-images.githubusercontent.com/26150152/224183606-46d27898-1b65-42d2-b68f-287b1c64ce26.png">
 
 ## Demo
