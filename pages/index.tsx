@@ -305,13 +305,10 @@ export default function Home(props: { folders: string[] }) {
       );
       */
 
-      // starts playhead if note is first piece
+      // start playhead at piece
       Tone.Draw.schedule(() => {
         if (regionLoop) {
-          const firstPiece = seq.find((s) => s.time === regionLoop.start);
-          if (value.idx === firstPiece?.idx) {
-            wavesurfer.play(regionLoop.start);
-          }
+          wavesurfer.play(seq[value.idx].time);
         }
       }, time);
     }, seq).start(0);
