@@ -11,6 +11,8 @@ import util from "audio-buffer-utils";
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
 
+import data from "../public/data.json";
+
 let init = false;
 
 let wavesurfer: any;
@@ -19,6 +21,7 @@ let regionSel: any;
 let touchMoved = false;
 
 let players: any = [];
+let l_players: any = [];
 let part: any;
 
 type TSeq = {
@@ -42,11 +45,20 @@ const arrShuffle = (a: any[]) => {
   return a;
 };
 
+const table: any[] = [];
+(data as any[]).forEach((b) => {
+  b.c.forEach((v: any, i: any) => {
+    const row = { n: b.n, i: i + 1, d: v[0], f: v[1] };
+    table.push(row);
+  });
+});
+
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
   const [scroll, setScroll] = useState(0);
+  const [fader, setFader] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const workerRef = useRef<Worker>();
@@ -235,67 +247,76 @@ export default function Home(props: { folders: string[] }) {
     setSelectedFile(folder);
     setLoading(true);
 
+    l_players.forEach((p: any) => p.dispose());
+    l_players = [];
+
+    let times: any[] = [];
     await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
-        const times = text
+        times = text
           .split("\n")
           .filter((t) => t)
           .map((t) => parseFloat(t));
-
-        players.forEach((p: any) => p.dispose());
-        players = [];
-        seq = [];
-
-        const origBuffer = new Tone.Buffer(`/drums/${folder}/audio.wav`, () => {
-          const buff = origBuffer.get();
-
-          if (buff) {
-            times.forEach((t, idx) => {
-              const dur =
-                idx === times.length - 1
-                  ? parseFloat((buff.duration - t).toFixed(6))
-                  : parseFloat((times[idx + 1] - t).toFixed(6));
-
-              const b = util.slice(
-                buff,
-                buff.sampleRate * t,
-                buff.sampleRate * (t + dur)
-              );
-              players.push(new Tone.Player(b).toDestination());
-
-              seq.push({
-                idx: idx,
-                time: t,
-                duration: dur,
-              });
-            });
-
-            const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
-            Tone.Transport.setLoopPoints(0, end);
-            Tone.Transport.loop = true;
-
-            part?.dispose();
-            part = new Tone.Part((time, value) => {
-              players[value.idx]?.start(time);
-
-              // starts playhead if note is first piece
-              Tone.Draw.schedule(() => {
-                if (regionLoop) {
-                  const firstPiece = seq.find(
-                    (s) => s.time === regionLoop.start
-                  );
-                  if (value.idx === firstPiece?.idx) {
-                    wavesurfer.play(regionLoop.start);
-                  }
-                }
-              }, time);
-            }, seq).start(0);
-
-            wavesurfer.loadDecodedBuffer(buff);
-          }
-        });
       });
+
+    players.forEach((p: any) => p.dispose());
+    players = [];
+    seq = [];
+
+    const temp: any[] = [];
+    await Promise.all(
+      times.map(async (t: number, idx: number) => {
+        await fetch(`/drums/${folder}/${idx + 1}.wav`)
+          .then(async (response) => {
+            return await response.arrayBuffer();
+          })
+          .then(async (arrayBuffer) => {
+            const buff = await Tone.context.decodeAudioData(arrayBuffer);
+            temp.push({ i: idx, t: t, buff: buff });
+          })
+          .catch((error) => {
+            throw Error(`Asset failed to load: ${error.message}`);
+          });
+      })
+    );
+
+    temp.sort((a, b) => a.i - b.i);
+    temp.forEach((o) => {
+      players.push(new Tone.Player(o.buff).toDestination());
+      seq.push({
+        idx: o.i,
+        time: o.t,
+        duration: parseFloat(o.buff.duration.toFixed(6)),
+      });
+    });
+
+    const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+    Tone.Transport.setLoopPoints(0, end);
+    Tone.Transport.loop = true;
+
+    part?.dispose();
+    part = new Tone.Part((time, value) => {
+      players[value.idx]?.start(time);
+      l_players[value.idx]?.start(time);
+      /*
+      l_players[value.idx]?.stop(
+        Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
+      );
+      */
+
+      // starts playhead if note is first piece
+      Tone.Draw.schedule(() => {
+        if (regionLoop) {
+          const firstPiece = seq.find((s) => s.time === regionLoop.start);
+          if (value.idx === firstPiece?.idx) {
+            wavesurfer.play(regionLoop.start);
+          }
+        }
+      }, time);
+    }, seq).start(0);
+
+    concatBuffers();
   };
 
   const originalClick = (
@@ -449,10 +470,11 @@ export default function Home(props: { folders: string[] }) {
 
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
+
     players.forEach((p: any) => (p.playbackRate = val));
+    l_players.forEach((p: any) => (p.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
-
     wavesurfer.setPlaybackRate(val);
     setSpeed(val);
   };
@@ -460,6 +482,34 @@ export default function Home(props: { folders: string[] }) {
   const changeZoom = (val: number) => {
     wavesurfer.zoom(val);
     setZoom(val);
+  };
+
+  const changeFader = (val: number) => {
+    if (val < 0) {
+      l_players.forEach((p: any) => {
+        p.set({
+          volume: val,
+        });
+      });
+      players.forEach((p: any) => {
+        p.set({
+          volume: 0,
+        });
+      });
+    } else if (val > 0) {
+      players.forEach((p: any) => {
+        p.set({
+          volume: val * -1,
+        });
+      });
+      l_players.forEach((p: any) => {
+        p.set({
+          volume: 0,
+        });
+      });
+    }
+
+    setFader(val);
   };
 
   useEffect(() => {
@@ -479,6 +529,58 @@ export default function Home(props: { folders: string[] }) {
       seq.map((obj) => players[obj.idx].buffer.toArray())
     );
   }, []);
+
+  const findMatches = async () => {
+    l_players.forEach((p: any) => p.dispose());
+    l_players = [];
+
+    let srcTable: any[] = [];
+    srcTable = table.filter((r) => r.n === selectedFile);
+    // all pieces
+    // srcTable = table.filter((r) => r.n !== selectedFile);
+
+    const selTable = table.filter(
+      (r) =>
+        r.n === props.folders[Math.floor(Math.random() * props.folders.length)]
+    );
+
+    const matches: any = [];
+    srcTable.forEach((src) => {
+      const t = selTable.map((r) => {
+        const freqDiff = Math.abs(r.f - src.f);
+        const durDiff = Math.abs(r.d - src.d);
+        return { ...r, fDiff: freqDiff, dDiff: durDiff };
+      });
+
+      t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
+
+      const r = Math.floor(Math.random() * 3);
+      matches.push(t[r]);
+    });
+
+    const t_players: any[] = [];
+    await Promise.all(
+      matches.map(async (m: any, idx: number) => {
+        await fetch(`/drums/${m.n}/${m.i}.wav`)
+          .then(async (response) => {
+            return await response.arrayBuffer();
+          })
+          .then(async (arrayBuffer) => {
+            const buff = await Tone.context.decodeAudioData(arrayBuffer);
+            t_players.push({
+              i: idx,
+              o: new Tone.Player(buff).toDestination(),
+            });
+          })
+          .catch((error) => {
+            throw Error(`Asset failed to load: ${error.message}`);
+          });
+      })
+    );
+
+    t_players.sort((a, b) => a.i - b.i);
+    l_players = t_players.map((r) => r.o);
+  };
 
   return (
     <>
@@ -572,6 +674,66 @@ export default function Home(props: { folders: string[] }) {
           }
         />
 
+        <input
+          id="speed"
+          type="range"
+          min={0.05}
+          max={2}
+          value={speed}
+          step={0.05}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeSpeed(parseFloat(e.target.value));
+          }}
+          disabled={loading}
+        />
+
+        <input
+          id="fader"
+          type="range"
+          min={-20}
+          max={20}
+          value={fader}
+          step={0.2}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeFader(parseFloat(e.target.value));
+          }}
+          disabled={loading}
+        />
+
+        <ul className={styles.playlist}>
+          {props.folders.map((folder) => {
+            return (
+              <li
+                className={folder === selectedFile ? styles.selected : ""}
+                key={folder}
+                onClick={(e) => listClick(e, folder)}
+              >
+                {folder}
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className={styles.toolbar}>
+          <button onClick={() => {}} disabled={loading}>
+            Layer
+          </button>
+
+          <button disabled={loading} onClick={() => findMatches()}>
+            Match
+          </button>
+
+          <button onClick={() => {}} disabled={loading}>
+            Break/All
+          </button>
+
+          <button id="download" onClick={() => {}} disabled={loading}>
+            Btn4
+          </button>
+        </div>
+
         <div className={styles.toolbar}>
           <button onClick={(e) => originalClick(e)} disabled={loading}>
             Original
@@ -598,34 +760,6 @@ export default function Home(props: { folders: string[] }) {
             Download
           </button>
         </div>
-
-        <input
-          id="speed"
-          type="range"
-          min={0.05}
-          max={2}
-          value={speed}
-          step={0.05}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeSpeed(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-
-        <ul className={styles.playlist}>
-          {props.folders.map((folder) => {
-            return (
-              <li
-                className={folder === selectedFile ? styles.selected : ""}
-                key={folder}
-                onClick={(e) => listClick(e, folder)}
-              >
-                {folder}
-              </li>
-            );
-          })}
-        </ul>
       </main>
     </>
   );

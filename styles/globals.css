@@ -138,6 +138,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
   background-image: url("/speed.svg");
 }
 
+#fader::-webkit-slider-thumb {
+  background-image: url("/fader.svg");
+}
+
 input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-webkit-slider-runnable-track {
   background-color: gray;
