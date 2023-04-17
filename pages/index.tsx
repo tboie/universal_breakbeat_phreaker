@@ -12,6 +12,7 @@ import util from "audio-buffer-utils";
 import toWav from "audiobuffer-to-wav";
 
 import data from "../public/data.json";
+import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
@@ -55,6 +56,7 @@ const table: any[] = [];
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
+  const [layer, setLayer] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
   const [scroll, setScroll] = useState(0);
@@ -244,6 +246,7 @@ export default function Home(props: { folders: string[] }) {
     setFader(0);
     setSelectedFile(folder);
     setLoading(true);
+    setLayer(false);
 
     let times: any[] = [];
     await fetch(`/drums/${folder}/times.txt`)
@@ -580,6 +583,13 @@ export default function Home(props: { folders: string[] }) {
     l_players = t_players.map((r) => r.o);
   };
 
+  const layerClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    l_players.forEach((p: any) => p.set({ mute: layer }));
+    setLayer(!layer);
+  };
+
   return (
     <>
       <Head>
@@ -715,11 +725,15 @@ export default function Home(props: { folders: string[] }) {
         </ul>
 
         <div className={styles.toolbar}>
-          <button onClick={() => {}} disabled={loading}>
+          <button
+            className={layer ? styles.selected : ""}
+            onClick={(e) => layerClick(e)}
+            disabled={loading}
+          >
             Layer
           </button>
 
-          <button disabled={loading} onClick={() => findMatches()}>
+          <button disabled={loading || !layer} onClick={() => findMatches()}>
             Match
           </button>
 

@@ -67,6 +67,7 @@
   width: 25%;
 }
 
+.toolbar .selected,
 .toolbar button:active,
 .controls button:active {
   background-color: rgba(135, 206, 235, 0.25);
@@ -101,5 +102,5 @@
 
 .selected {
   color: #39ff14;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(135, 206, 235, 0.25);
 }
