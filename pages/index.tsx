@@ -310,7 +310,10 @@ export default function Home(props: { folders: string[] }) {
       // start playhead at piece
       Tone.Draw.schedule(() => {
         if (regionLoop) {
-          wavesurfer.play(seq[value.idx]?.time);
+          const piece = seq.find((s) => s.idx === value.idx);
+          if (piece) {
+            wavesurfer.play(piece.time);
+          }
         }
       }, time);
     }, seq).start(0);
