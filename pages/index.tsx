@@ -220,16 +220,14 @@ export default function Home(props: { folders: string[] }) {
   }, []);
 
   const resetWaveSurfer = () => {
+    regionLoop = undefined;
+    regionSel = undefined;
     wavesurfer.stop();
     wavesurfer.clearRegions();
     wavesurfer.clearMarkers();
     wavesurfer.setPlaybackRate(1);
     wavesurfer.zoom(0);
     wavesurfer.empty();
-
-    setSpeed(1);
-    setZoom(0);
-    setPlaying(false);
   };
 
   const listClick = async (
@@ -239,16 +237,13 @@ export default function Home(props: { folders: string[] }) {
     e?.preventDefault();
     e?.stopPropagation();
 
-    Tone.Transport.stop();
-    regionLoop = undefined;
-    regionSel = undefined;
     resetWaveSurfer();
 
+    setSpeed(1);
+    setZoom(0);
+    setFader(0);
     setSelectedFile(folder);
     setLoading(true);
-
-    l_players.forEach((p: any) => p.dispose());
-    l_players = [];
 
     let times: any[] = [];
     await fetch(`/drums/${folder}/times.txt`)
@@ -259,10 +254,6 @@ export default function Home(props: { folders: string[] }) {
           .filter((t) => t)
           .map((t) => parseFloat(t));
       });
-
-    players.forEach((p: any) => p.dispose());
-    players = [];
-    seq = [];
 
     const temp: any[] = [];
     await Promise.all(
@@ -282,6 +273,15 @@ export default function Home(props: { folders: string[] }) {
     );
 
     temp.sort((a, b) => a.i - b.i);
+
+    l_players.forEach((p: any) => p.dispose());
+    l_players = [];
+
+    players.forEach((p: any) => p.dispose());
+    players = [];
+
+    seq = [];
+
     temp.forEach((o) => {
       players.push(new Tone.Player(o.buff).toDestination());
       seq.push({
@@ -308,11 +308,12 @@ export default function Home(props: { folders: string[] }) {
       // start playhead at piece
       Tone.Draw.schedule(() => {
         if (regionLoop) {
-          wavesurfer.play(seq[value.idx].time);
+          wavesurfer.play(seq[value.idx]?.time);
         }
       }, time);
     }, seq).start(0);
 
+    Tone.Transport.position = "0:0:0";
     concatBuffers();
   };
 
