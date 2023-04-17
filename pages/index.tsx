@@ -12,7 +12,6 @@ import util from "audio-buffer-utils";
 import toWav from "audiobuffer-to-wav";
 
 import data from "../public/data.json";
-import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
