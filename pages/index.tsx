@@ -101,8 +101,6 @@ export default function Home(props: { folders: string[] }) {
         container: "#waveform2",
         height: 200,
         waveColor: "gold",
-        progressColor: "#39FF14",
-        cursorColor: "#FF10F0",
         fillParent: false,
         scrollParent: false,
       });
