@@ -20,6 +20,8 @@ let ws2: any;
 
 let regionLoop: any;
 let regionSel: any;
+let regionLayer1: any;
+
 let touchMoved = false;
 
 let players: any = [];
@@ -216,6 +218,16 @@ export default function Home(props: { folders: string[] }) {
           );
         }
 
+        if (!regionLayer1) {
+          ws1.addRegion({
+            id: "layer1",
+            start: 0,
+            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
+            loop: false,
+          });
+          regionLayer1 = Object.values(ws1.regions.list)[2];
+        }
+
         ws1.clearMarkers();
         seq.forEach((s) => {
           ws1.addMarker({ time: s.time });
@@ -234,6 +246,7 @@ export default function Home(props: { folders: string[] }) {
   const resetWaveSurfer = () => {
     regionLoop = undefined;
     regionSel = undefined;
+    regionLayer1 = undefined;
 
     ws1.stop();
     ws1.clearRegions();
@@ -640,11 +653,13 @@ export default function Home(props: { folders: string[] }) {
       <main className={styles.main}>
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
-        <div id="waveform1" className={styles.waveform} />
+        <div
+          id="waveform1"
+          className={`${layer ? "showLayer" : "hideLayer"}`}
+        />
         <div
           id="waveform2"
-          className={styles.waveform2}
-          style={{ visibility: layer ? "visible" : "hidden" }}
+          className={`${layer ? "showLayer" : "hideLayer"}`}
         />
 
         <div className={styles.controls}>
