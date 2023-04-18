@@ -330,7 +330,10 @@ export default function Home(props: { folders: string[] }) {
       const piece = seq.find((s) => s.idx === value.idx);
 
       if (piece) {
-        if (piece.time >= regionLayer1.start && piece.time < regionLayer1.end) {
+        if (
+          piece.time >= regionLayer1?.start &&
+          piece.time < regionLayer1?.end
+        ) {
           l_players[value.idx]?.start(time);
 
           /* trim overlapping pieces
