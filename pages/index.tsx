@@ -15,7 +15,7 @@ import data from "../public/data.json";
 
 let init = false;
 
-let wavesurfer: any;
+let ws1: any;
 let ws2: any;
 
 let regionLoop: any;
@@ -76,8 +76,8 @@ export default function Home(props: { folders: string[] }) {
         //@ts-ignore
         (await import("wavesurfer.js/dist/plugin/wavesurfer.markers")).default;
 
-      wavesurfer = WaveSurfer.create({
-        container: "#waveform",
+      ws1 = WaveSurfer.create({
+        container: "#waveform1",
         height: 200,
         waveColor: "#39FF14",
         progressColor: "#39FF14",
@@ -108,13 +108,11 @@ export default function Home(props: { folders: string[] }) {
       const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
-          const minZoom = Math.floor(
-            window.innerWidth / wavesurfer.getDuration()
-          );
+          const minZoom = Math.floor(window.innerWidth / ws1.getDuration());
           // 2 seconds max
           const maxZoom = Math.floor(window.innerWidth / 2);
 
-          wavesurfer.zoom(minZoom);
+          ws1.zoom(minZoom);
           ws2.zoom(minZoom);
           zoomEle.min = minZoom.toString();
           zoomEle.max = maxZoom.toString();
@@ -143,7 +141,7 @@ export default function Home(props: { folders: string[] }) {
       window.addEventListener("resize", (event) => {
         configScroll();
         configZoom();
-        wavesurfer.drawer.fireEvent("redraw");
+        ws1.drawer.fireEvent("redraw");
         ws2.drawer.fireEvent("redraw");
       });
 
@@ -151,11 +149,11 @@ export default function Home(props: { folders: string[] }) {
         touchMoved = true;
       });
 
-      wavesurfer.on("zoom", (val: number) => {
+      ws1.on("zoom", (val: number) => {
         configScroll();
       });
 
-      wavesurfer.on("region-update-end", (region: any) => {
+      ws1.on("region-update-end", (region: any) => {
         // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
@@ -182,46 +180,45 @@ export default function Home(props: { folders: string[] }) {
         });
       });
 
-      wavesurfer.on("ready", () => {
-        wavesurfer.setVolume(0);
+      ws1.on("ready", () => {
+        ws1.setVolume(0);
 
         if (!regionSel) {
-          wavesurfer.addRegion({
+          ws1.addRegion({
             id: "selection",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: false,
           });
-          regionSel = Object.values(wavesurfer.regions.list)[0];
+          regionSel = Object.values(ws1.regions.list)[0];
         }
 
         if (!regionLoop) {
-          wavesurfer.addRegion({
+          ws1.addRegion({
             id: "loop",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: true,
           });
 
-          regionLoop = Object.values(wavesurfer.regions.list)[1];
+          regionLoop = Object.values(ws1.regions.list)[1];
           regionLoop.on("out", (e: any) => {
-            if (wavesurfer.getCurrentTime() > regionLoop.end) {
-              wavesurfer.play(regionLoop.start);
+            if (ws1.getCurrentTime() > regionLoop.end) {
+              ws1.play(regionLoop.start);
             }
           });
 
           configZoom();
         } else {
           // sets playhead on randomize
-          wavesurfer.seekTo(
-            Tone.Time(Tone.Transport.position).toSeconds() /
-              wavesurfer.getDuration()
+          ws1.seekTo(
+            Tone.Time(Tone.Transport.position).toSeconds() / ws1.getDuration()
           );
         }
 
-        wavesurfer.clearMarkers();
+        ws1.clearMarkers();
         seq.forEach((s) => {
-          wavesurfer.addMarker({ time: s.time });
+          ws1.addMarker({ time: s.time });
         });
 
         setLoading(false);
@@ -238,12 +235,12 @@ export default function Home(props: { folders: string[] }) {
     regionLoop = undefined;
     regionSel = undefined;
 
-    wavesurfer.stop();
-    wavesurfer.clearRegions();
-    wavesurfer.clearMarkers();
-    wavesurfer.setPlaybackRate(1);
-    wavesurfer.zoom(0);
-    wavesurfer.empty();
+    ws1.stop();
+    ws1.clearRegions();
+    ws1.clearMarkers();
+    ws1.setPlaybackRate(1);
+    ws1.zoom(0);
+    ws1.empty();
 
     ws2.zoom(0);
     ws2.empty();
@@ -330,7 +327,7 @@ export default function Home(props: { folders: string[] }) {
         if (regionLoop) {
           const piece = seq.find((s) => s.idx === value.idx);
           if (piece) {
-            wavesurfer.play(piece.time);
+            ws1.play(piece.time);
           }
         }
       }, time);
@@ -401,7 +398,7 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const wav = toWav(wavesurfer.backend.buffer);
+    const wav = toWav(ws1.backend.buffer);
     const blob = new window.Blob([new DataView(wav)], {
       type: "audio/wav",
     });
@@ -424,8 +421,8 @@ export default function Home(props: { folders: string[] }) {
     await Tone.start();
     if (playing) {
       Tone.Transport.stop();
-      wavesurfer.pause();
-      wavesurfer.seekTo(regionLoop.start / wavesurfer.getDuration());
+      ws1.pause();
+      ws1.seekTo(regionLoop.start / ws1.getDuration());
     } else {
       Tone.Transport.start("+0.5", regionLoop.start / speed);
     }
@@ -496,12 +493,12 @@ export default function Home(props: { folders: string[] }) {
     l_players.forEach((p: any) => (p.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
-    wavesurfer.setPlaybackRate(val);
+    ws1.setPlaybackRate(val);
     setSpeed(val);
   };
 
   const changeZoom = (val: number) => {
-    wavesurfer.zoom(val);
+    ws1.zoom(val);
     ws2.zoom(val);
     setZoom(val);
   };
@@ -540,7 +537,7 @@ export default function Home(props: { folders: string[] }) {
       new URL("../concatBuffers.js", import.meta.url)
     );
     workerRef.current.onmessage = (e: MessageEvent<any>) => {
-      wavesurfer.loadDecodedBuffer(util.create(e.data));
+      ws1.loadDecodedBuffer(util.create(e.data));
     };
 
     return () => {
@@ -643,7 +640,7 @@ export default function Home(props: { folders: string[] }) {
       <main className={styles.main}>
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
-        <div id="waveform" className={styles.waveform} />
+        <div id="waveform1" className={styles.waveform} />
         <div
           id="waveform2"
           className={styles.waveform2}
@@ -689,7 +686,7 @@ export default function Home(props: { folders: string[] }) {
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseInt(e.target.value);
             const container = document.querySelector(
-              "#waveform"
+              "#waveform1"
             ) as HTMLDivElement;
 
             const container2 = document.querySelector(
@@ -708,7 +705,7 @@ export default function Home(props: { folders: string[] }) {
           }}
           disabled={
             loading ||
-            zoom === Math.floor(window.innerWidth / wavesurfer?.getDuration())
+            zoom === Math.floor(window.innerWidth / ws1?.getDuration())
           }
         />
 
