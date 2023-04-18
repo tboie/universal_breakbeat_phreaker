@@ -326,12 +326,20 @@ export default function Home(props: { folders: string[] }) {
     part?.dispose();
     part = new Tone.Part((time, value) => {
       players[value.idx]?.start(time);
-      l_players[value.idx]?.start(time);
-      /* trim overlapping pieces
-      l_players[value.idx]?.stop(
-        Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
-      );
-      */
+
+      const piece = seq.find((s) => s.idx === value.idx);
+
+      if (piece) {
+        if (piece.time >= regionLayer1.start && piece.time < regionLayer1.end) {
+          l_players[value.idx]?.start(time);
+
+          /* trim overlapping pieces
+          l_players[value.idx]?.stop(
+            Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
+          );
+          */
+        }
+      }
 
       // start playhead at piece
       Tone.Draw.schedule(() => {
