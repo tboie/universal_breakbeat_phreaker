@@ -16,6 +16,8 @@ import data from "../public/data.json";
 let init = false;
 
 let wavesurfer: any;
+let ws2: any;
+
 let regionLoop: any;
 let regionSel: any;
 let touchMoved = false;
@@ -93,6 +95,16 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
+      ws2 = WaveSurfer.create({
+        container: "#waveform2",
+        height: 200,
+        waveColor: "gold",
+        progressColor: "#39FF14",
+        cursorColor: "#FF10F0",
+        fillParent: false,
+        scrollParent: false,
+      });
+
       const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
@@ -103,6 +115,7 @@ export default function Home(props: { folders: string[] }) {
           const maxZoom = Math.floor(window.innerWidth / 2);
 
           wavesurfer.zoom(minZoom);
+          ws2.zoom(minZoom);
           zoomEle.min = minZoom.toString();
           zoomEle.max = maxZoom.toString();
           zoomEle.value = minZoom.toString();
@@ -131,6 +144,7 @@ export default function Home(props: { folders: string[] }) {
         configScroll();
         configZoom();
         wavesurfer.drawer.fireEvent("redraw");
+        ws2.drawer.fireEvent("redraw");
       });
 
       document.body.addEventListener("touchmove", (event) => {
@@ -223,12 +237,16 @@ export default function Home(props: { folders: string[] }) {
   const resetWaveSurfer = () => {
     regionLoop = undefined;
     regionSel = undefined;
+
     wavesurfer.stop();
     wavesurfer.clearRegions();
     wavesurfer.clearMarkers();
     wavesurfer.setPlaybackRate(1);
     wavesurfer.zoom(0);
     wavesurfer.empty();
+
+    ws2.zoom(0);
+    ws2.empty();
   };
 
   const listClick = async (
@@ -301,7 +319,7 @@ export default function Home(props: { folders: string[] }) {
     part = new Tone.Part((time, value) => {
       players[value.idx]?.start(time);
       l_players[value.idx]?.start(time);
-      /*
+      /* trim overlapping pieces
       l_players[value.idx]?.stop(
         Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
       );
@@ -484,6 +502,7 @@ export default function Home(props: { folders: string[] }) {
 
   const changeZoom = (val: number) => {
     wavesurfer.zoom(val);
+    ws2.zoom(val);
     setZoom(val);
   };
 
@@ -520,14 +539,16 @@ export default function Home(props: { folders: string[] }) {
     workerRef.current = new Worker(
       new URL("../concatBuffers.js", import.meta.url)
     );
-    workerRef.current.onmessage = (e: MessageEvent<any[]>) => {
+    workerRef.current.onmessage = (e: MessageEvent<any>) => {
       wavesurfer.loadDecodedBuffer(util.create(e.data));
     };
-    return () => workerRef.current?.terminate();
+
+    return () => {
+      workerRef.current?.terminate();
+    };
   }, []);
 
   const concatBuffers = useCallback(async () => {
-    // should more stuff go in worker?
     workerRef.current?.postMessage(
       seq.map((obj) => players[obj.idx].buffer.toArray())
     );
@@ -583,11 +604,27 @@ export default function Home(props: { folders: string[] }) {
 
     t_players.sort((a, b) => a.i - b.i);
     l_players = t_players.map((r) => r.o);
+
+    const duration = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+    Tone.Offline(({ transport }) => {
+      const c_players = l_players.map((p: any) =>
+        new Tone.Player(p.buffer).toDestination()
+      );
+
+      new Tone.Part((time, value) => {
+        c_players[value.idx]?.start(time);
+      }, seq).start(0);
+
+      transport.start(0);
+    }, duration).then((buffer) => {
+      ws2.loadDecodedBuffer(buffer.get());
+    });
   };
 
   const layerClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
     e.preventDefault();
+
     l_players.forEach((p: any) => p.set({ mute: layer }));
     setLayer(!layer);
   };
@@ -607,6 +644,11 @@ export default function Home(props: { folders: string[] }) {
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
         <div id="waveform" className={styles.waveform} />
+        <div
+          id="waveform2"
+          className={styles.waveform2}
+          style={{ visibility: layer ? "visible" : "hidden" }}
+        />
 
         <div className={styles.controls}>
           <button
@@ -650,8 +692,16 @@ export default function Home(props: { folders: string[] }) {
               "#waveform"
             ) as HTMLDivElement;
 
+            const container2 = document.querySelector(
+              "#waveform2"
+            ) as HTMLDivElement;
+
             if (container) {
               container.scrollLeft = val;
+            }
+
+            if (container2) {
+              container2.scrollLeft = val;
             }
 
             setScroll(val);

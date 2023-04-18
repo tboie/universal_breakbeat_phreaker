@@ -19,10 +19,18 @@ main {
   color: rgba(255, 255, 255, 0.96);
 }
 
-#waveform {
+#waveform,
+#waveform2 {
   overflow-x: hidden !important;
   min-height: 200px !important;
   margin-bottom: 0.25rem;
+}
+
+#waveform2 {
+  margin-top: 1.1rem;
+  z-index: 2;
+  position: fixed !important;
+  width: 100% !important;
 }
 
 [data-id="loop"] {
