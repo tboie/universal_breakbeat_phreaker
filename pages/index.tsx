@@ -141,7 +141,7 @@ export default function Home(props: { folders: string[] }) {
 
       const configScroll = () => {
         const scrollEle = document.querySelector("#scroll") as HTMLInputElement;
-        const waveEle = document.querySelector("#waveform") as HTMLDivElement;
+        const waveEle = document.querySelector("#waveform0") as HTMLDivElement;
 
         if (scrollEle && waveEle) {
           const scrollMax = waveEle.scrollWidth - window.innerWidth;
@@ -573,6 +573,7 @@ export default function Home(props: { folders: string[] }) {
   const changeZoom = (val: number) => {
     ws0.zoom(val);
     ws1.zoom(val);
+    ws2.zoom(val);
     setZoom(val);
   };
 
@@ -829,16 +830,24 @@ export default function Home(props: { folders: string[] }) {
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseInt(e.target.value);
-            const container = document.querySelector(
+            const container0 = document.querySelector(
               "#waveform0"
             ) as HTMLDivElement;
 
-            const container2 = document.querySelector(
+            const container1 = document.querySelector(
               "#waveform1"
             ) as HTMLDivElement;
 
-            if (container) {
-              container.scrollLeft = val;
+            const container2 = document.querySelector(
+              "#waveform2"
+            ) as HTMLDivElement;
+
+            if (container0) {
+              container0.scrollLeft = val;
+            }
+
+            if (container1) {
+              container1.scrollLeft = val;
             }
 
             if (container2) {
