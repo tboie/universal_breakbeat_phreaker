@@ -417,6 +417,7 @@ export default function Home(props: { folders: string[] }) {
     });
 
     drawLayer(0);
+    drawLayer(1, selectedLayer === 1 ? false : true);
     //concatBuffers();
   };
 
