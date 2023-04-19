@@ -66,7 +66,7 @@ export default function Home(props: { folders: string[] }) {
   const [fader, setFader] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
-  const workerRef = useRef<Worker>();
+  //const workerRef = useRef<Worker>();
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -356,7 +356,9 @@ export default function Home(props: { folders: string[] }) {
     }, seq).start(0);
 
     Tone.Transport.position = "0:0:0";
-    concatBuffers();
+    //concatBuffers();
+
+    drawLayer(0);
   };
 
   const originalClick = (
@@ -411,7 +413,8 @@ export default function Home(props: { folders: string[] }) {
       end: snapEnd,
     });
 
-    concatBuffers();
+    drawLayer(0);
+    //concatBuffers();
   };
 
   const downloadClick = (
@@ -553,6 +556,7 @@ export default function Home(props: { folders: string[] }) {
     setFader(val);
   };
 
+  /*
   useEffect(() => {
     // worker used to concat waveform after randomization
     workerRef.current = new Worker(
@@ -572,6 +576,7 @@ export default function Home(props: { folders: string[] }) {
       seq.map((obj) => players[obj.idx].buffer.toArray())
     );
   }, []);
+  */
 
   const findMatches = async () => {
     l_players.forEach((p: any) => p.dispose());
@@ -624,11 +629,24 @@ export default function Home(props: { folders: string[] }) {
     t_players.sort((a, b) => a.i - b.i);
     l_players = t_players.map((r) => r.o);
 
+    drawLayer(1);
+  };
+
+  const drawLayer = (layer: number, selection?: boolean) => {
     const duration = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+
     Tone.Offline(({ transport }) => {
-      const c_players = l_players.map((p: any) =>
-        new Tone.Player(p.buffer).toDestination()
-      );
+      let c_players: Tone.Player[] = [];
+
+      if (layer === 0) {
+        c_players = players.map((p: any) =>
+          new Tone.Player(p.buffer).toDestination()
+        );
+      } else if (layer === 1) {
+        c_players = l_players.map((p: any) =>
+          new Tone.Player(p.buffer).toDestination()
+        );
+      }
 
       new Tone.Part((time, value) => {
         c_players[value.idx]?.start(time);
@@ -636,7 +654,11 @@ export default function Home(props: { folders: string[] }) {
 
       transport.start(0);
     }, duration).then((buffer) => {
-      ws2.loadDecodedBuffer(buffer.get());
+      if (layer === 0) {
+        ws1.loadDecodedBuffer(buffer.get());
+      } else if (layer === 1) {
+        ws2.loadDecodedBuffer(buffer.get());
+      }
     });
   };
 
