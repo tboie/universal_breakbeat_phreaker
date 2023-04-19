@@ -68,6 +68,9 @@ export default function Home(props: { folders: string[] }) {
   const [playing, setPlaying] = useState(false);
   //const workerRef = useRef<Worker>();
 
+  const refSelectedLayer = useRef(0);
+  refSelectedLayer.current = selectedLayer;
+
   useEffect(() => {
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
@@ -649,7 +652,21 @@ export default function Home(props: { folders: string[] }) {
       }
 
       new Tone.Part((time, value) => {
-        c_players[value.idx]?.start(time);
+        if (selection) {
+          if (layer === 1) {
+            const piece = seq.find((s) => s.idx === value.idx);
+            if (piece) {
+              if (
+                piece.time >= regionLayer1?.start &&
+                piece.time < regionLayer1?.end
+              ) {
+                c_players[value.idx]?.start(time);
+              }
+            }
+          }
+        } else {
+          c_players[value.idx]?.start(time);
+        }
       }, seq).start(0);
 
       transport.start(0);
@@ -667,11 +684,18 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
 
     if (selectedLayer === 0) {
+      drawLayer(1);
       setSelectedLayer(1);
     } else {
+      drawLayer(1, true);
       setSelectedLayer(0);
     }
   };
+
+  useEffect(() => {
+    if (init) {
+    }
+  }, [selectedLayer]);
 
   return (
     <>
