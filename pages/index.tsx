@@ -59,7 +59,7 @@ const table: any[] = [];
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
-  const [layer, setLayer] = useState(false);
+  const [selectedLayer, setSelectedLayer] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
   const [scroll, setScroll] = useState(0);
@@ -271,7 +271,6 @@ export default function Home(props: { folders: string[] }) {
     setFader(0);
     setSelectedFile(folder);
     setLoading(true);
-    setLayer(false);
 
     let times: any[] = [];
     await fetch(`/drums/${folder}/times.txt`)
@@ -666,8 +665,11 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    l_players.forEach((p: any) => p.set({ mute: layer }));
-    setLayer(!layer);
+    if (selectedLayer === 0) {
+      setSelectedLayer(1);
+    } else {
+      setSelectedLayer(0);
+    }
   };
 
   return (
@@ -686,12 +688,9 @@ export default function Home(props: { folders: string[] }) {
 
         <div
           id="waveform1"
-          className={`${layer ? "showLayer" : "hideLayer"}`}
+          className={`${selectedLayer === 0 ? "layer0" : "layer1"}`}
         />
-        <div
-          id="waveform2"
-          className={`${layer ? "showLayer" : "hideLayer"}`}
-        />
+        <div id="waveform2" />
 
         <div className={styles.controls}>
           <button
@@ -821,14 +820,17 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.toolbar}>
           <button
-            className={layer ? styles.selected : ""}
+            className={selectedLayer === 1 ? styles.selected : ""}
             onClick={(e) => layerClick(e)}
             disabled={loading}
           >
             Layer
           </button>
 
-          <button disabled={loading || !layer} onClick={() => findMatches()}>
+          <button
+            disabled={loading || selectedLayer === 0}
+            onClick={() => findMatches()}
+          >
             Match
           </button>
 

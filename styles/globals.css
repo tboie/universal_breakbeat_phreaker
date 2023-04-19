@@ -68,19 +68,15 @@ main {
   ) !important;
 }
 
-#waveform1.hideLayer [data-id="layer1"] {
+#waveform1.layer0 [data-id="layer1"] {
   visibility: hidden !important;
 }
 
-#waveform1.hideLayer [data-id="selection"] {
+#waveform1.layer0 [data-id="selection"] {
   visibility: visible !important;
 }
 
-#waveform2.hideLayer {
-  visibility: hidden !important;
-}
-
-#waveform1.showLayer [data-id="selection"] {
+#waveform1.layer1 [data-id="selection"] {
   visibility: hidden !important;
 }
 
