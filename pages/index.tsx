@@ -830,29 +830,14 @@ export default function Home(props: { folders: string[] }) {
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseInt(e.target.value);
-            const container0 = document.querySelector(
-              "#waveform0"
-            ) as HTMLDivElement;
 
-            const container1 = document.querySelector(
-              "#waveform1"
-            ) as HTMLDivElement;
+            ["#waveform0", "#waveform1", "#waveform2"].forEach((n) => {
+              const container = document.querySelector(n) as HTMLDivElement;
 
-            const container2 = document.querySelector(
-              "#waveform2"
-            ) as HTMLDivElement;
-
-            if (container0) {
-              container0.scrollLeft = val;
-            }
-
-            if (container1) {
-              container1.scrollLeft = val;
-            }
-
-            if (container2) {
-              container2.scrollLeft = val;
-            }
+              if (container) {
+                container.scrollLeft = val;
+              }
+            });
 
             setScroll(val);
           }}
