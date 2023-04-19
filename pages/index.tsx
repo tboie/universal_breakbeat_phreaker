@@ -298,13 +298,6 @@ export default function Home(props: { folders: string[] }) {
 
     resetWaveSurfer();
 
-    setSpeed(1);
-    setZoom(0);
-    setFader(0);
-    setSelectedFile(folder);
-    setLoading(true);
-    setSelectedLayer(0);
-
     let times: any[] = [];
     await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
@@ -400,6 +393,13 @@ export default function Home(props: { folders: string[] }) {
 
     //concatBuffers();
     drawLayer(0);
+
+    setSpeed(1);
+    setZoom(0);
+    setFader(0);
+    setSelectedFile(folder);
+    setLoading(true);
+    setSelectedLayer(0);
   };
 
   const originalClick = (
