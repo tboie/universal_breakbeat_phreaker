@@ -692,11 +692,6 @@ export default function Home(props: { folders: string[] }) {
     }
   };
 
-  useEffect(() => {
-    if (init) {
-    }
-  }, [selectedLayer]);
-
   return (
     <>
       <Head>
