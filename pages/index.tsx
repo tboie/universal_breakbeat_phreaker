@@ -392,7 +392,7 @@ export default function Home(props: { folders: string[] }) {
     Tone.Transport.position = "0:0:0";
 
     //concatBuffers();
-    drawLayer(0);
+    await drawLayer(0);
 
     setSpeed(1);
     setZoom(0);
@@ -410,7 +410,9 @@ export default function Home(props: { folders: string[] }) {
     listClick(undefined, selectedFile);
   };
 
-  const randomClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const randomClick = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -454,9 +456,9 @@ export default function Home(props: { folders: string[] }) {
       end: snapEnd,
     });
 
-    drawLayer(0);
-    drawLayer(1, selectedLayer === 1 ? false : true);
-    drawLayer(2, selectedLayer === 2 ? false : true);
+    await drawLayer(0);
+    await drawLayer(1, selectedLayer === 1 ? false : true);
+    await drawLayer(2, selectedLayer === 2 ? false : true);
 
     //concatBuffers();
   };
@@ -683,10 +685,10 @@ export default function Home(props: { folders: string[] }) {
       players2 = t_players.map((r) => r.o);
     }
 
-    drawLayer(layer);
+    await drawLayer(layer);
   };
 
-  const drawLayer = (layer: number, selection?: boolean) => {
+  const drawLayer = async (layer: number, selection?: boolean) => {
     const duration = seq[seq.length - 1].time + seq[seq.length - 1].duration;
 
     Tone.Offline(({ transport }) => {
@@ -742,7 +744,7 @@ export default function Home(props: { folders: string[] }) {
     });
   };
 
-  const layerClick = (
+  const layerClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
   ) => {
@@ -750,11 +752,12 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
 
     if (layer !== selectedLayer) {
-      drawLayer(layer);
+      await drawLayer(layer === 2 ? 1 : 2, true);
+      await drawLayer(layer);
       setSelectedLayer(layer);
     } else {
-      drawLayer(1, true);
-      drawLayer(2, true);
+      await drawLayer(1, true);
+      await drawLayer(2, true);
       setSelectedLayer(0);
     }
   };
