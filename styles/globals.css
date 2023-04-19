@@ -19,14 +19,14 @@ main {
   color: rgba(255, 255, 255, 0.96);
 }
 
-#waveform1,
-#waveform2 {
+#waveform0,
+#waveform1 {
   overflow-x: hidden !important;
   min-height: 200px !important;
   margin-bottom: 0.25rem;
 }
 
-#waveform2 {
+#waveform1 {
   margin-top: 1.1rem;
   z-index: 2;
   position: fixed !important;
@@ -68,15 +68,15 @@ main {
   ) !important;
 }
 
-#waveform1.layer0 [data-id="layer1"] {
+#waveform0.layer0 [data-id="layer1"] {
   visibility: hidden !important;
 }
 
-#waveform1.layer0 [data-id="selection"] {
+#waveform0.layer0 [data-id="selection"] {
   visibility: visible !important;
 }
 
-#waveform1.layer1 [data-id="selection"] {
+#waveform0.layer1 [data-id="selection"] {
   visibility: hidden !important;
 }
 

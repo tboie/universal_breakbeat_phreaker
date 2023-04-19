@@ -15,18 +15,19 @@ import data from "../public/data.json";
 
 let init = false;
 
+let ws0: any;
 let ws1: any;
-let ws2: any;
 
 let regionLoop: any;
-let regionSel: any;
+let regionRand: any;
 let regionLayer1: any;
 
 let touchMoved = false;
 
-let players: any = [];
-let l_players: any = [];
-let part: any;
+let players0: Tone.Player[] = [];
+let players1: Tone.Player[] = [];
+
+let part: Tone.Part;
 
 type TSeq = {
   idx: number;
@@ -81,8 +82,8 @@ export default function Home(props: { folders: string[] }) {
         //@ts-ignore
         (await import("wavesurfer.js/dist/plugin/wavesurfer.markers")).default;
 
-      ws1 = WaveSurfer.create({
-        container: "#waveform1",
+      ws0 = WaveSurfer.create({
+        container: "#waveform0",
         height: 200,
         waveColor: "#39FF14",
         progressColor: "#39FF14",
@@ -100,8 +101,8 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
-      ws2 = WaveSurfer.create({
-        container: "#waveform2",
+      ws1 = WaveSurfer.create({
+        container: "#waveform1",
         height: 200,
         waveColor: "gold",
         fillParent: false,
@@ -111,12 +112,12 @@ export default function Home(props: { folders: string[] }) {
       const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
-          const minZoom = Math.floor(window.innerWidth / ws1.getDuration());
+          const minZoom = Math.floor(window.innerWidth / ws0.getDuration());
           // 2 seconds max
           const maxZoom = Math.floor(window.innerWidth / 2);
 
+          ws0.zoom(minZoom);
           ws1.zoom(minZoom);
-          ws2.zoom(minZoom);
           zoomEle.min = minZoom.toString();
           zoomEle.max = maxZoom.toString();
           zoomEle.value = minZoom.toString();
@@ -144,19 +145,19 @@ export default function Home(props: { folders: string[] }) {
       window.addEventListener("resize", (event) => {
         configScroll();
         configZoom();
+        ws0.drawer.fireEvent("redraw");
         ws1.drawer.fireEvent("redraw");
-        ws2.drawer.fireEvent("redraw");
       });
 
       document.body.addEventListener("touchmove", (event) => {
         touchMoved = true;
       });
 
-      ws1.on("zoom", (val: number) => {
+      ws0.on("zoom", (val: number) => {
         configScroll();
       });
 
-      ws1.on("region-update-end", (region: any) => {
+      ws0.on("region-update-end", (region: any) => {
         // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
@@ -183,55 +184,55 @@ export default function Home(props: { folders: string[] }) {
         });
       });
 
-      ws1.on("ready", () => {
-        ws1.setVolume(0);
+      ws0.on("ready", () => {
+        ws0.setVolume(0);
 
-        if (!regionSel) {
-          ws1.addRegion({
+        if (!regionRand) {
+          ws0.addRegion({
             id: "selection",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: false,
           });
-          regionSel = Object.values(ws1.regions.list)[0];
+          regionRand = Object.values(ws0.regions.list)[0];
         }
 
         if (!regionLoop) {
-          ws1.addRegion({
+          ws0.addRegion({
             id: "loop",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: true,
           });
 
-          regionLoop = Object.values(ws1.regions.list)[1];
+          regionLoop = Object.values(ws0.regions.list)[1];
           regionLoop.on("out", (e: any) => {
-            if (ws1.getCurrentTime() > regionLoop.end) {
-              ws1.play(regionLoop.start);
+            if (ws0.getCurrentTime() > regionLoop.end) {
+              ws0.play(regionLoop.start);
             }
           });
 
           configZoom();
         } else {
           // sets playhead on randomize
-          ws1.seekTo(
-            Tone.Time(Tone.Transport.position).toSeconds() / ws1.getDuration()
+          ws0.seekTo(
+            Tone.Time(Tone.Transport.position).toSeconds() / ws0.getDuration()
           );
         }
 
         if (!regionLayer1) {
-          ws1.addRegion({
+          ws0.addRegion({
             id: "layer1",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: false,
           });
-          regionLayer1 = Object.values(ws1.regions.list)[2];
+          regionLayer1 = Object.values(ws0.regions.list)[2];
         }
 
-        ws1.clearMarkers();
+        ws0.clearMarkers();
         seq.forEach((s) => {
-          ws1.addMarker({ time: s.time });
+          ws0.addMarker({ time: s.time });
         });
 
         setLoading(false);
@@ -246,19 +247,19 @@ export default function Home(props: { folders: string[] }) {
 
   const resetWaveSurfer = () => {
     regionLoop = undefined;
-    regionSel = undefined;
+    regionRand = undefined;
     regionLayer1 = undefined;
 
-    ws1.stop();
-    ws1.clearRegions();
-    ws1.clearMarkers();
-    ws1.setPlaybackRate(1);
+    ws0.stop();
+    ws0.clearRegions();
+    ws0.clearMarkers();
+    ws0.setPlaybackRate(1);
+    ws0.zoom(0);
+    ws0.empty();
+
     ws1.zoom(0);
     ws1.empty();
-
-    ws2.zoom(0);
-    ws2.empty();
-    ws2.backend.buffer = undefined;
+    ws1.backend.buffer = undefined;
   };
 
   const listClick = async (
@@ -305,16 +306,16 @@ export default function Home(props: { folders: string[] }) {
 
     temp.sort((a, b) => a.i - b.i);
 
-    l_players.forEach((p: any) => p.dispose());
-    l_players = [];
+    players1.forEach((p: any) => p.dispose());
+    players1 = [];
 
-    players.forEach((p: any) => p.dispose());
-    players = [];
+    players0.forEach((p: any) => p.dispose());
+    players0 = [];
 
     seq = [];
 
     temp.forEach((o) => {
-      players.push(new Tone.Player(o.buff).toDestination());
+      players0.push(new Tone.Player(o.buff).toDestination());
       seq.push({
         idx: o.i,
         time: o.t,
@@ -328,7 +329,7 @@ export default function Home(props: { folders: string[] }) {
 
     part?.dispose();
     part = new Tone.Part((time, value) => {
-      players[value.idx]?.start(time);
+      players0[value.idx]?.start(time);
 
       const piece = seq.find((s) => s.idx === value.idx);
 
@@ -337,10 +338,10 @@ export default function Home(props: { folders: string[] }) {
           piece.time >= regionLayer1?.start &&
           piece.time < regionLayer1?.end
         ) {
-          l_players[value.idx]?.start(time);
+          players1[value.idx]?.start(time);
 
           /* trim overlapping pieces
-          l_players[value.idx]?.stop(
+          players1[value.idx]?.stop(
             Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
           );
           */
@@ -352,7 +353,7 @@ export default function Home(props: { folders: string[] }) {
         if (regionLoop) {
           const piece = seq.find((s) => s.idx === value.idx);
           if (piece) {
-            ws1.play(piece.time);
+            ws0.play(piece.time);
           }
         }
       }, time);
@@ -376,8 +377,8 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const startIdx = seq.findIndex((s) => s.time === regionSel.start);
-    let endIdx = seq.findIndex((s) => s.time === regionSel.end);
+    const startIdx = seq.findIndex((s) => s.time === regionRand.start);
+    let endIdx = seq.findIndex((s) => s.time === regionRand.end);
     if (endIdx === -1) {
       endIdx = seq.length;
     }
@@ -427,7 +428,7 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const wav = toWav(ws1.backend.buffer);
+    const wav = toWav(ws0.backend.buffer);
     const blob = new window.Blob([new DataView(wav)], {
       type: "audio/wav",
     });
@@ -450,8 +451,8 @@ export default function Home(props: { folders: string[] }) {
     await Tone.start();
     if (playing) {
       Tone.Transport.stop();
-      ws1.pause();
-      ws1.seekTo(regionLoop.start / ws1.getDuration());
+      ws0.pause();
+      ws0.seekTo(regionLoop.start / ws0.getDuration());
     } else {
       Tone.Transport.start("+0.5", regionLoop.start / speed);
     }
@@ -518,39 +519,39 @@ export default function Home(props: { folders: string[] }) {
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
 
-    players.forEach((p: any) => (p.playbackRate = val));
-    l_players.forEach((p: any) => (p.playbackRate = val));
+    players0.forEach((p: any) => (p.playbackRate = val));
+    players1.forEach((p: any) => (p.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
-    ws1.setPlaybackRate(val);
+    ws0.setPlaybackRate(val);
     setSpeed(val);
   };
 
   const changeZoom = (val: number) => {
+    ws0.zoom(val);
     ws1.zoom(val);
-    ws2.zoom(val);
     setZoom(val);
   };
 
   const changeFader = (val: number) => {
     if (val < 0) {
-      l_players.forEach((p: any) => {
+      players1.forEach((p: any) => {
         p.set({
           volume: val,
         });
       });
-      players.forEach((p: any) => {
+      players0.forEach((p: any) => {
         p.set({
           volume: 0,
         });
       });
     } else if (val > 0) {
-      players.forEach((p: any) => {
+      players0.forEach((p: any) => {
         p.set({
           volume: val * -1,
         });
       });
-      l_players.forEach((p: any) => {
+      players1.forEach((p: any) => {
         p.set({
           volume: 0,
         });
@@ -567,7 +568,7 @@ export default function Home(props: { folders: string[] }) {
       new URL("../concatBuffers.js", import.meta.url)
     );
     workerRef.current.onmessage = (e: MessageEvent<any>) => {
-      ws1.loadDecodedBuffer(util.create(e.data));
+      ws0.loadDecodedBuffer(util.create(e.data));
     };
 
     return () => {
@@ -583,8 +584,8 @@ export default function Home(props: { folders: string[] }) {
   */
 
   const findMatches = async () => {
-    l_players.forEach((p: any) => p.dispose());
-    l_players = [];
+    players1.forEach((p: any) => p.dispose());
+    players1 = [];
 
     let srcTable: any[] = [];
     srcTable = table.filter((r) => r.n === selectedFile);
@@ -631,7 +632,7 @@ export default function Home(props: { folders: string[] }) {
     );
 
     t_players.sort((a, b) => a.i - b.i);
-    l_players = t_players.map((r) => r.o);
+    players1 = t_players.map((r) => r.o);
 
     drawLayer(1);
   };
@@ -643,11 +644,11 @@ export default function Home(props: { folders: string[] }) {
       let c_players: Tone.Player[] = [];
 
       if (layer === 0) {
-        c_players = players.map((p: any) =>
+        c_players = players0.map((p: any) =>
           new Tone.Player(p.buffer).toDestination()
         );
       } else if (layer === 1) {
-        c_players = l_players.map((p: any) =>
+        c_players = players1.map((p: any) =>
           new Tone.Player(p.buffer).toDestination()
         );
       }
@@ -673,9 +674,9 @@ export default function Home(props: { folders: string[] }) {
       transport.start(0);
     }, duration).then((buffer) => {
       if (layer === 0) {
-        ws1.loadDecodedBuffer(buffer.get());
+        ws0.loadDecodedBuffer(buffer.get());
       } else if (layer === 1) {
-        ws2.loadDecodedBuffer(buffer.get());
+        ws1.loadDecodedBuffer(buffer.get());
       }
     });
   };
@@ -708,10 +709,10 @@ export default function Home(props: { folders: string[] }) {
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
         <div
-          id="waveform1"
+          id="waveform0"
           className={`${selectedLayer === 0 ? "layer0" : "layer1"}`}
         />
-        <div id="waveform2" />
+        <div id="waveform1" />
 
         <div className={styles.controls}>
           <button
@@ -752,11 +753,11 @@ export default function Home(props: { folders: string[] }) {
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseInt(e.target.value);
             const container = document.querySelector(
-              "#waveform1"
+              "#waveform0"
             ) as HTMLDivElement;
 
             const container2 = document.querySelector(
-              "#waveform2"
+              "#waveform1"
             ) as HTMLDivElement;
 
             if (container) {
@@ -771,7 +772,7 @@ export default function Home(props: { folders: string[] }) {
           }}
           disabled={
             loading ||
-            zoom === Math.floor(window.innerWidth / ws1?.getDuration())
+            zoom === Math.floor(window.innerWidth / ws0?.getDuration())
           }
         />
 
