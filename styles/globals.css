@@ -193,6 +193,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
   background-image: url("/fader.svg");
 }
 
+#layer2Volume::-webkit-slider-thumb {
+  background-image: url("/2.svg");
+}
+
 input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-webkit-slider-runnable-track {
   background-color: gray;

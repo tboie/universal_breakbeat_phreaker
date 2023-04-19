@@ -68,6 +68,7 @@ export default function Home(props: { folders: string[] }) {
   const [zoom, setZoom] = useState(0);
   const [scroll, setScroll] = useState(0);
   const [fader, setFader] = useState(0);
+  const [layer2Volume, setLayer2Volume] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   //const workerRef = useRef<Worker>();
@@ -577,23 +578,23 @@ export default function Home(props: { folders: string[] }) {
 
   const changeFader = (val: number) => {
     if (val < 0) {
-      players1.forEach((p: any) => {
+      players1.forEach((p) => {
         p.set({
           volume: val,
         });
       });
-      players0.forEach((p: any) => {
+      players0.forEach((p) => {
         p.set({
           volume: 0,
         });
       });
     } else if (val > 0) {
-      players0.forEach((p: any) => {
+      players0.forEach((p) => {
         p.set({
           volume: val * -1,
         });
       });
-      players1.forEach((p: any) => {
+      players1.forEach((p) => {
         p.set({
           volume: 0,
         });
@@ -601,6 +602,15 @@ export default function Home(props: { folders: string[] }) {
     }
 
     setFader(val);
+  };
+
+  const changeLayer2Volume = (val: number) => {
+    players2.forEach((p) => {
+      p.set({
+        volume: val,
+      });
+    });
+    setLayer2Volume(val);
   };
 
   /*
@@ -627,10 +637,10 @@ export default function Home(props: { folders: string[] }) {
 
   const findMatches = async (layer: number) => {
     if (layer === 1) {
-      players1.forEach((p: any) => p.dispose());
+      players1.forEach((p) => p.dispose());
       players1 = [];
     } else if (layer === 2) {
-      players2.forEach((p: any) => p.dispose());
+      players2.forEach((p) => p.dispose());
       players2 = [];
     }
 
@@ -696,16 +706,16 @@ export default function Home(props: { folders: string[] }) {
       let c_players: Tone.Player[] = [];
 
       if (layer === 0) {
-        c_players = players0.map((p: any) =>
-          new Tone.Player(p.buffer).toDestination()
+        c_players = players0.map((p) =>
+          new Tone.Player(p.buffer.get()).toDestination()
         );
       } else if (layer === 1) {
-        c_players = players1.map((p: any) =>
-          new Tone.Player(p.buffer).toDestination()
+        c_players = players1.map((p) =>
+          new Tone.Player(p.buffer.get()).toDestination()
         );
       } else if (layer === 2) {
-        c_players = players2.map((p: any) =>
-          new Tone.Player(p.buffer).toDestination()
+        c_players = players2.map((p) =>
+          new Tone.Player(p.buffer.get()).toDestination()
         );
       }
 
@@ -808,6 +818,7 @@ export default function Home(props: { folders: string[] }) {
             {">"}
           </button>
         </div>
+
         <input
           id="scroll"
           type="range"
@@ -881,13 +892,27 @@ export default function Home(props: { folders: string[] }) {
           min={-20}
           max={20}
           value={fader}
-          step={0.2}
+          step={0.1}
           className={styles.slider}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             changeFader(parseFloat(e.target.value));
           }}
           disabled={loading}
         />
+        <input
+          id="layer2Volume"
+          type="range"
+          min={-20}
+          max={0}
+          value={layer2Volume}
+          step={0.1}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeLayer2Volume(parseFloat(e.target.value));
+          }}
+          disabled={loading}
+        />
+
         <ul className={styles.playlist}>
           {props.folders.map((folder) => {
             return (
@@ -901,6 +926,7 @@ export default function Home(props: { folders: string[] }) {
             );
           })}
         </ul>
+
         <div className={styles.toolbar}>
           <button
             className={selectedLayer === 1 ? styles.selected : ""}
