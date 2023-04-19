@@ -255,6 +255,7 @@ export default function Home(props: { folders: string[] }) {
 
     ws2.zoom(0);
     ws2.empty();
+    ws2.backend.buffer = undefined;
   };
 
   const listClick = async (
@@ -355,8 +356,8 @@ export default function Home(props: { folders: string[] }) {
     }, seq).start(0);
 
     Tone.Transport.position = "0:0:0";
-    //concatBuffers();
 
+    //concatBuffers();
     drawLayer(0);
   };
 
