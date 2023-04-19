@@ -272,6 +272,7 @@ export default function Home(props: { folders: string[] }) {
     regionLoop = undefined;
     regionRand = undefined;
     regionLayer1 = undefined;
+    regionLayer2 = undefined;
 
     ws0.stop();
     ws0.clearRegions();
