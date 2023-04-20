@@ -134,6 +134,7 @@ export default function Home(props: { folders: string[] }) {
           zoomEle.min = minZoom.toString();
           zoomEle.max = maxZoom.toString();
           zoomEle.value = minZoom.toString();
+          zoomEle.step = Math.floor(maxZoom / 6).toString();
 
           setZoom(minZoom);
         }
@@ -860,7 +861,7 @@ export default function Home(props: { folders: string[] }) {
         <input
           id="zoom"
           type="range"
-          step={10}
+          step={20}
           min={0}
           max={100}
           value={zoom}
