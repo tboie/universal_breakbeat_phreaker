@@ -33,7 +33,7 @@ main {
   z-index: 2;
   position: fixed !important;
   width: 100% !important;
-  opacity: 0.87;
+  opacity: 0.8;
 }
 
 [data-id="loop"] {
