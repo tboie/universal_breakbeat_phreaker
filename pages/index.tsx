@@ -73,9 +73,6 @@ export default function Home(props: { folders: string[] }) {
   const [playing, setPlaying] = useState(false);
   //const workerRef = useRef<Worker>();
 
-  const refSelectedLayer = useRef(0);
-  refSelectedLayer.current = selectedLayer;
-
   useEffect(() => {
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
@@ -637,14 +634,6 @@ export default function Home(props: { folders: string[] }) {
   */
 
   const findMatches = async (layer: number) => {
-    if (layer === 1) {
-      players1.forEach((p) => p.dispose());
-      players1 = [];
-    } else if (layer === 2) {
-      players2.forEach((p) => p.dispose());
-      players2 = [];
-    }
-
     let srcTable: any[] = [];
     srcTable = table.filter((r) => r.n === selectedFile);
     // all pieces
@@ -692,8 +681,10 @@ export default function Home(props: { folders: string[] }) {
     t_players.sort((a, b) => a.i - b.i);
 
     if (layer === 1) {
+      players1.forEach((p) => p.dispose());
       players1 = t_players.map((r) => r.o);
     } else if (layer === 2) {
+      players2.forEach((p) => p.dispose());
       players2 = t_players.map((r) => r.o);
     }
 
