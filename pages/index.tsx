@@ -781,31 +781,33 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    if (layer === 0) {
-      seq.forEach((n) => {
-        if (n.time >= regionRand.start && n.time < regionRand.end) {
-          players0[n.idx]?.set({
-            mute: Math.round(Math.random()) ? true : false,
-          });
-        }
-      });
-    } else if (layer === 1) {
-      seq.forEach((n) => {
-        if (n.time >= regionLayer1.start && n.time < regionLayer1.end) {
-          players1[n.idx]?.set({
-            mute: Math.round(Math.random()) ? true : false,
-          });
-        }
-      });
-    } else if (layer === 2) {
-      seq.forEach((n) => {
-        if (n.time >= regionLayer2.start && n.time < regionLayer2.end) {
-          players2[n.idx]?.set({
-            mute: Math.round(Math.random()) ? true : false,
-          });
-        }
-      });
-    }
+    seq.forEach((n) => {
+      if (
+        layer === 0 &&
+        n.time >= regionRand.start &&
+        n.time < regionRand.end
+      ) {
+        players0[n.idx]?.set({
+          mute: Math.round(Math.random()) ? true : false,
+        });
+      } else if (
+        layer === 1 &&
+        n.time >= regionLayer1.start &&
+        n.time < regionLayer1.end
+      ) {
+        players1[n.idx]?.set({
+          mute: Math.round(Math.random()) ? true : false,
+        });
+      } else if (
+        layer === 2 &&
+        n.time >= regionLayer2.start &&
+        n.time < regionLayer2.end
+      ) {
+        players2[n.idx]?.set({
+          mute: Math.round(Math.random()) ? true : false,
+        });
+      }
+    });
 
     drawLayer(layer);
   };
