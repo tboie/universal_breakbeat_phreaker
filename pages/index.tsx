@@ -701,14 +701,23 @@ export default function Home(props: { folders: string[] }) {
         c_players = players0.map((p) =>
           new Tone.Player(p.buffer.get()).toDestination()
         );
+        c_players.forEach((p, idx) => {
+          p.set({ mute: players0[idx].mute });
+        });
       } else if (layer === 1) {
         c_players = players1.map((p) =>
           new Tone.Player(p.buffer.get()).toDestination()
         );
+        c_players.forEach((p, idx) => {
+          p.set({ mute: players1[idx].mute });
+        });
       } else if (layer === 2) {
         c_players = players2.map((p) =>
           new Tone.Player(p.buffer.get()).toDestination()
         );
+        c_players.forEach((p, idx) => {
+          p.set({ mute: players2[idx].mute });
+        });
       }
 
       new Tone.Part((time, value) => {
@@ -765,6 +774,41 @@ export default function Home(props: { folders: string[] }) {
     }
   };
 
+  const erase = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (layer === 0) {
+      seq.forEach((n) => {
+        if (n.time >= regionRand.start && n.time < regionRand.end) {
+          players0[n.idx]?.set({
+            mute: Math.round(Math.random()) ? true : false,
+          });
+        }
+      });
+    } else if (layer === 1) {
+      seq.forEach((n) => {
+        if (n.time >= regionLayer1.start && n.time < regionLayer1.end) {
+          players1[n.idx]?.set({
+            mute: Math.round(Math.random()) ? true : false,
+          });
+        }
+      });
+    } else if (layer === 2) {
+      seq.forEach((n) => {
+        if (n.time >= regionLayer2.start && n.time < regionLayer2.end) {
+          players2[n.idx]?.set({
+            mute: Math.round(Math.random()) ? true : false,
+          });
+        }
+      });
+    }
+
+    drawLayer(layer);
+  };
   return (
     <>
       <Head>
@@ -936,8 +980,8 @@ export default function Home(props: { folders: string[] }) {
             Match
           </button>
 
-          <button onClick={() => {}} disabled={loading}>
-            button
+          <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
+            Erase
           </button>
         </div>
         <div className={styles.toolbar}>
