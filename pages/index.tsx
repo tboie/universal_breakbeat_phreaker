@@ -354,28 +354,15 @@ export default function Home(props: { folders: string[] }) {
     part = new Tone.Part((time, value) => {
       players0[value.idx]?.start(time);
 
-      const piece = seq.find((s) => s.idx === value.idx);
+      players1[value.idx]?.start(time);
 
-      if (piece) {
-        if (
-          piece.time >= regionLayer1?.start &&
-          piece.time < regionLayer1?.end
-        ) {
-          players1[value.idx]?.start(time);
+      /* trim overlapping pieces
+      players1[value.idx]?.stop(
+        Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
+      );
+      */
 
-          /* trim overlapping pieces
-          players1[value.idx]?.stop(
-            Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
-          );
-          */
-        }
-        if (
-          piece.time >= regionLayer2?.start &&
-          piece.time < regionLayer2?.end
-        ) {
-          players2[value.idx]?.start(time);
-        }
-      }
+      players2[value.idx]?.start(time);
 
       // start playhead at piece
       Tone.Draw.schedule(() => {
@@ -456,8 +443,8 @@ export default function Home(props: { folders: string[] }) {
     });
 
     await drawLayer(0);
-    await drawLayer(1, selectedLayer === 1 ? false : true);
-    await drawLayer(2, selectedLayer === 2 ? false : true);
+    await drawLayer(1);
+    await drawLayer(2);
 
     //concatBuffers();
   };
@@ -691,7 +678,7 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(layer);
   };
 
-  const drawLayer = async (layer: number, selection?: boolean) => {
+  const drawLayer = async (layer: number) => {
     const duration = seq[seq.length - 1].time + seq[seq.length - 1].duration;
 
     Tone.Offline(({ transport }) => {
@@ -721,27 +708,7 @@ export default function Home(props: { folders: string[] }) {
       }
 
       new Tone.Part((time, value) => {
-        if (selection) {
-          const piece = seq.find((s) => s.idx === value.idx);
-          if (piece) {
-            if (
-              layer === 1 &&
-              piece.time >= regionLayer1?.start &&
-              piece.time < regionLayer1?.end
-            ) {
-              c_players[value.idx]?.start(time);
-            }
-            if (
-              layer === 2 &&
-              piece.time >= regionLayer2?.start &&
-              piece.time < regionLayer2?.end
-            ) {
-              c_players[value.idx]?.start(time);
-            }
-          }
-        } else {
-          c_players[value.idx]?.start(time);
-        }
+        c_players[value.idx]?.start(time);
       }, seq).start(0);
 
       transport.start(0);
@@ -764,12 +731,12 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
 
     if (layer !== selectedLayer) {
-      await drawLayer(layer === 2 ? 1 : 2, true);
+      await drawLayer(layer === 2 ? 1 : 2);
       await drawLayer(layer);
       setSelectedLayer(layer);
     } else {
-      await drawLayer(1, true);
-      await drawLayer(2, true);
+      await drawLayer(1);
+      await drawLayer(2);
       setSelectedLayer(0);
     }
   };
