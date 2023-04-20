@@ -66,7 +66,7 @@ const arrShuffle = (a: any[]) => {
 };
 
 export default function Home(props: { folders: string[] }) {
-  const [selectedFile, setSelectedFile] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedLayer, setSelectedLayer] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
@@ -385,7 +385,7 @@ export default function Home(props: { folders: string[] }) {
     setSpeed(1);
     setZoom(0);
     setFader(0);
-    setSelectedFile(folder);
+    setSelectedFolder(folder);
     setLoading(true);
     setSelectedLayer(0);
   };
@@ -395,7 +395,7 @@ export default function Home(props: { folders: string[] }) {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    listClick(undefined, selectedFile);
+    listClick(undefined, selectedFolder);
   };
 
   const randomClick = async (
@@ -465,7 +465,7 @@ export default function Home(props: { folders: string[] }) {
     const anchor = document.createElement("a");
 
     anchor.href = blobUrl;
-    anchor.download = selectedFile + "_PHREAKED";
+    anchor.download = selectedFolder + "_PHREAKED";
     anchor.click();
 
     window.URL.revokeObjectURL(blobUrl);
@@ -624,7 +624,7 @@ export default function Home(props: { folders: string[] }) {
 
   const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable: any[] = [];
-    srcTable = table.filter((r) => r.n === selectedFile);
+    srcTable = table.filter((r) => r.n === selectedFolder);
 
     if (
       !selection ||
@@ -948,7 +948,7 @@ export default function Home(props: { folders: string[] }) {
           {props.folders.map((folder) => {
             return (
               <li
-                className={folder === selectedFile ? styles.selected : ""}
+                className={folder === selectedFolder ? styles.selected : ""}
                 key={folder}
                 onClick={(e) => listClick(e, folder)}
               >
