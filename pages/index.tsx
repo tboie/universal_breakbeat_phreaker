@@ -40,6 +40,18 @@ type TSeq = {
 
 let seq: TSeq[] = [];
 
+let pallet1: any[] = [];
+let pallet2: any[] = [];
+
+// all pieces data table
+const table: any[] = [];
+(data as any[]).forEach((b) => {
+  b.c.forEach((v: any, i: any) => {
+    const row = { n: b.n, i: i + 1, d: v[0], f: v[1] };
+    table.push(row);
+  });
+});
+
 const closest = (array: number[], goal: number) =>
   array.reduce((prev, curr) =>
     Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
@@ -52,14 +64,6 @@ const arrShuffle = (a: any[]) => {
   }
   return a;
 };
-
-const table: any[] = [];
-(data as any[]).forEach((b) => {
-  b.c.forEach((v: any, i: any) => {
-    const row = { n: b.n, i: i + 1, d: v[0], f: v[1] };
-    table.push(row);
-  });
-});
 
 export default function Home(props: { folders: string[] }) {
   const [selectedFile, setSelectedFile] = useState("");
@@ -353,16 +357,14 @@ export default function Home(props: { folders: string[] }) {
     part?.dispose();
     part = new Tone.Part((time, value) => {
       players0[value.idx]?.start(time);
-
       players1[value.idx]?.start(time);
+      players2[value.idx]?.start(time);
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
         Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
       );
       */
-
-      players2[value.idx]?.start(time);
 
       // start playhead at piece
       Tone.Draw.schedule(() => {
@@ -620,20 +622,33 @@ export default function Home(props: { folders: string[] }) {
   }, []);
   */
 
-  const findMatches = async (layer: number) => {
+  const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable: any[] = [];
     srcTable = table.filter((r) => r.n === selectedFile);
-    // all pieces
-    // srcTable = table.filter((r) => r.n !== selectedFile);
 
-    const selTable = table.filter(
-      (r) =>
-        r.n === props.folders[Math.floor(Math.random() * props.folders.length)]
-    );
+    if (
+      !selection ||
+      (layer === 1 && !players1.length) ||
+      (layer === 2 && !players2.length)
+    ) {
+      const pallet = table.filter(
+        (r) =>
+          r.n ===
+          props.folders[Math.floor(Math.random() * props.folders.length)]
+      );
+
+      if (layer === 1) {
+        pallet1 = pallet;
+      } else {
+        pallet2 = pallet;
+      }
+    }
 
     const matches: any = [];
     srcTable.forEach((src) => {
-      const t = selTable.map((r) => {
+      const pallet = layer === 1 ? pallet1 : pallet2;
+
+      const t = pallet.map((r) => {
         const freqDiff = Math.abs(r.f - src.f);
         const durDiff = Math.abs(r.d - src.d);
         return { ...r, fDiff: freqDiff, dDiff: durDiff };
@@ -653,11 +668,29 @@ export default function Home(props: { folders: string[] }) {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
-            const buff = await Tone.context.decodeAudioData(arrayBuffer);
-            t_players.push({
-              i: idx,
-              o: new Tone.Player(buff).toDestination(),
-            });
+            const region = layer === 1 ? regionLayer1 : regionLayer2;
+
+            if (
+              !selection ||
+              (layer === 1 && !players1[idx]) ||
+              (layer === 2 && !players2[idx]) ||
+              (seq[idx].time > region.start && seq[idx].time < region.end)
+            ) {
+              const buff = await Tone.context.decodeAudioData(arrayBuffer);
+              t_players.push({
+                i: idx,
+                o: new Tone.Player(buff).toDestination(),
+              });
+            } else {
+              t_players.push({
+                i: idx,
+                o: new Tone.Player(
+                  layer === 1
+                    ? players1[idx].buffer.get()
+                    : players2[idx].buffer.get()
+                ).toDestination(),
+              });
+            }
           })
           .catch((error) => {
             throw Error(`Asset failed to load: ${error.message}`);
@@ -941,10 +974,17 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
-            disabled={loading || selectedLayer === 0}
-            onClick={() => findMatches(selectedLayer)}
+            onClick={(e) =>
+              selectedLayer ? findMatches(selectedLayer, true) : randomClick(e)
+            }
+            disabled={loading}
           >
-            Match
+            <Image
+              src={loading ? "dice_disabled.svg" : "dice.svg"}
+              alt="dice"
+              width={24}
+              height={24}
+            />
           </button>
 
           <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
@@ -960,13 +1000,11 @@ export default function Home(props: { folders: string[] }) {
             {playing ? "Stop" : "Play"}
           </button>
 
-          <button onClick={(e) => randomClick(e)} disabled={loading}>
-            <Image
-              src={loading ? "dice_disabled.svg" : "dice.svg"}
-              alt="dice"
-              width={24}
-              height={24}
-            />
+          <button
+            disabled={loading || selectedLayer === 0}
+            onClick={() => findMatches(selectedLayer)}
+          >
+            Match
           </button>
 
           <button
