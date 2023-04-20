@@ -3,11 +3,10 @@ import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
 import path from "path";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import * as Tone from "tone";
-//@ts-ignore
-import util from "audio-buffer-utils";
+
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
 
@@ -379,7 +378,6 @@ export default function Home(props: { folders: string[] }) {
 
     Tone.Transport.position = "0:0:0";
 
-    //concatBuffers();
     await drawLayer(0);
 
     setSpeed(1);
@@ -447,8 +445,6 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
-
-    //concatBuffers();
   };
 
   const downloadClick = (
@@ -599,28 +595,6 @@ export default function Home(props: { folders: string[] }) {
     });
     setLayer2Volume(val);
   };
-
-  /*
-  useEffect(() => {
-    // worker used to concat waveform after randomization
-    workerRef.current = new Worker(
-      new URL("../concatBuffers.js", import.meta.url)
-    );
-    workerRef.current.onmessage = (e: MessageEvent<any>) => {
-      ws0.loadDecodedBuffer(util.create(e.data));
-    };
-
-    return () => {
-      workerRef.current?.terminate();
-    };
-  }, []);
-
-  const concatBuffers = useCallback(async () => {
-    workerRef.current?.postMessage(
-      seq.map((obj) => players[obj.idx].buffer.toArray())
-    );
-  }, []);
-  */
 
   const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable: any[] = [];
