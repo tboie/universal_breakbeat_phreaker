@@ -980,7 +980,7 @@ export default function Home(props: { folders: string[] }) {
             disabled={loading || selectedLayer === 0}
             onClick={() => findMatches(selectedLayer)}
           >
-            Match
+            Pallet
           </button>
 
           <button
