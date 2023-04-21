@@ -541,22 +541,26 @@ export default function Home(props: { folders: string[] }) {
       players1.forEach((p) => {
         p.set({
           volume: val,
+          mute: p.mute,
         });
       });
       players0.forEach((p) => {
         p.set({
           volume: 0,
+          mute: p.mute,
         });
       });
     } else if (val > 0) {
       players0.forEach((p) => {
         p.set({
           volume: val * -1,
+          mute: p.mute,
         });
       });
       players1.forEach((p) => {
         p.set({
           volume: 0,
+          mute: p.mute,
         });
       });
     }
@@ -568,6 +572,7 @@ export default function Home(props: { folders: string[] }) {
     players2.forEach((p) => {
       p.set({
         volume: val,
+        mute: p.mute,
       });
     });
     setLayer2Volume(val);
