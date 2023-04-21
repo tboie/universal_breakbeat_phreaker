@@ -19,9 +19,7 @@ let ws1: any;
 let ws2: any;
 
 let regionLoop: any;
-let regionRand: any;
-let regionLayer1: any;
-let regionLayer2: any;
+let regionSelect: any;
 
 let touchMoved = false;
 
@@ -202,14 +200,14 @@ export default function Home(props: { folders: string[] }) {
       ws0.on("ready", () => {
         ws0.setVolume(0);
 
-        if (!regionRand) {
+        if (!regionSelect) {
           ws0.addRegion({
             id: "selection",
             start: 0,
             end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
             loop: false,
           });
-          regionRand = Object.values(ws0.regions.list)[0];
+          regionSelect = Object.values(ws0.regions.list)[0];
         }
 
         if (!regionLoop) {
@@ -235,26 +233,6 @@ export default function Home(props: { folders: string[] }) {
           );
         }
 
-        if (!regionLayer1) {
-          ws0.addRegion({
-            id: "layer1",
-            start: 0,
-            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
-            loop: false,
-          });
-          regionLayer1 = Object.values(ws0.regions.list)[2];
-        }
-
-        if (!regionLayer2) {
-          ws0.addRegion({
-            id: "layer2",
-            start: 0,
-            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
-            loop: false,
-          });
-          regionLayer2 = Object.values(ws0.regions.list)[3];
-        }
-
         ws0.clearMarkers();
         seq.forEach((s) => {
           ws0.addMarker({ time: s.time });
@@ -272,9 +250,7 @@ export default function Home(props: { folders: string[] }) {
 
   const resetWaveSurfer = () => {
     regionLoop = undefined;
-    regionRand = undefined;
-    regionLayer1 = undefined;
-    regionLayer2 = undefined;
+    regionSelect = undefined;
 
     ws0.stop();
     ws0.clearRegions();
@@ -403,8 +379,8 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const startIdx = seq.findIndex((s) => s.time === regionRand.start);
-    let endIdx = seq.findIndex((s) => s.time === regionRand.end);
+    const startIdx = seq.findIndex((s) => s.time === regionSelect.start);
+    let endIdx = seq.findIndex((s) => s.time === regionSelect.end);
     if (endIdx === -1) {
       endIdx = seq.length;
     }
@@ -643,13 +619,12 @@ export default function Home(props: { folders: string[] }) {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
-            const region = layer === 1 ? regionLayer1 : regionLayer2;
-
             if (
               !selection ||
               (layer === 1 && !players1[idx]) ||
               (layer === 2 && !players2[idx]) ||
-              (seq[idx].time > region.start && seq[idx].time < region.end)
+              (seq[idx].time > regionSelect.start &&
+                seq[idx].time < regionSelect.end)
             ) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
               t_players.push({
@@ -759,24 +734,24 @@ export default function Home(props: { folders: string[] }) {
     seq.forEach((n) => {
       if (
         layer === 0 &&
-        n.time >= regionRand.start &&
-        n.time < regionRand.end
+        n.time >= regionSelect.start &&
+        n.time < regionSelect.end
       ) {
         players0[n.idx]?.set({
           mute: Math.round(Math.random()) ? true : false,
         });
       } else if (
         layer === 1 &&
-        n.time >= regionLayer1.start &&
-        n.time < regionLayer1.end
+        n.time >= regionSelect.start &&
+        n.time < regionSelect.end
       ) {
         players1[n.idx]?.set({
           mute: Math.round(Math.random()) ? true : false,
         });
       } else if (
         layer === 2 &&
-        n.time >= regionLayer2.start &&
-        n.time < regionLayer2.end
+        n.time >= regionSelect.start &&
+        n.time < regionSelect.end
       ) {
         players2[n.idx]?.set({
           mute: Math.round(Math.random()) ? true : false,
