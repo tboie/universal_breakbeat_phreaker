@@ -628,7 +628,7 @@ export default function Home(props: { folders: string[] }) {
               !selection ||
               (layer === 1 && !players1[idx]) ||
               (layer === 2 && !players2[idx]) ||
-              (seq[idx].time > regionSelect.start &&
+              (seq[idx].time >= regionSelect.start &&
                 seq[idx].time < regionSelect.end)
             ) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
