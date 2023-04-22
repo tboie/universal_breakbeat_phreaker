@@ -33,7 +33,6 @@ type TSeq = {
   playerIdx: number;
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
-  mute: boolean;
 };
 
 let seq: TSeq[] = [];
@@ -324,7 +323,6 @@ export default function Home(props: { folders: string[] }) {
         playerIdx: o.i,
         time: o.t,
         duration: parseFloat(o.buff.duration.toFixed(6)),
-        mute: false,
       });
     });
 
@@ -403,7 +401,6 @@ export default function Home(props: { folders: string[] }) {
         playerIdx: obj.playerIdx,
         time: parseFloat(durTotal.toFixed(6)),
         duration: obj.duration,
-        mute: obj.mute,
       };
 
       part.add(ret.time, { playerIdx: ret.playerIdx, duration: ret.duration });
@@ -744,7 +741,6 @@ export default function Home(props: { folders: string[] }) {
 
     seq.forEach((n) => {
       const mute = Math.round(Math.random()) ? true : false;
-      n.mute = mute;
 
       if (n.time >= regionSelect.start && n.time < regionSelect.end) {
         if (layer === 0) {
