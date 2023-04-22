@@ -33,6 +33,7 @@ type TSeq = {
   playerIdx: number;
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
+  mute: boolean;
 };
 
 let seq: TSeq[] = [];
@@ -323,6 +324,7 @@ export default function Home(props: { folders: string[] }) {
         playerIdx: o.i,
         time: o.t,
         duration: parseFloat(o.buff.duration.toFixed(6)),
+        mute: false,
       });
     });
 
@@ -401,6 +403,7 @@ export default function Home(props: { folders: string[] }) {
         playerIdx: obj.playerIdx,
         time: parseFloat(durTotal.toFixed(6)),
         duration: obj.duration,
+        mute: obj.mute,
       };
 
       part.add(ret.time, { playerIdx: ret.playerIdx, duration: ret.duration });
@@ -578,9 +581,12 @@ export default function Home(props: { folders: string[] }) {
     setLayer2Volume(val);
   };
 
-  const findMatches = async (layer: number, selection?: boolean) => {
-    let srcTable: any[] = [];
-    srcTable = table.filter((r) => r.n === selectedFolder);
+  const findMatches = async (
+    layer: number,
+    selection?: boolean,
+    fillGaps?: boolean
+  ) => {
+    let srcTable = table.filter((r) => r.n === selectedFolder);
 
     if (
       !selection ||
@@ -737,30 +743,23 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
 
     seq.forEach((n) => {
-      if (
-        layer === 0 &&
-        n.time >= regionSelect.start &&
-        n.time < regionSelect.end
-      ) {
-        players0[n.playerIdx]?.set({
-          mute: Math.round(Math.random()) ? true : false,
-        });
-      } else if (
-        layer === 1 &&
-        n.time >= regionSelect.start &&
-        n.time < regionSelect.end
-      ) {
-        players1[n.playerIdx]?.set({
-          mute: Math.round(Math.random()) ? true : false,
-        });
-      } else if (
-        layer === 2 &&
-        n.time >= regionSelect.start &&
-        n.time < regionSelect.end
-      ) {
-        players2[n.playerIdx]?.set({
-          mute: Math.round(Math.random()) ? true : false,
-        });
+      const mute = Math.round(Math.random()) ? true : false;
+      n.mute = mute;
+
+      if (n.time >= regionSelect.start && n.time < regionSelect.end) {
+        if (layer === 0) {
+          players0[n.playerIdx]?.set({
+            mute: mute,
+          });
+        } else if (layer === 1) {
+          players1[n.playerIdx]?.set({
+            mute: mute,
+          });
+        } else if (layer === 2) {
+          players2[n.playerIdx]?.set({
+            mute: mute,
+          });
+        }
       }
     });
 
