@@ -740,9 +740,9 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
 
     seq.forEach((n) => {
-      const mute = Math.round(Math.random()) ? true : false;
-
       if (n.time >= regionSelect.start && n.time < regionSelect.end) {
+        const mute = Math.round(Math.random()) ? true : false;
+
         if (layer === 0) {
           players0[n.playerIdx]?.set({
             mute: mute,
