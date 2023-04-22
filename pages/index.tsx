@@ -30,7 +30,7 @@ let players2: Tone.Player[] = [];
 let part: Tone.Part;
 
 type TSeq = {
-  idx: number;
+  playerIdx: number;
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
 };
@@ -320,7 +320,7 @@ export default function Home(props: { folders: string[] }) {
     temp.forEach((o) => {
       players0.push(new Tone.Player(o.buff).toDestination());
       seq.push({
-        idx: o.i,
+        playerIdx: o.i,
         time: o.t,
         duration: parseFloat(o.buff.duration.toFixed(6)),
       });
@@ -332,9 +332,9 @@ export default function Home(props: { folders: string[] }) {
 
     part?.dispose();
     part = new Tone.Part((time, value) => {
-      players0[value.idx]?.start(time);
-      players1[value.idx]?.start(time);
-      players2[value.idx]?.start(time);
+      players0[value.playerIdx]?.start(time);
+      players1[value.playerIdx]?.start(time);
+      players2[value.playerIdx]?.start(time);
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -345,7 +345,7 @@ export default function Home(props: { folders: string[] }) {
       // start playhead at piece
       Tone.Draw.schedule(() => {
         if (regionLoop) {
-          const piece = seq.find((s) => s.idx === value.idx);
+          const piece = seq.find((s) => s.playerIdx === value.playerIdx);
           if (piece) {
             ws0.play(piece.time);
           }
@@ -398,12 +398,12 @@ export default function Home(props: { folders: string[] }) {
       }
 
       const ret = {
-        idx: obj.idx,
+        playerIdx: obj.playerIdx,
         time: parseFloat(durTotal.toFixed(6)),
         duration: obj.duration,
       };
 
-      part.add(ret.time, { idx: ret.idx, duration: ret.duration });
+      part.add(ret.time, { playerIdx: ret.playerIdx, duration: ret.duration });
       return ret;
     });
 
@@ -696,7 +696,7 @@ export default function Home(props: { folders: string[] }) {
       }
 
       new Tone.Part((time, value) => {
-        c_players[value.idx]?.start(time);
+        c_players[value.playerIdx]?.start(time);
       }, seq).start(0);
 
       transport.start(0);
@@ -742,7 +742,7 @@ export default function Home(props: { folders: string[] }) {
         n.time >= regionSelect.start &&
         n.time < regionSelect.end
       ) {
-        players0[n.idx]?.set({
+        players0[n.playerIdx]?.set({
           mute: Math.round(Math.random()) ? true : false,
         });
       } else if (
@@ -750,7 +750,7 @@ export default function Home(props: { folders: string[] }) {
         n.time >= regionSelect.start &&
         n.time < regionSelect.end
       ) {
-        players1[n.idx]?.set({
+        players1[n.playerIdx]?.set({
           mute: Math.round(Math.random()) ? true : false,
         });
       } else if (
@@ -758,7 +758,7 @@ export default function Home(props: { folders: string[] }) {
         n.time >= regionSelect.start &&
         n.time < regionSelect.end
       ) {
-        players2[n.idx]?.set({
+        players2[n.playerIdx]?.set({
           mute: Math.round(Math.random()) ? true : false,
         });
       }
