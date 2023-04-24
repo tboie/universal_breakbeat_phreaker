@@ -395,7 +395,7 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    let layerSeq = seq.filter((n) => n.time);
+    let layerSeq = seq.filter((n) => n.layer === 0);
     layerSeq.sort((a, b) => a.time - b.time);
 
     const startIdx = layerSeq.findIndex((n) => n.time === regionSelect.start);
