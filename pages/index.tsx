@@ -349,7 +349,6 @@ export default function Home(props: { folders: string[] }) {
     part?.dispose();
     part = new Tone.Part((time, value) => {
       const notes = seq.filter((s) => value.time === s.time);
-
       notes.forEach((n) => n.player?.start(time));
 
       /* trim overlapping pieces
@@ -395,32 +394,53 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    let layerSeq = seq.filter((n) => n.layer === 0);
-    layerSeq.sort((a, b) => a.time - b.time);
+    const startIdx = seq
+      .filter((n) => n.layer === 0)
+      .findIndex((n) => n.time === regionSelect.start);
 
-    const startIdx = layerSeq.findIndex((n) => n.time === regionSelect.start);
-    let endIdx = layerSeq.findIndex((n) => n.time === regionSelect.end);
+    let endIdx = seq
+      .filter((n) => n.layer === 0)
+      .findIndex((n) => n.time === regionSelect.end);
+
     if (endIdx === -1) {
-      endIdx = layerSeq.length;
+      endIdx = seq.filter((n) => n.layer === 0).length;
     }
 
-    const shuffled = arrShuffle(layerSeq.slice(startIdx, endIdx));
-    layerSeq.splice(startIdx, shuffled.length, ...shuffled);
+    let layerSeq = seq.reduce(
+      (groups: any, item) => ({
+        ...groups,
+        [item.time]: [...(groups[item.time] || []), item],
+      }),
+      {}
+    );
+
+    let noteArray: any[] = [];
+    Object.keys(layerSeq).forEach((k, i) => {
+      noteArray.push(layerSeq[k]);
+    });
+
+    const shuffled = arrShuffle(noteArray.slice(startIdx, endIdx));
+    noteArray.splice(startIdx, shuffled.length, ...shuffled);
 
     // dispose objects?
-    seq = seq.filter((n) => n.layer !== selectedLayer);
+    seq = [];
 
     // could notes be scheduled more precisely to avoid dropouts?
     part.clear();
     let durTotal = 0;
-    layerSeq.forEach((n, idx) => {
+    noteArray.forEach((notes, idx) => {
       if (idx) {
-        durTotal += layerSeq[idx - 1].duration;
+        durTotal += noteArray[idx - 1][0].duration;
       }
 
-      const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
-      seq.push({ ...ret });
-      part.add(ret.time, { ...ret, player: undefined });
+      notes.forEach((n: any, i: number) => {
+        const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
+        if (!i) {
+          // pass player into part?
+          part.add(ret.time, { ...ret, player: undefined });
+        }
+        seq.push({ ...ret });
+      });
     });
 
     let times = seq.filter((n) => n.layer === selectedLayer).map((s) => s.time);
@@ -447,7 +467,7 @@ export default function Home(props: { folders: string[] }) {
 
     await drawLayer(0);
     await drawLayer(1);
-    //await drawLayer(2);
+    await drawLayer(2);
   };
 
   const downloadClick = (
