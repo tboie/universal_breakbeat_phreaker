@@ -23,16 +23,27 @@ let regionSelect: any;
 
 let touchMoved = false;
 
-let players0: Tone.Player[] = [];
-let players1: Tone.Player[] = [];
-let players2: Tone.Player[] = [];
-
 let part: Tone.Part;
 
+type TBuffer = {
+  name: string;
+  idx: number;
+  layer: number;
+  buffer: Tone.ToneAudioBuffer;
+};
+
+let buffers: TBuffer[] = [];
+
 type TSeq = {
-  playerIdx: number;
+  layer: number;
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
+  player?: Tone.Player;
+  /*
+  name: string;
+  idx: number;
+  layer: number;
+  */
 };
 
 let seq: TSeq[] = [];
@@ -72,7 +83,6 @@ export default function Home(props: { folders: string[] }) {
   const [layer2Volume, setLayer2Volume] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
-  //const workerRef = useRef<Worker>();
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -287,16 +297,41 @@ export default function Home(props: { folders: string[] }) {
           .map((t) => parseFloat(t));
       });
 
-    const temp: any[] = [];
+    buffers.forEach((b) => b.buffer.dispose());
+    seq.forEach((s) => s.player?.dispose());
+    seq = [];
+
     await Promise.all(
       times.map(async (t: number, idx: number) => {
-        await fetch(`/drums/${folder}/${idx + 1}.wav`)
+        idx++;
+        await fetch(`/drums/${folder}/${idx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
             const buff = await Tone.context.decodeAudioData(arrayBuffer);
-            temp.push({ i: idx, t: t, buff: buff });
+
+            buffers.push({
+              name: folder,
+              idx: idx,
+              layer: 0,
+              buffer: new Tone.Buffer(buff),
+            });
+
+            const bufferObj = buffers.find(
+              (b) => b.layer === 0 && b.name === folder && b.idx === idx
+            );
+
+            seq.push({
+              layer: 0,
+              time: t,
+              duration: bufferObj
+                ? parseFloat(bufferObj.buffer.duration.toFixed(6))
+                : 0,
+              player: bufferObj
+                ? new Tone.Player(bufferObj.buffer).toDestination()
+                : undefined,
+            });
           })
           .catch((error) => {
             throw Error(`Asset failed to load: ${error.message}`);
@@ -304,37 +339,18 @@ export default function Home(props: { folders: string[] }) {
       })
     );
 
-    temp.sort((a, b) => a.i - b.i);
+    const end = seq
+      .filter((s) => s.layer === selectedLayer)
+      .reduce((n, { duration }) => n + duration, 0);
 
-    players0.forEach((p: any) => p.dispose());
-    players0 = [];
-
-    players1.forEach((p: any) => p.dispose());
-    players1 = [];
-
-    players2.forEach((p: any) => p.dispose());
-    players2 = [];
-
-    seq = [];
-
-    temp.forEach((o) => {
-      players0.push(new Tone.Player(o.buff).toDestination());
-      seq.push({
-        playerIdx: o.i,
-        time: o.t,
-        duration: parseFloat(o.buff.duration.toFixed(6)),
-      });
-    });
-
-    const end = seq[seq.length - 1].time + seq[seq.length - 1].duration;
     Tone.Transport.setLoopPoints(0, end);
     Tone.Transport.loop = true;
 
     part?.dispose();
     part = new Tone.Part((time, value) => {
-      players0[value.playerIdx]?.start(time);
-      players1[value.playerIdx]?.start(time);
-      players2[value.playerIdx]?.start(time);
+      const notes = seq.filter((s) => value.time === s.time);
+
+      notes.forEach((n) => n.player?.start(time));
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -345,7 +361,7 @@ export default function Home(props: { folders: string[] }) {
       // start playhead at piece
       Tone.Draw.schedule(() => {
         if (regionLoop) {
-          const piece = seq.find((s) => s.playerIdx === value.playerIdx);
+          const piece = seq.find((s) => s.layer === 0 && s.time === value.time);
           if (piece) {
             ws0.play(piece.time);
           }
@@ -379,49 +395,59 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const startIdx = seq.findIndex((s) => s.time === regionSelect.start);
-    let endIdx = seq.findIndex((s) => s.time === regionSelect.end);
+    let layerSeq = seq.filter((n) => n.time);
+    layerSeq.sort((a, b) => a.time - b.time);
+
+    const startIdx = layerSeq.findIndex((n) => n.time === regionSelect.start);
+    let endIdx = layerSeq.findIndex((n) => n.time === regionSelect.end);
     if (endIdx === -1) {
-      endIdx = seq.length;
+      endIdx = layerSeq.length;
     }
 
-    const shuffled = arrShuffle(seq.slice(startIdx, endIdx));
-    seq.splice(startIdx, shuffled.length, ...shuffled);
+    const shuffled = arrShuffle(layerSeq.slice(startIdx, endIdx));
+    layerSeq.splice(startIdx, shuffled.length, ...shuffled);
 
-    let durTotal = 0;
+    // dispose objects?
+    seq = seq.filter((n) => n.layer !== selectedLayer);
 
     // could notes be scheduled more precisely to avoid dropouts?
     part.clear();
-    seq = seq.map((obj, idx) => {
+    let durTotal = 0;
+    layerSeq.forEach((n, idx) => {
       if (idx) {
-        durTotal += seq[idx - 1].duration;
+        durTotal += layerSeq[idx - 1].duration;
       }
 
-      const ret = {
-        playerIdx: obj.playerIdx,
-        time: parseFloat(durTotal.toFixed(6)),
-        duration: obj.duration,
-      };
-
-      part.add(ret.time, { playerIdx: ret.playerIdx, duration: ret.duration });
-      return ret;
+      const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
+      seq.push({ ...ret });
+      part.add(ret.time, { ...ret, player: undefined });
     });
 
-    const times = seq.map((s) => s.time);
-    times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
+    let times = seq.filter((n) => n.layer === selectedLayer).map((s) => s.time);
+    const end = seq
+      .filter((n) => n.layer === selectedLayer)
+      .reduce((n, { duration }) => n + duration, 0);
 
-    const snapStart = closest(times, regionLoop.start);
-    const snapEnd = closest(times, regionLoop.end);
+    times.push(end);
+
+    let snapStart = closest(times, regionLoop.start);
+    let snapEnd = closest(times, regionLoop.end);
 
     Tone.Transport.setLoopPoints(snapStart / speed, snapEnd / speed);
+
     regionLoop.update({
       start: snapStart,
       end: snapEnd,
     });
 
+    regionSelect.update({
+      start: closest(times, regionSelect.start),
+      end: closest(times, regionSelect.end),
+    });
+
     await drawLayer(0);
     await drawLayer(1);
-    await drawLayer(2);
+    //await drawLayer(2);
   };
 
   const downloadClick = (
@@ -470,8 +496,11 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const times = seq.map((s) => s.time);
-    times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
+    let layerSeq = [...seq.filter((n) => n.layer === selectedLayer)];
+    layerSeq.sort((a, b) => a.time - b.time);
+
+    const times = layerSeq.map((s) => s.time);
+    times.push(layerSeq.reduce((n, { duration }) => n + duration, 0));
 
     const handle = pos === "start" ? regionLoop.start : regionLoop.end;
     const result = closest(times, handle);
@@ -521,8 +550,7 @@ export default function Home(props: { folders: string[] }) {
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
 
-    players0.forEach((p: any) => (p.playbackRate = val));
-    players1.forEach((p: any) => (p.playbackRate = val));
+    seq.forEach((s: any) => (s.player.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
     ws0.setPlaybackRate(val);
@@ -538,57 +566,59 @@ export default function Home(props: { folders: string[] }) {
 
   const changeFader = (val: number) => {
     if (val < 0) {
-      players1.forEach((p) => {
-        p.set({
-          volume: val,
-          mute: p.mute,
+      seq
+        .filter((s) => s.layer === 1)
+        .forEach((n) => {
+          n.player?.set({
+            volume: val,
+          });
         });
-      });
-      players0.forEach((p) => {
-        p.set({
-          volume: 0,
-          mute: p.mute,
+      seq
+        .filter((s) => s.layer === 0)
+        .forEach((n) => {
+          n.player?.set({
+            volume: 0,
+          });
         });
-      });
     } else if (val > 0) {
-      players0.forEach((p) => {
-        p.set({
-          volume: val * -1,
-          mute: p.mute,
+      seq
+        .filter((s) => s.layer === 0)
+        .forEach((n) => {
+          n.player?.set({
+            volume: val * -1,
+          });
         });
-      });
-      players1.forEach((p) => {
-        p.set({
-          volume: 0,
-          mute: p.mute,
+      seq
+        .filter((s) => s.layer === 1)
+        .forEach((n) => {
+          n.player?.set({
+            volume: 0,
+          });
         });
-      });
     }
 
     setFader(val);
   };
 
   const changeLayer2Volume = (val: number) => {
-    players2.forEach((p) => {
-      p.set({
-        volume: val,
-        mute: p.mute,
+    seq
+      .filter((s) => s.layer === 2)
+      .forEach((n) => {
+        n.player?.set({
+          volume: val,
+        });
       });
-    });
     setLayer2Volume(val);
   };
 
-  const findMatches = async (
-    layer: number,
-    selection?: boolean,
-    fillGaps?: boolean
-  ) => {
+  const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable = table.filter((r) => r.n === selectedFolder);
 
     if (
-      !selection ||
+      !selection
+      /*
       (layer === 1 && !players1.length) ||
-      (layer === 2 && !players2.length)
+      (layer === 2 && !players2.length)*/
     ) {
       const pallet = table.filter(
         (r) =>
@@ -619,7 +649,7 @@ export default function Home(props: { folders: string[] }) {
       matches.push(t[r]);
     });
 
-    const t_players: any[] = [];
+    seq = seq.filter((s) => s.layer !== layer);
     await Promise.all(
       matches.map(async (m: any, idx: number) => {
         await fetch(`/drums/${m.n}/${m.i}.wav`)
@@ -627,26 +657,36 @@ export default function Home(props: { folders: string[] }) {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
+            const layerSeq = seq.filter((s) => s.layer === layer);
             if (
-              !selection ||
-              (layer === 1 && !players1[idx]) ||
+              !selection
+              /*  || (layer === 1 && !players1[idx]) ||
               (layer === 2 && !players2[idx]) ||
-              (seq[idx].time >= regionSelect.start &&
-                seq[idx].time < regionSelect.end)
+
+              (layerSeq[idx].time >= regionSelect.start &&
+                layerSeq[idx].time < regionSelect.end)*/
             ) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
-              t_players.push({
-                i: idx,
-                o: new Tone.Player(buff).toDestination(),
+              buffers.push({
+                name: m.n,
+                idx: m.i,
+                layer: layer,
+                buffer: new Tone.Buffer(buff),
               });
-            } else {
-              t_players.push({
-                i: idx,
-                o: new Tone.Player(
-                  layer === 1
-                    ? players1[idx].buffer.get()
-                    : players2[idx].buffer.get()
-                ).toDestination(),
+
+              const bufferObj = buffers.find(
+                (b) => b.layer === layer && b.name === m.n && b.idx === m.i
+              );
+
+              seq.push({
+                layer: layer,
+                time: seq.filter((s) => s.layer === 0)[idx].time,
+                duration: bufferObj
+                  ? parseFloat(bufferObj.buffer.duration.toFixed(6))
+                  : 0,
+                player: bufferObj
+                  ? new Tone.Player(bufferObj.buffer).toDestination()
+                  : undefined,
               });
             }
           })
@@ -656,51 +696,36 @@ export default function Home(props: { folders: string[] }) {
       })
     );
 
-    t_players.sort((a, b) => a.i - b.i);
-
-    if (layer === 1) {
-      players1.forEach((p) => p.dispose());
-      players1 = t_players.map((r) => r.o);
-    } else if (layer === 2) {
-      players2.forEach((p) => p.dispose());
-      players2 = t_players.map((r) => r.o);
-    }
+    seq.sort((a, b) => a.time - b.time);
 
     await drawLayer(layer);
   };
 
   const drawLayer = async (layer: number) => {
-    const duration = seq[seq.length - 1].time + seq[seq.length - 1].duration;
+    const duration = seq
+      .filter((s) => s.layer === 0)
+      .reduce((n, { duration }) => n + duration, 0);
 
     Tone.Offline(({ transport }) => {
-      let c_players: Tone.Player[] = [];
+      const notes = seq
+        .filter((note) => note.layer === layer)
+        .map((p) => ({
+          time: p.time,
+          duration: p.duration,
+          player: new Tone.Player(p.player?.buffer.get()).toDestination(),
+          mute: p.player?.mute,
+        }));
 
-      if (layer === 0) {
-        c_players = players0.map((p) =>
-          new Tone.Player(p.buffer.get()).toDestination()
-        );
-        c_players.forEach((p, idx) => {
-          p.set({ mute: players0[idx].mute });
-        });
-      } else if (layer === 1) {
-        c_players = players1.map((p) =>
-          new Tone.Player(p.buffer.get()).toDestination()
-        );
-        c_players.forEach((p, idx) => {
-          p.set({ mute: players1[idx].mute });
-        });
-      } else if (layer === 2) {
-        c_players = players2.map((p) =>
-          new Tone.Player(p.buffer.get()).toDestination()
-        );
-        c_players.forEach((p, idx) => {
-          p.set({ mute: players2[idx].mute });
-        });
-      }
+      new Tone.Part(
+        (time, value) => {
+          const note = notes.find((o) => o.time === value.time);
 
-      new Tone.Part((time, value) => {
-        c_players[value.playerIdx]?.start(time);
-      }, seq).start(0);
+          if (note && !note.mute) {
+            note.player?.start(time);
+          }
+        },
+        seq.filter((s) => s.layer === layer)
+      ).start(0);
 
       transport.start(0);
     }, duration).then((buffer) => {
@@ -739,25 +764,17 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    seq.forEach((n) => {
-      if (n.time >= regionSelect.start && n.time < regionSelect.end) {
-        const mute = Math.round(Math.random()) ? true : false;
+    seq
+      .filter((s) => s.layer === layer)
+      .forEach((n) => {
+        if (n.time >= regionSelect.start && n.time < regionSelect.end) {
+          const mute = Math.round(Math.random()) ? true : false;
 
-        if (layer === 0) {
-          players0[n.playerIdx]?.set({
-            mute: mute,
-          });
-        } else if (layer === 1) {
-          players1[n.playerIdx]?.set({
-            mute: mute,
-          });
-        } else if (layer === 2) {
-          players2[n.playerIdx]?.set({
+          n.player?.set({
             mute: mute,
           });
         }
-      }
-    });
+      });
 
     drawLayer(layer);
   };
