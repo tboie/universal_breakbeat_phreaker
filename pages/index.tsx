@@ -210,11 +210,15 @@ export default function Home(props: { folders: string[] }) {
       ws0.on("ready", () => {
         ws0.setVolume(0);
 
+        const end = seq
+          .filter((s) => s.layer === 0)
+          .reduce((n, { duration }) => n + duration, 0);
+
         if (!regionSelect) {
           ws0.addRegion({
             id: "selection",
             start: 0,
-            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
+            end: end,
             loop: false,
           });
           regionSelect = Object.values(ws0.regions.list)[0];
@@ -224,7 +228,7 @@ export default function Home(props: { folders: string[] }) {
           ws0.addRegion({
             id: "loop",
             start: 0,
-            end: seq[seq.length - 1].time + seq[seq.length - 1].duration,
+            end: end,
             loop: true,
           });
 
@@ -300,6 +304,7 @@ export default function Home(props: { folders: string[] }) {
     buffers.forEach((b) => b.buffer.dispose());
     seq.forEach((s) => s.player?.dispose());
     seq = [];
+    buffers = [];
 
     await Promise.all(
       times.map(async (t: number, idx: number) => {
@@ -340,7 +345,7 @@ export default function Home(props: { folders: string[] }) {
     );
 
     const end = seq
-      .filter((s) => s.layer === selectedLayer)
+      .filter((s) => s.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
     Tone.Transport.setLoopPoints(0, end);
@@ -443,9 +448,9 @@ export default function Home(props: { folders: string[] }) {
       });
     });
 
-    let times = seq.filter((n) => n.layer === selectedLayer).map((s) => s.time);
+    let times = seq.filter((n) => n.layer === 0).map((s) => s.time);
     const end = seq
-      .filter((n) => n.layer === selectedLayer)
+      .filter((n) => n.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
     times.push(end);
