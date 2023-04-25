@@ -184,8 +184,12 @@ export default function Home(props: { folders: string[] }) {
           touchMoved = false;
         }
 
-        const times = seq.map((s) => s.time);
-        times.push(seq[seq.length - 1].time + seq[seq.length - 1].duration);
+        let times = seq.filter((n) => n.layer === 0).map((s) => s.time);
+        const end = seq
+          .filter((s) => s.layer === 0)
+          .reduce((n, { duration }) => n + duration, 0);
+
+        times.push(end);
 
         const snapStart = closest(times, region.start);
         const snapEnd = closest(times, region.end);
