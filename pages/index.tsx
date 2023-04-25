@@ -27,7 +27,7 @@ let part: Tone.Part;
 
 type TBuffer = {
   name: string;
-  idx: number;
+  cutIdx: number;
   layer: number;
   buffer: Tone.ToneAudioBuffer;
 };
@@ -39,11 +39,8 @@ type TSeq = {
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
   player: Tone.Player;
-  /*
   name: string;
-  idx: number;
-  layer: number;
-  */
+  cutIdx: number;
 };
 
 let seq: TSeq[] = [];
@@ -318,13 +315,13 @@ export default function Home(props: { folders: string[] }) {
 
             buffers.push({
               name: folder,
-              idx: idx,
+              cutIdx: idx,
               layer: 0,
               buffer: new Tone.Buffer(buff),
             });
 
             const bufferObj = buffers.find(
-              (b) => b.layer === 0 && b.name === folder && b.idx === idx
+              (b) => b.layer === 0 && b.name === folder && b.cutIdx === idx
             );
 
             seq.push({
@@ -334,6 +331,8 @@ export default function Home(props: { folders: string[] }) {
                 ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                 : 0,
               player: new Tone.Player(bufferObj?.buffer).toDestination(),
+              name: folder,
+              cutIdx: idx,
             });
           })
           .catch((error) => {
@@ -699,13 +698,13 @@ export default function Home(props: { folders: string[] }) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
               buffers.push({
                 name: m.n,
-                idx: m.i,
+                cutIdx: m.i,
                 layer: layer,
                 buffer: new Tone.Buffer(buff),
               });
 
               const bufferObj = buffers.find(
-                (b) => b.layer === layer && b.name === m.n && b.idx === m.i
+                (b) => b.layer === layer && b.name === m.n && b.cutIdx === m.i
               );
 
               seq.push({
@@ -715,6 +714,8 @@ export default function Home(props: { folders: string[] }) {
                   ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                   : 0,
                 player: new Tone.Player(bufferObj?.buffer).toDestination(),
+                name: m.n,
+                cutIdx: m.i,
               });
             }
           })
