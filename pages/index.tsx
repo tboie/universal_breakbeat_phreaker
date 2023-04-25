@@ -696,14 +696,21 @@ export default function Home(props: { folders: string[] }) {
                 layerSeq[idx].time < regionSelect.end)*/
             ) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
-              buffers.push({
-                name: m.n,
-                cutIdx: m.i,
-                layer: layer,
-                buffer: new Tone.Buffer(buff),
-              });
 
-              const bufferObj = buffers.find(
+              let bufferObj = buffers.find(
+                (b) => b.layer === layer && b.name === m.n && b.cutIdx === m.i
+              );
+
+              if (!bufferObj) {
+                buffers.push({
+                  name: m.n,
+                  cutIdx: m.i,
+                  layer: layer,
+                  buffer: new Tone.Buffer(buff),
+                });
+              }
+
+              bufferObj = buffers.find(
                 (b) => b.layer === layer && b.name === m.n && b.cutIdx === m.i
               );
 
@@ -726,6 +733,8 @@ export default function Home(props: { folders: string[] }) {
     );
 
     seq.sort((a, b) => a.time - b.time);
+
+    console.log(buffers);
 
     await drawLayer(layer);
   };
