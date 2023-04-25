@@ -673,6 +673,12 @@ export default function Home(props: { folders: string[] }) {
     });
 
     seq = seq.filter((s) => s.layer !== layer);
+
+    buffers
+      .filter((b) => b.layer === selectedLayer)
+      .forEach((b) => b.buffer.dispose());
+    buffers = buffers.filter((b) => b.layer !== layer);
+
     await Promise.all(
       matches.map(async (m: any, idx: number) => {
         await fetch(`/drums/${m.n}/${m.i}.wav`)
@@ -680,7 +686,8 @@ export default function Home(props: { folders: string[] }) {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
-            const layerSeq = seq.filter((s) => s.layer === layer);
+            // const layerSeq = seq.filter((s) => s.layer === layer);
+
             if (
               !selection
               /*  || (layer === 1 && !players1[idx]) ||
