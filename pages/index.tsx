@@ -640,12 +640,7 @@ export default function Home(props: { folders: string[] }) {
   const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable = table.filter((r) => r.n === selectedFolder);
 
-    if (
-      !selection
-      /*
-      (layer === 1 && !players1.length) ||
-      (layer === 2 && !players2.length)*/
-    ) {
+    if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       const pallet = table.filter(
         (r) =>
           r.n ===
@@ -659,14 +654,19 @@ export default function Home(props: { folders: string[] }) {
       }
     }
 
-    const matches: any = [];
-    srcTable.forEach((src) => {
+    let matches: any = [];
+    srcTable.forEach((src, idx) => {
       const pallet = layer === 1 ? pallet1 : pallet2;
 
       const t = pallet.map((r) => {
         const freqDiff = Math.abs(r.f - src.f);
         const durDiff = Math.abs(r.d - src.d);
-        return { ...r, fDiff: freqDiff, dDiff: durDiff };
+        return {
+          ...r,
+          fDiff: freqDiff,
+          dDiff: durDiff,
+          t: seq.filter((s) => s.layer === 0)[idx].time,
+        };
       });
 
       t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
@@ -675,12 +675,66 @@ export default function Home(props: { folders: string[] }) {
       matches.push(t[r]);
     });
 
-    seq = seq.filter((s) => s.layer !== layer);
+    if (selection) {
+      matches = matches.filter(
+        (m: any) => m.t >= regionSelect.start && m.t < regionSelect.end
+      );
+    }
 
-    buffers
-      .filter((b) => b.layer === selectedLayer)
-      .forEach((b) => b.buffer.dispose());
-    buffers = buffers.filter((b) => b.layer !== layer);
+    seq
+      .filter((s) => s.layer === layer)
+      .forEach((n) => {
+        const buff = buffers.find(
+          (b) => b.name === n.name && b.cutIdx === n.cutIdx
+        );
+
+        if (buff) {
+          if (selection) {
+            if (n.time >= regionSelect.start && n.time < regionSelect.end) {
+              // check for notes outside of selection using same buffer
+              const sameBufferNotes = seq
+                .filter(
+                  (s) =>
+                    s.layer === layer &&
+                    (s.time < regionSelect.start || s.time >= regionSelect.end)
+                )
+                .filter((nn) => nn.name === n.name && nn.cutIdx === n.cutIdx);
+
+              if (!sameBufferNotes.length) {
+                buff.buffer.dispose();
+              }
+            }
+          } else {
+            buff.buffer.dispose();
+          }
+        }
+      });
+
+    if (selection) {
+      seq
+        .filter(
+          (s) =>
+            s.layer === layer &&
+            s.time >= regionSelect.start &&
+            s.time < regionSelect.end
+        )
+        .forEach((n) => {
+          buffers = buffers.filter(
+            (b) =>
+              b.layer !== layer || (b.name !== n.name && b.cutIdx !== n.cutIdx)
+          );
+        });
+
+      seq = seq.filter(
+        (s) =>
+          s.layer !== layer ||
+          s.time < regionSelect.start ||
+          s.time >= regionSelect.end
+      );
+    } else {
+      buffers = buffers.filter((b) => b.layer !== layer);
+      seq = seq.filter((s) => s.layer !== layer);
+    }
 
     await Promise.all(
       matches.map(async (m: any, idx: number) => {
@@ -689,46 +743,34 @@ export default function Home(props: { folders: string[] }) {
             return await response.arrayBuffer();
           })
           .then(async (arrayBuffer) => {
-            // const layerSeq = seq.filter((s) => s.layer === layer);
+            const buff = await Tone.context.decodeAudioData(arrayBuffer);
 
-            if (
-              !selection
-              /*  || (layer === 1 && !players1[idx]) ||
-              (layer === 2 && !players2[idx]) ||
+            let bufferObj = buffers.find(
+              (b) => b.name === m.n && b.cutIdx === m.i
+            );
 
-              (layerSeq[idx].time >= regionSelect.start &&
-                layerSeq[idx].time < regionSelect.end)*/
-            ) {
-              const buff = await Tone.context.decodeAudioData(arrayBuffer);
-
-              let bufferObj = buffers.find(
-                (b) => b.name === m.n && b.cutIdx === m.i
-              );
-
-              if (!bufferObj) {
-                buffers.push({
-                  name: m.n,
-                  cutIdx: m.i,
-                  layer: layer,
-                  buffer: new Tone.Buffer(buff),
-                });
-              }
-
-              bufferObj = buffers.find(
-                (b) => b.name === m.n && b.cutIdx === m.i
-              );
-
-              seq.push({
-                layer: layer,
-                time: seq.filter((s) => s.layer === 0)[idx].time,
-                duration: bufferObj
-                  ? parseFloat(bufferObj.buffer.duration.toFixed(6))
-                  : 0,
-                player: new Tone.Player(bufferObj?.buffer).toDestination(),
+            if (!bufferObj) {
+              buffers.push({
                 name: m.n,
                 cutIdx: m.i,
+                layer: layer,
+                buffer: new Tone.Buffer(buff),
               });
             }
+
+            bufferObj = buffers.find((b) => b.name === m.n && b.cutIdx === m.i);
+
+            seq.push({
+              layer: layer,
+              time: m.t,
+              duration: bufferObj
+                ? parseFloat(bufferObj.buffer.duration.toFixed(6))
+                : 0,
+              player: new Tone.Player(bufferObj?.buffer).toDestination(),
+              name: m.n,
+              cutIdx: m.i,
+            });
+            //  }
           })
           .catch((error) => {
             throw Error(`Asset failed to load: ${error.message}`);
@@ -737,8 +779,6 @@ export default function Home(props: { folders: string[] }) {
     );
 
     seq.sort((a, b) => a.time - b.time);
-
-    console.log(buffers);
 
     await drawLayer(layer);
   };
