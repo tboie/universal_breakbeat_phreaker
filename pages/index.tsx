@@ -698,7 +698,7 @@ export default function Home(props: { folders: string[] }) {
               const buff = await Tone.context.decodeAudioData(arrayBuffer);
 
               let bufferObj = buffers.find(
-                (b) => b.layer === layer && b.name === m.n && b.cutIdx === m.i
+                (b) => b.name === m.n && b.cutIdx === m.i
               );
 
               if (!bufferObj) {
@@ -711,7 +711,7 @@ export default function Home(props: { folders: string[] }) {
               }
 
               bufferObj = buffers.find(
-                (b) => b.layer === layer && b.name === m.n && b.cutIdx === m.i
+                (b) => b.name === m.n && b.cutIdx === m.i
               );
 
               seq.push({
