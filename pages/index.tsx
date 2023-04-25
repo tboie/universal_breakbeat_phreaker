@@ -38,7 +38,7 @@ type TSeq = {
   layer: number;
   time: number; // TODO: verify 6 decimal standard throughout
   duration: number;
-  player?: Tone.Player;
+  player: Tone.Player;
   /*
   name: string;
   idx: number;
@@ -302,7 +302,7 @@ export default function Home(props: { folders: string[] }) {
       });
 
     buffers.forEach((b) => b.buffer.dispose());
-    seq.forEach((s) => s.player?.dispose());
+    seq.forEach((s) => s.player.dispose());
     seq = [];
     buffers = [];
 
@@ -333,9 +333,7 @@ export default function Home(props: { folders: string[] }) {
               duration: bufferObj
                 ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                 : 0,
-              player: bufferObj
-                ? new Tone.Player(bufferObj.buffer).toDestination()
-                : undefined,
+              player: new Tone.Player(bufferObj?.buffer).toDestination(),
             });
           })
           .catch((error) => {
@@ -354,7 +352,7 @@ export default function Home(props: { folders: string[] }) {
     part?.dispose();
     part = new Tone.Part((time, value) => {
       const notes = seq.filter((s) => value.time === s.time);
-      notes.forEach((n) => n.player?.start(time));
+      notes.forEach((n) => n.player.start(time));
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -594,14 +592,14 @@ export default function Home(props: { folders: string[] }) {
       seq
         .filter((s) => s.layer === 1)
         .forEach((n) => {
-          n.player?.set({
+          n.player.set({
             volume: val,
           });
         });
       seq
         .filter((s) => s.layer === 0)
         .forEach((n) => {
-          n.player?.set({
+          n.player.set({
             volume: 0,
           });
         });
@@ -609,14 +607,14 @@ export default function Home(props: { folders: string[] }) {
       seq
         .filter((s) => s.layer === 0)
         .forEach((n) => {
-          n.player?.set({
+          n.player.set({
             volume: val * -1,
           });
         });
       seq
         .filter((s) => s.layer === 1)
         .forEach((n) => {
-          n.player?.set({
+          n.player.set({
             volume: 0,
           });
         });
@@ -629,7 +627,7 @@ export default function Home(props: { folders: string[] }) {
     seq
       .filter((s) => s.layer === 2)
       .forEach((n) => {
-        n.player?.set({
+        n.player.set({
           volume: val,
         });
       });
@@ -709,9 +707,7 @@ export default function Home(props: { folders: string[] }) {
                 duration: bufferObj
                   ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                   : 0,
-                player: bufferObj
-                  ? new Tone.Player(bufferObj.buffer).toDestination()
-                  : undefined,
+                player: new Tone.Player(bufferObj?.buffer).toDestination(),
               });
             }
           })
@@ -737,8 +733,8 @@ export default function Home(props: { folders: string[] }) {
         .map((p) => ({
           time: p.time,
           duration: p.duration,
-          player: new Tone.Player(p.player?.buffer.get()).toDestination(),
-          mute: p.player?.mute,
+          player: new Tone.Player(p.player.buffer.get()).toDestination(),
+          mute: p.player.mute,
         }));
 
       new Tone.Part(
@@ -746,7 +742,7 @@ export default function Home(props: { folders: string[] }) {
           const note = notes.find((o) => o.time === value.time);
 
           if (note && !note.mute) {
-            note.player?.start(time);
+            note.player.start(time);
           }
         },
         seq.filter((s) => s.layer === layer)
@@ -795,7 +791,7 @@ export default function Home(props: { folders: string[] }) {
         if (n.time >= regionSelect.start && n.time < regionSelect.end) {
           const mute = Math.round(Math.random()) ? true : false;
 
-          n.player?.set({
+          n.player.set({
             mute: mute,
           });
         }
