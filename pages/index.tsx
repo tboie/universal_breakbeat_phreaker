@@ -23,16 +23,12 @@ let regionSelect: any;
 
 let touchMoved = false;
 
-let part: Tone.Part;
-
 type TBuffer = {
   name: string;
   cutIdx: number;
   layer: number;
   buffer: Tone.ToneAudioBuffer;
 };
-
-let buffers: TBuffer[] = [];
 
 type TSeq = {
   layer: number;
@@ -43,10 +39,16 @@ type TSeq = {
   cutIdx: number;
 };
 
-let seq: TSeq[] = [];
+type TPallet = {
+  layer: number;
+  sounds: any[];
+};
 
-let pallet1: any[] = [];
-let pallet2: any[] = [];
+let buffers: TBuffer[] = [];
+let seq: TSeq[] = [];
+let pallets: TPallet[] = [];
+
+let part: Tone.Part;
 
 // all pieces data table
 const table: any[] = [];
@@ -57,6 +59,7 @@ const table: any[] = [];
   });
 });
 
+// utils
 const closest = (array: number[], goal: number) =>
   array.reduce((prev, curr) =>
     Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
@@ -306,6 +309,7 @@ export default function Home(props: { folders: string[] }) {
     seq.forEach((s) => s.player.dispose());
     seq = [];
     buffers = [];
+    pallets = [];
 
     await Promise.all(
       times.map(async (t: number, idx: number) => {
@@ -641,38 +645,41 @@ export default function Home(props: { folders: string[] }) {
     let srcTable = table.filter((r) => r.n === selectedFolder);
 
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
-      const pallet = table.filter(
+      const newPallet = table.filter(
         (r) =>
           r.n ===
           props.folders[Math.floor(Math.random() * props.folders.length)]
       );
 
-      if (layer === 1) {
-        pallet1 = pallet;
+      const pallet = pallets.find((p) => p.layer === layer);
+      if (pallet) {
+        pallet.sounds = newPallet;
       } else {
-        pallet2 = pallet;
+        pallets.push({ layer: layer, sounds: newPallet });
       }
     }
 
     let matches: any = [];
     srcTable.forEach((src, idx) => {
-      const pallet = layer === 1 ? pallet1 : pallet2;
+      const pallet = pallets.find((p) => p.layer === layer);
 
-      const t = pallet.map((r) => {
-        const freqDiff = Math.abs(r.f - src.f);
-        const durDiff = Math.abs(r.d - src.d);
-        return {
-          ...r,
-          fDiff: freqDiff,
-          dDiff: durDiff,
-          t: seq.filter((s) => s.layer === 0)[idx].time,
-        };
-      });
+      if (pallet) {
+        const t = pallet.sounds.map((r) => {
+          const freqDiff = Math.abs(r.f - src.f);
+          const durDiff = Math.abs(r.d - src.d);
+          return {
+            ...r,
+            fDiff: freqDiff,
+            dDiff: durDiff,
+            t: seq.filter((s) => s.layer === 0)[idx].time,
+          };
+        });
 
-      t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
 
-      const r = Math.floor(Math.random() * 3);
-      matches.push(t[r]);
+        const r = Math.floor(Math.random() * 3);
+        matches.push(t[r]);
+      }
     });
 
     if (selection) {
