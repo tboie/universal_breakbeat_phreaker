@@ -404,19 +404,16 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const startIdx = seq
-      .filter((n) => n.layer === 0)
-      .findIndex((n) => n.time === regionSelect.start);
+    const baseSeq = seq.filter((n) => n.layer === 0);
 
-    let endIdx = seq
-      .filter((n) => n.layer === 0)
-      .findIndex((n) => n.time === regionSelect.end);
-
+    const startIdx = baseSeq.findIndex((n) => n.time === regionSelect.start);
+    let endIdx = baseSeq.findIndex((n) => n.time === regionSelect.end);
     if (endIdx === -1) {
-      endIdx = seq.filter((n) => n.layer === 0).length;
+      endIdx = baseSeq.length;
     }
 
-    let layerSeq = seq.reduce(
+    // group notes by time
+    const timesSeq = seq.reduce(
       (groups: any, item) => ({
         ...groups,
         [item.time]: [...(groups[item.time] || []), item],
@@ -425,8 +422,8 @@ export default function Home(props: { folders: string[] }) {
     );
 
     let noteArray: any[] = [];
-    Object.keys(layerSeq).forEach((k, i) => {
-      noteArray.push(layerSeq[k]);
+    Object.keys(timesSeq).forEach((k, i) => {
+      noteArray.push(timesSeq[k]);
     });
 
     const shuffled = arrShuffle(noteArray.slice(startIdx, endIdx));
