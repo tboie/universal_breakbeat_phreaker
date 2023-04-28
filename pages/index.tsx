@@ -324,8 +324,8 @@ export default function Home(props: { folders: string[] }) {
       });
 
     part?.dispose();
-    buffers.forEach((b) => b.buffer.dispose());
     seq.forEach((s) => s.player.dispose());
+    buffers.forEach((b) => b.buffer.dispose());
     seq = [];
     buffers = [];
     pallets = [];
