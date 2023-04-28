@@ -17,6 +17,7 @@ let init = false;
 let ws0: any;
 let ws1: any;
 let ws2: any;
+let wsRegions: any;
 
 let regionLoop: any;
 let regionSelect: any;
@@ -95,10 +96,34 @@ export default function Home(props: { folders: string[] }) {
         (await import("wavesurfer.js/dist/plugin/wavesurfer.markers")).default;
 
       ws0 = WaveSurfer.create({
-        container: "#waveform0",
+        container: "#ws0",
         height: 200,
         waveColor: "#39FF14",
-        progressColor: "#39FF14",
+        fillParent: false,
+        scrollParent: false,
+      });
+
+      ws1 = WaveSurfer.create({
+        container: "#ws1",
+        height: 200,
+        waveColor: "gold",
+        fillParent: false,
+        scrollParent: false,
+      });
+
+      ws2 = WaveSurfer.create({
+        container: "#ws2",
+        height: 200,
+        waveColor: "teal",
+        fillParent: false,
+        scrollParent: false,
+      });
+
+      wsRegions = WaveSurfer.create({
+        container: "#wsRegions",
+        height: 200,
+        waveColor: "transparent",
+        progressColor: "transparent",
         cursorColor: "#FF10F0",
         fillParent: false,
         scrollParent: false,
@@ -113,29 +138,16 @@ export default function Home(props: { folders: string[] }) {
         ],
       });
 
-      ws1 = WaveSurfer.create({
-        container: "#waveform1",
-        height: 200,
-        waveColor: "gold",
-        fillParent: false,
-        scrollParent: false,
-      });
-
-      ws2 = WaveSurfer.create({
-        container: "#waveform2",
-        height: 200,
-        waveColor: "teal",
-        fillParent: false,
-        scrollParent: false,
-      });
-
       const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
-          const minZoom = Math.floor(window.innerWidth / ws0.getDuration());
+          const minZoom = Math.floor(
+            window.innerWidth / wsRegions.getDuration()
+          );
           // 2 seconds max
           const maxZoom = Math.floor(window.innerWidth / 2);
 
+          wsRegions.zoom(minZoom);
           ws0.zoom(minZoom);
           ws1.zoom(minZoom);
           ws2.zoom(minZoom);
@@ -150,7 +162,7 @@ export default function Home(props: { folders: string[] }) {
 
       const configScroll = () => {
         const scrollEle = document.querySelector("#scroll") as HTMLInputElement;
-        const waveEle = document.querySelector("#waveform0") as HTMLDivElement;
+        const waveEle = document.querySelector("#ws0") as HTMLDivElement;
 
         if (scrollEle && waveEle) {
           const scrollMax = waveEle.scrollWidth - window.innerWidth;
@@ -167,6 +179,7 @@ export default function Home(props: { folders: string[] }) {
       window.addEventListener("resize", (event) => {
         configScroll();
         configZoom();
+        wsRegions.drawer.fireEvent("redraw");
         ws0.drawer.fireEvent("redraw");
         ws1.drawer.fireEvent("redraw");
         ws2.drawer.fireEvent("redraw");
@@ -176,11 +189,11 @@ export default function Home(props: { folders: string[] }) {
         touchMoved = true;
       });
 
-      ws0.on("zoom", (val: number) => {
+      wsRegions.on("zoom", (val: number) => {
         configScroll();
       });
 
-      ws0.on("region-update-end", (region: any) => {
+      wsRegions.on("region-update-end", (region: any) => {
         // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
@@ -211,49 +224,50 @@ export default function Home(props: { folders: string[] }) {
         });
       });
 
-      ws0.on("ready", () => {
-        ws0.setVolume(0);
+      wsRegions.on("ready", () => {
+        wsRegions.setVolume(0);
 
         const end = seq
           .filter((s) => s.layer === 0)
           .reduce((n, { duration }) => n + duration, 0);
 
         if (!regionSelect) {
-          ws0.addRegion({
+          wsRegions.addRegion({
             id: "selection",
             start: 0,
             end: end,
             loop: false,
           });
-          regionSelect = Object.values(ws0.regions.list)[0];
+          regionSelect = Object.values(wsRegions.regions.list)[0];
         }
 
         if (!regionLoop) {
-          ws0.addRegion({
+          wsRegions.addRegion({
             id: "loop",
             start: 0,
             end: end,
             loop: true,
           });
 
-          regionLoop = Object.values(ws0.regions.list)[1];
+          regionLoop = Object.values(wsRegions.regions.list)[1];
           regionLoop.on("out", (e: any) => {
-            if (ws0.getCurrentTime() > regionLoop.end) {
-              ws0.play(regionLoop.start);
+            if (wsRegions.getCurrentTime() > regionLoop.end) {
+              wsRegions.play(regionLoop.start);
             }
           });
 
           configZoom();
         } else {
           // sets playhead on randomize
-          ws0.seekTo(
-            Tone.Time(Tone.Transport.position).toSeconds() / ws0.getDuration()
+          wsRegions.seekTo(
+            Tone.Time(Tone.Transport.position).toSeconds() /
+              wsRegions.getDuration()
           );
         }
 
-        ws0.clearMarkers();
+        wsRegions.clearMarkers();
         seq.forEach((s) => {
-          ws0.addMarker({ time: s.time });
+          wsRegions.addMarker({ time: s.time });
         });
 
         setLoading(false);
@@ -270,12 +284,16 @@ export default function Home(props: { folders: string[] }) {
     regionLoop = undefined;
     regionSelect = undefined;
 
-    ws0.stop();
-    ws0.clearRegions();
-    ws0.clearMarkers();
-    ws0.setPlaybackRate(1);
+    wsRegions.stop();
+    wsRegions.clearRegions();
+    wsRegions.clearMarkers();
+    wsRegions.setPlaybackRate(1);
+    wsRegions.zoom(0);
+    wsRegions.empty();
+
     ws0.zoom(0);
     ws0.empty();
+    ws0.backend.buffer = undefined;
 
     ws1.zoom(0);
     ws1.empty();
@@ -374,7 +392,7 @@ export default function Home(props: { folders: string[] }) {
         if (regionLoop) {
           const piece = seq.find((s) => s.layer === 0 && s.time === value.time);
           if (piece) {
-            ws0.play(piece.time);
+            wsRegions.play(piece.time);
           }
         }
       }, time);
@@ -382,6 +400,7 @@ export default function Home(props: { folders: string[] }) {
 
     Tone.Transport.position = "0:0:0";
 
+    await drawLayer("silence");
     await drawLayer(0);
 
     setSpeed(1);
@@ -485,7 +504,7 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const wav = toWav(ws0.backend.buffer);
+    const wav = toWav(wsRegions.backend.buffer);
     const blob = new window.Blob([new DataView(wav)], {
       type: "audio/wav",
     });
@@ -508,8 +527,8 @@ export default function Home(props: { folders: string[] }) {
     await Tone.start();
     if (playing) {
       Tone.Transport.stop();
-      ws0.pause();
-      ws0.seekTo(regionLoop.start / ws0.getDuration());
+      wsRegions.pause();
+      wsRegions.seekTo(regionLoop.start / wsRegions.getDuration());
     } else {
       Tone.Transport.start("+0.5", regionLoop.start / speed);
     }
@@ -581,11 +600,12 @@ export default function Home(props: { folders: string[] }) {
     seq.forEach((s: any) => (s.player.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
-    ws0.setPlaybackRate(val);
+    wsRegions.setPlaybackRate(val);
     setSpeed(val);
   };
 
   const changeZoom = (val: number) => {
+    wsRegions.zoom(val);
     ws0.zoom(val);
     ws1.zoom(val);
     ws2.zoom(val);
@@ -788,35 +808,39 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(layer);
   };
 
-  const drawLayer = async (layer: number) => {
+  const drawLayer = async (layer: number | "silence") => {
     const duration = seq
       .filter((s) => s.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
     Tone.Offline(({ transport }) => {
-      const notes = seq
-        .filter((note) => note.layer === layer)
-        .map((p) => ({
-          time: p.time,
-          duration: p.duration,
-          player: new Tone.Player(p.player.buffer.get()).toDestination(),
-          mute: p.player.mute,
-        }));
+      if (layer !== "silence") {
+        const notes = seq
+          .filter((note) => note.layer === layer)
+          .map((p) => ({
+            time: p.time,
+            duration: p.duration,
+            player: new Tone.Player(p.player.buffer.get()).toDestination(),
+            mute: p.player.mute,
+          }));
 
-      new Tone.Part(
-        (time, value) => {
-          const note = notes.find((o) => o.time === value.time);
+        new Tone.Part(
+          (time, value) => {
+            const note = notes.find((o) => o.time === value.time);
 
-          if (note && !note.mute) {
-            note.player.start(time);
-          }
-        },
-        seq.filter((s) => s.layer === layer)
-      ).start(0);
+            if (note && !note.mute) {
+              note.player.start(time);
+            }
+          },
+          seq.filter((s) => s.layer === layer)
+        ).start(0);
+      }
 
       transport.start(0);
     }, duration).then((buffer) => {
-      if (layer === 0) {
+      if (layer === "silence") {
+        wsRegions.loadDecodedBuffer(buffer.get());
+      } else if (layer === 0) {
         ws0.loadDecodedBuffer(buffer.get());
       } else if (layer === 1) {
         ws1.loadDecodedBuffer(buffer.get());
@@ -879,9 +903,19 @@ export default function Home(props: { folders: string[] }) {
       <main className={styles.main}>
         <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
 
-        <div id="waveform0" className={`layer${selectedLayer}`} />
-        <div id="waveform1" />
-        <div id="waveform2" />
+        <div
+          id="ws0"
+          className={`ws ${selectedLayer === 0 ? "selected" : ""}`}
+        />
+        <div
+          id="ws1"
+          className={`ws ${selectedLayer === 1 ? "selected" : ""}`}
+        />
+        <div
+          id="ws2"
+          className={`ws ${selectedLayer === 2 ? "selected" : ""}`}
+        />
+        <div id="wsRegions" className={`layer${selectedLayer}`} />
 
         <div className={styles.controls}>
           <button
@@ -922,7 +956,7 @@ export default function Home(props: { folders: string[] }) {
           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
             const val = parseInt(e.target.value);
 
-            ["#waveform0", "#waveform1", "#waveform2"].forEach((n) => {
+            ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
               const container = document.querySelector(n) as HTMLDivElement;
 
               if (container) {
@@ -934,7 +968,7 @@ export default function Home(props: { folders: string[] }) {
           }}
           disabled={
             loading ||
-            zoom === Math.floor(window.innerWidth / ws0?.getDuration())
+            zoom === Math.floor(window.innerWidth / wsRegions?.getDuration())
           }
         />
         <input

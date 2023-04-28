@@ -19,21 +19,23 @@ main {
   color: rgba(255, 255, 255, 0.96);
 }
 
-#waveform0,
-#waveform1,
-#waveform2 {
+.ws {
   overflow-x: hidden !important;
   min-height: 200px !important;
   margin-bottom: 0.25rem;
 }
 
-#waveform1,
-#waveform2 {
+#ws0,
+#ws1,
+#ws2 {
   margin-top: 1.1rem;
-  z-index: 2;
   position: fixed !important;
   width: 100% !important;
   opacity: 0.8;
+}
+
+.ws.selected {
+  z-index: 1 !important;
 }
 
 [data-id="loop"] {
