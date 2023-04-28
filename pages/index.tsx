@@ -378,9 +378,6 @@ export default function Home(props: { folders: string[] }) {
 
     part?.dispose();
     part = new Tone.Part((time, value) => {
-      //const notes = seq.filter((s) => value.time === s.time);
-      //notes.forEach((n) => n.player.start(time));
-
       value.player.start(time);
 
       /* trim overlapping pieces
