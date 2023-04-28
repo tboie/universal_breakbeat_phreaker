@@ -11,6 +11,7 @@ import * as Tone from "tone";
 import toWav from "audiobuffer-to-wav";
 
 import data from "../public/data.json";
+import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
@@ -84,6 +85,7 @@ export default function Home(props: { folders: string[] }) {
   const [layer2Volume, setLayer2Volume] = useState(0);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -904,6 +906,15 @@ export default function Home(props: { folders: string[] }) {
 
     drawLayer(layer);
   };
+
+  const toggleDisplay = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setDisplay(display === "controls" ? "playlist" : "controls");
+  };
+
   return (
     <>
       <Head>
@@ -932,134 +943,143 @@ export default function Home(props: { folders: string[] }) {
         />
         <div id="wsRegions" className={`layer${selectedLayer}`} />
 
-        <div className={styles.controls}>
-          <button
-            onClick={(e) => resizeRegion(e, "start", "left")}
-            disabled={loading}
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={(e) => resizeRegion(e, "start", "right")}
-            disabled={loading}
-          >
-            {">"}
-          </button>
-          <span className={styles.info}>{speed + "x"}</span>
-          <button
-            onClick={(e) => resizeRegion(e, "end", "left")}
-            disabled={loading}
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={(e) => resizeRegion(e, "end", "right")}
-            disabled={loading}
-          >
-            {">"}
-          </button>
-        </div>
-
-        <input
-          id="scroll"
-          type="range"
-          min={0}
-          max={100}
-          value={scroll}
-          step={1}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const val = parseInt(e.target.value);
-
-            ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
-              const container = document.querySelector(n) as HTMLDivElement;
-
-              if (container) {
-                container.scrollLeft = val;
-              }
-            });
-
-            setScroll(val);
-          }}
-          disabled={
-            loading ||
-            zoom === Math.floor(window.innerWidth / wsRegions?.getDuration())
-          }
-        />
-        <input
-          id="zoom"
-          type="range"
-          step={20}
-          min={0}
-          max={100}
-          value={zoom}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeZoom(parseInt(e.target.value));
-          }}
-          disabled={
-            loading ||
-            parseInt(
-              (document.querySelector("#zoom") as HTMLInputElement)?.min
-            ) >=
-              parseInt(
-                (document.querySelector("#zoom") as HTMLInputElement)?.max
-              )
-          }
-        />
-        <input
-          id="speed"
-          type="range"
-          min={0.05}
-          max={2}
-          value={speed}
-          step={0.05}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeSpeed(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-        <input
-          id="fader"
-          type="range"
-          min={-20}
-          max={20}
-          value={fader}
-          step={0.1}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeFader(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-        <input
-          id="layer2Volume"
-          type="range"
-          min={-20}
-          max={0}
-          value={layer2Volume}
-          step={0.1}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeLayer2Volume(parseFloat(e.target.value));
-          }}
-          disabled={loading}
-        />
-
-        <ul className={styles.playlist}>
-          {props.folders.map((folder) => {
-            return (
-              <li
-                className={folder === selectedFolder ? styles.selected : ""}
-                key={folder}
-                onClick={(e) => listClick(e, folder)}
+        <div className={styles.content}>
+          <div className={`${display === "playlist" ? styles.hide : ""}`}>
+            <div className={styles.controls}>
+              <button
+                onClick={(e) => resizeRegion(e, "start", "left")}
+                disabled={loading}
               >
-                {folder}
-              </li>
-            );
-          })}
-        </ul>
+                {"<"}
+              </button>
+              <button
+                onClick={(e) => resizeRegion(e, "start", "right")}
+                disabled={loading}
+              >
+                {">"}
+              </button>
+              <span className={styles.info}>{speed + "x"}</span>
+              <button
+                onClick={(e) => resizeRegion(e, "end", "left")}
+                disabled={loading}
+              >
+                {"<"}
+              </button>
+              <button
+                onClick={(e) => resizeRegion(e, "end", "right")}
+                disabled={loading}
+              >
+                {">"}
+              </button>
+            </div>
+
+            <input
+              id="scroll"
+              type="range"
+              min={0}
+              max={100}
+              value={scroll}
+              step={1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const val = parseInt(e.target.value);
+
+                ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
+                  const container = document.querySelector(n) as HTMLDivElement;
+
+                  if (container) {
+                    container.scrollLeft = val;
+                  }
+                });
+
+                setScroll(val);
+              }}
+              disabled={
+                loading ||
+                zoom ===
+                  Math.floor(window.innerWidth / wsRegions?.getDuration())
+              }
+            />
+            <input
+              id="zoom"
+              type="range"
+              step={20}
+              min={0}
+              max={100}
+              value={zoom}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeZoom(parseInt(e.target.value));
+              }}
+              disabled={
+                loading ||
+                parseInt(
+                  (document.querySelector("#zoom") as HTMLInputElement)?.min
+                ) >=
+                  parseInt(
+                    (document.querySelector("#zoom") as HTMLInputElement)?.max
+                  )
+              }
+            />
+            <input
+              id="speed"
+              type="range"
+              min={0.05}
+              max={2}
+              value={speed}
+              step={0.05}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeSpeed(parseFloat(e.target.value));
+              }}
+              disabled={loading}
+            />
+            <input
+              id="fader"
+              type="range"
+              min={-20}
+              max={20}
+              value={fader}
+              step={0.1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeFader(parseFloat(e.target.value));
+              }}
+              disabled={loading}
+            />
+            <input
+              id="layer2Volume"
+              type="range"
+              min={-20}
+              max={0}
+              value={layer2Volume}
+              step={0.1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeLayer2Volume(parseFloat(e.target.value));
+              }}
+              disabled={loading}
+            />
+          </div>
+
+          <ul
+            className={`${styles.playlist} ${
+              display === "controls" ? styles.hide : ""
+            }`}
+          >
+            {props.folders.map((folder) => {
+              return (
+                <li
+                  className={folder === selectedFolder ? styles.selected : ""}
+                  key={folder}
+                  onClick={(e) => listClick(e, folder)}
+                >
+                  {folder}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <div className={styles.toolbar}>
           <button
@@ -1096,6 +1116,7 @@ export default function Home(props: { folders: string[] }) {
             Erase
           </button>
         </div>
+
         <div className={styles.toolbar}>
           <button
             id="download"
@@ -1107,6 +1128,10 @@ export default function Home(props: { folders: string[] }) {
 
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
             {playing ? "Stop" : "Play"}
+          </button>
+
+          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
+            {display === "controls" ? "List" : "Controls"}
           </button>
 
           <button

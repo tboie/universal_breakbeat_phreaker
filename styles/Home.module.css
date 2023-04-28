@@ -28,6 +28,19 @@
   width: 95%;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: scroll;
+  padding: 0.25rem 0;
+  margin: 0 auto;
+}
+
+.content .hide {
+  display: none;
+}
+
 .toolbar,
 .controls {
   display: flex;
