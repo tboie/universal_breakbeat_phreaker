@@ -323,6 +323,7 @@ export default function Home(props: { folders: string[] }) {
           .map((t) => parseFloat(t));
       });
 
+    part?.dispose();
     buffers.forEach((b) => b.buffer.dispose());
     seq.forEach((s) => s.player.dispose());
     seq = [];
@@ -376,7 +377,6 @@ export default function Home(props: { folders: string[] }) {
     Tone.Transport.setLoopPoints(0, end);
     Tone.Transport.loop = true;
 
-    part?.dispose();
     part = new Tone.Part((time, value) => {
       value.player.start(time);
 
