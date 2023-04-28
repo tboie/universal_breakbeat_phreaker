@@ -378,8 +378,10 @@ export default function Home(props: { folders: string[] }) {
 
     part?.dispose();
     part = new Tone.Part((time, value) => {
-      const notes = seq.filter((s) => value.time === s.time);
-      notes.forEach((n) => n.player.start(time));
+      //const notes = seq.filter((s) => value.time === s.time);
+      //notes.forEach((n) => n.player.start(time));
+
+      value.player.start(time);
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -461,12 +463,9 @@ export default function Home(props: { folders: string[] }) {
         durTotal += noteArray[idx - 1][0].duration;
       }
 
-      notes.forEach((n: any, i: number) => {
+      notes.forEach((n: any) => {
         const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
-        if (!i) {
-          // pass player into part?
-          part.add(ret.time, { ...ret, player: undefined });
-        }
+        part.add(ret.time, { ...ret });
         seq.push({ ...ret });
       });
     });
@@ -493,6 +492,7 @@ export default function Home(props: { folders: string[] }) {
       end: closest(times, regionSelect.end),
     });
 
+    await drawLayer("silence");
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
@@ -809,6 +809,11 @@ export default function Home(props: { folders: string[] }) {
     );
 
     seq.sort((a, b) => a.time - b.time);
+
+    part.clear();
+    seq.forEach((n) => {
+      part.add(n.time, { ...n });
+    });
 
     await drawLayer(layer);
   };
