@@ -428,7 +428,7 @@ export default function Home(props: { folders: string[] }) {
     drawLayer(selectedLayer);
   };
 
-  const randomClick = async (
+  const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
@@ -666,7 +666,14 @@ export default function Home(props: { folders: string[] }) {
     setLayer2Volume(val);
   };
 
-  const findMatches = async (layer: number, selection?: boolean) => {
+  const findMatches = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number,
+    selection?: boolean
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
     let srcTable = table.filter((r) => r.n === selectedFolder);
 
     // load pallet
@@ -1098,11 +1105,13 @@ export default function Home(props: { folders: string[] }) {
             2
           </button>
 
+          <button onClick={(e) => shuffleClick(e)} disabled={loading}>
+            Shuffle
+          </button>
+
           <button
-            onClick={(e) =>
-              selectedLayer ? findMatches(selectedLayer, true) : randomClick(e)
-            }
-            disabled={loading}
+            onClick={(e) => findMatches(e, selectedLayer, true)}
+            disabled={!selectedLayer || loading}
           >
             <Image
               src={loading ? "dice_disabled.svg" : "dice.svg"}
@@ -1136,7 +1145,7 @@ export default function Home(props: { folders: string[] }) {
 
           <button
             disabled={loading || selectedLayer === 0}
-            onClick={() => findMatches(selectedLayer)}
+            onClick={(e) => findMatches(e, selectedLayer)}
           >
             Pallet
           </button>
