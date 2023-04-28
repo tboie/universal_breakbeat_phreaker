@@ -410,12 +410,20 @@ export default function Home(props: { folders: string[] }) {
     setSelectedLayer(0);
   };
 
-  const originalClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const uneraseClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
-    listClick(undefined, selectedFolder);
+
+    seq
+      .filter(
+        (n) =>
+          n.layer === selectedLayer &&
+          n.time >= regionSelect.start &&
+          n.time < regionSelect.end
+      )
+      .forEach((n) => n.player.set({ mute: false }));
+
+    drawLayer(selectedLayer);
   };
 
   const randomClick = async (
@@ -1089,8 +1097,12 @@ export default function Home(props: { folders: string[] }) {
           </button>
         </div>
         <div className={styles.toolbar}>
-          <button onClick={(e) => originalClick(e)} disabled={loading}>
-            Original
+          <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            Download
           </button>
 
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
@@ -1104,12 +1116,8 @@ export default function Home(props: { folders: string[] }) {
             Pallet
           </button>
 
-          <button
-            id="download"
-            onClick={(e) => downloadClick(e)}
-            disabled={loading}
-          >
-            Download
+          <button onClick={(e) => uneraseClick(e)} disabled={loading}>
+            Unerase
           </button>
         </div>
       </main>
