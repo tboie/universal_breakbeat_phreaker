@@ -11,7 +11,6 @@ import * as Tone from "tone";
 import toWav from "audiobuffer-to-wav";
 
 import data from "../public/data.json";
-import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
