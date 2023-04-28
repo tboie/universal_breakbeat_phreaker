@@ -662,6 +662,7 @@ export default function Home(props: { folders: string[] }) {
   const findMatches = async (layer: number, selection?: boolean) => {
     let srcTable = table.filter((r) => r.n === selectedFolder);
 
+    // load pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       const newPallet = table.filter(
         (r) =>
@@ -677,6 +678,7 @@ export default function Home(props: { folders: string[] }) {
       }
     }
 
+    // find matches
     let matches: any = [];
     srcTable.forEach((src, idx) => {
       const pallet = pallets.find((p) => p.layer === layer);
@@ -706,6 +708,7 @@ export default function Home(props: { folders: string[] }) {
       );
     }
 
+    // dispose buffer and remove duplicate buffers
     seq
       .filter((s) => s.layer === layer)
       .forEach((n) => {
@@ -735,6 +738,7 @@ export default function Home(props: { folders: string[] }) {
         }
       });
 
+    // modify sequence
     if (selection) {
       seq
         .filter(
@@ -761,6 +765,7 @@ export default function Home(props: { folders: string[] }) {
       seq = seq.filter((s) => s.layer !== layer);
     }
 
+    // download and add buffers, sequence notes
     await Promise.all(
       matches.map(async (m: any, idx: number) => {
         await fetch(`/drums/${m.n}/${m.i}.wav`)
