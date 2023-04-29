@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
+  width: 20%;
 }
 
 .slider {
@@ -47,7 +47,7 @@
   width: 100%;
   flex-direction: row;
   max-width: 500px;
-  margin: 0 auto;
+  margin: 0.25rem auto;
 }
 
 .toolbar button,
@@ -62,6 +62,7 @@
   flex-grow: 1;
   font-size: 0.9rem;
   border-left: none;
+  width: 20%;
 }
 
 .controls button:nth-child(1),
@@ -72,10 +73,6 @@
 
 .controls button {
   font-size: 1.1rem;
-}
-
-.toolbar button {
-  width: 25%;
 }
 
 .toolbar .selected,

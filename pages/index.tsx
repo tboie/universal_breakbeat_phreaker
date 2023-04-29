@@ -949,36 +949,103 @@ export default function Home(props: { folders: string[] }) {
         />
         <div id="wsRegions" className={`layer${selectedLayer}`} />
 
+        <div className={styles.controls}>
+          <button
+            onClick={(e) => resizeRegion(e, "start", "left")}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={(e) => resizeRegion(e, "start", "right")}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+          <span className={styles.info}>{speed + "x"}</span>
+          <button
+            onClick={(e) => resizeRegion(e, "end", "left")}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={(e) => resizeRegion(e, "end", "right")}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+        </div>
+
+        <div className={styles.toolbar}>
+          <button
+            className={selectedLayer === 1 ? styles.selected : ""}
+            onClick={(e) => layerClick(e, 1)}
+            disabled={loading}
+          >
+            1
+          </button>
+
+          <button
+            className={selectedLayer === 2 ? styles.selected : ""}
+            onClick={(e) => layerClick(e, 2)}
+            disabled={loading}
+          >
+            2
+          </button>
+
+          <button onClick={(e) => shuffleClick(e)} disabled={loading}>
+            Shuffle
+          </button>
+
+          <button
+            onClick={(e) => findMatches(e, selectedLayer, true)}
+            disabled={!selectedLayer || loading}
+          >
+            <Image
+              src={loading ? "dice_disabled.svg" : "dice.svg"}
+              alt="dice"
+              width={24}
+              height={24}
+            />
+          </button>
+
+          <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
+            Erase
+          </button>
+        </div>
+
+        <div className={styles.toolbar}>
+          <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            Download
+          </button>
+
+          <button disabled={loading} onClick={(e) => playStopClick(e)}>
+            {playing ? "Stop" : "Play"}
+          </button>
+
+          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
+            {display === "controls" ? "List" : "Controls"}
+          </button>
+
+          <button
+            disabled={loading || selectedLayer === 0}
+            onClick={(e) => findMatches(e, selectedLayer)}
+          >
+            Pallet
+          </button>
+
+          <button onClick={(e) => uneraseClick(e)} disabled={loading}>
+            Unerase
+          </button>
+        </div>
+
         <div className={styles.content}>
           <div className={`${display === "playlist" ? styles.hide : ""}`}>
-            <div className={styles.controls}>
-              <button
-                onClick={(e) => resizeRegion(e, "start", "left")}
-                disabled={loading}
-              >
-                {"<"}
-              </button>
-              <button
-                onClick={(e) => resizeRegion(e, "start", "right")}
-                disabled={loading}
-              >
-                {">"}
-              </button>
-              <span className={styles.info}>{speed + "x"}</span>
-              <button
-                onClick={(e) => resizeRegion(e, "end", "left")}
-                disabled={loading}
-              >
-                {"<"}
-              </button>
-              <button
-                onClick={(e) => resizeRegion(e, "end", "right")}
-                disabled={loading}
-              >
-                {">"}
-              </button>
-            </div>
-
             <input
               id="scroll"
               type="range"
@@ -1085,73 +1152,6 @@ export default function Home(props: { folders: string[] }) {
               );
             })}
           </ul>
-        </div>
-
-        <div className={styles.toolbar}>
-          <button
-            className={selectedLayer === 1 ? styles.selected : ""}
-            onClick={(e) => layerClick(e, 1)}
-            disabled={loading}
-          >
-            1
-          </button>
-
-          <button
-            className={selectedLayer === 2 ? styles.selected : ""}
-            onClick={(e) => layerClick(e, 2)}
-            disabled={loading}
-          >
-            2
-          </button>
-
-          <button onClick={(e) => shuffleClick(e)} disabled={loading}>
-            Shuffle
-          </button>
-
-          <button
-            onClick={(e) => findMatches(e, selectedLayer, true)}
-            disabled={!selectedLayer || loading}
-          >
-            <Image
-              src={loading ? "dice_disabled.svg" : "dice.svg"}
-              alt="dice"
-              width={24}
-              height={24}
-            />
-          </button>
-
-          <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
-            Erase
-          </button>
-        </div>
-
-        <div className={styles.toolbar}>
-          <button
-            id="download"
-            onClick={(e) => downloadClick(e)}
-            disabled={loading}
-          >
-            Download
-          </button>
-
-          <button disabled={loading} onClick={(e) => playStopClick(e)}>
-            {playing ? "Stop" : "Play"}
-          </button>
-
-          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
-            {display === "controls" ? "List" : "Controls"}
-          </button>
-
-          <button
-            disabled={loading || selectedLayer === 0}
-            onClick={(e) => findMatches(e, selectedLayer)}
-          >
-            Pallet
-          </button>
-
-          <button onClick={(e) => uneraseClick(e)} disabled={loading}>
-            Unerase
-          </button>
         </div>
       </main>
     </>
