@@ -9,6 +9,7 @@ import * as Tone from "tone";
 
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
+import JSZip from "jszip";
 
 import data from "../public/data.json";
 
@@ -510,18 +511,54 @@ export default function Home(props: { folders: string[] }) {
     e.preventDefault();
     e.stopPropagation();
 
-    const wav = toWav(wsRegions.backend.buffer);
-    const blob = new window.Blob([new DataView(wav)], {
-      type: "audio/wav",
+    const duration = seq
+      .filter((s) => s.layer === 0)
+      .reduce((n, { duration }) => n + duration, 0);
+
+    Tone.Offline(({ transport }) => {
+      const notes = seq.map((p) => ({
+        time: p.time,
+        duration: p.duration,
+        player: new Tone.Player(p.player.buffer.get()).toDestination(),
+      }));
+
+      new Tone.Part((time, value) => {
+        value.player.start(time);
+      }, notes).start(0);
+
+      transport.start(0);
+    }, duration).then((buffer) => {
+      const wavRender = toWav(buffer);
+
+      const wavLayer0 = ws0.backend.buffer
+        ? toWav(ws0.backend.buffer)
+        : undefined;
+      const wavLayer1 = ws1.backend.buffer
+        ? toWav(ws1.backend.buffer)
+        : undefined;
+      const wavLayer2 = ws2.backend.buffer
+        ? toWav(ws2.backend.buffer)
+        : undefined;
+
+      const zip = new JSZip();
+      const sounds = zip.folder("universal breakbeat phreaker");
+      sounds?.file("rendered.wav", wavRender);
+
+      if (wavLayer0) sounds?.file("layer_0.wav", wavLayer0);
+      if (wavLayer1) sounds?.file("layer_1.wav", wavLayer1);
+      if (wavLayer2) sounds?.file("layer_2.wav", wavLayer2);
+
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+        const blobUrl = window.URL.createObjectURL(content);
+        const anchor = document.createElement("a");
+
+        anchor.href = blobUrl;
+        anchor.download = selectedFolder + "______PHREAKED.zip";
+        anchor.click();
+
+        window.URL.revokeObjectURL(blobUrl);
+      });
     });
-    const blobUrl = window.URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-
-    anchor.href = blobUrl;
-    anchor.download = selectedFolder + "_PHREAKED";
-    anchor.click();
-
-    window.URL.revokeObjectURL(blobUrl);
   };
 
   const playStopClick = async (
@@ -880,15 +917,7 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    if (layer !== selectedLayer) {
-      await drawLayer(layer === 2 ? 1 : 2);
-      await drawLayer(layer);
-      setSelectedLayer(layer);
-    } else {
-      await drawLayer(1);
-      await drawLayer(2);
-      setSelectedLayer(0);
-    }
+    setSelectedLayer(layer === selectedLayer ? 0 : layer);
   };
 
   const erase = (
