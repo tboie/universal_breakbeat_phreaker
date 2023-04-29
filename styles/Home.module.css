@@ -46,7 +46,6 @@
   display: flex;
   width: 100%;
   flex-direction: row;
-  padding: 0.25rem 0;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -60,7 +59,6 @@
   border-radius: 0;
   color: skyblue;
   background-color: black;
-  margin: 0.2rem 0;
   flex-grow: 1;
   font-size: 0.9rem;
   border-left: none;
