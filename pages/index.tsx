@@ -116,7 +116,7 @@ export default function Home(props: { folders: string[] }) {
       ws2 = WaveSurfer.create({
         container: "#ws2",
         height: 200,
-        waveColor: "teal",
+        waveColor: "#9D00FF",
         fillParent: false,
         scrollParent: false,
       });
@@ -126,7 +126,7 @@ export default function Home(props: { folders: string[] }) {
         height: 200,
         waveColor: "transparent",
         progressColor: "transparent",
-        cursorColor: "#FF10F0",
+        cursorColor: "#fff",
         fillParent: false,
         scrollParent: false,
         plugins: [
@@ -1031,12 +1031,13 @@ export default function Home(props: { folders: string[] }) {
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={!selectedLayer || loading}
           >
-            <Image
+            Flip
+            {/*<Image
               src={loading ? "dice_disabled.svg" : "dice.svg"}
               alt="dice"
               width={24}
               height={24}
-            />
+              />*/}
           </button>
 
           <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
