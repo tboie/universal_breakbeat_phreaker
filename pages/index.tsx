@@ -976,7 +976,7 @@ export default function Home(props: { folders: string[] }) {
           id="ws2"
           className={`ws ${selectedLayer === 2 ? "selected" : ""}`}
         />
-        <div id="wsRegions" className={`layer${selectedLayer}`} />
+        <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
         <div className={styles.controls}>
           <button
