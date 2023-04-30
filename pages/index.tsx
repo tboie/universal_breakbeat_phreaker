@@ -12,6 +12,7 @@ import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
 import data from "../public/data.json";
+import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
@@ -1023,13 +1024,17 @@ export default function Home(props: { folders: string[] }) {
             2
           </button>
 
-          <button onClick={(e) => shuffleClick(e)} disabled={loading}>
-            Shuffle
+          <button
+            disabled={loading || selectedLayer === 0}
+            onClick={(e) => findMatches(e, selectedLayer)}
+          >
+            Pallet
           </button>
 
           <button
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={!selectedLayer || loading}
+            className={styles.white}
           >
             Flip
             {/*<Image
@@ -1040,7 +1045,11 @@ export default function Home(props: { folders: string[] }) {
               />*/}
           </button>
 
-          <button onClick={(e) => erase(e, selectedLayer)} disabled={loading}>
+          <button
+            onClick={(e) => erase(e, selectedLayer)}
+            disabled={loading}
+            className={styles.white}
+          >
             Erase
           </button>
         </div>
@@ -1063,13 +1072,18 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
-            disabled={loading || selectedLayer === 0}
-            onClick={(e) => findMatches(e, selectedLayer)}
+            onClick={(e) => shuffleClick(e)}
+            disabled={loading}
+            className={styles.white}
           >
-            Pallet
+            Shuffle
           </button>
 
-          <button onClick={(e) => uneraseClick(e)} disabled={loading}>
+          <button
+            onClick={(e) => uneraseClick(e)}
+            disabled={loading}
+            className={styles.white}
+          >
             Unerase
           </button>
         </div>

@@ -41,22 +41,22 @@ main {
 [data-id="loop"] {
   height: 100px !important;
   top: 100px !important;
-  border-bottom: 2px solid #fff;
-  border-left: 2px solid #fff !important;
-  border-right: 2px solid #fff !important;
+  border-bottom: 2px solid skyblue !important;
+  border-left: 2px solid skyblue !important;
+  border-right: 2px solid skyblue !important;
   background: transparent !important;
 }
 
 [data-id="selection"] {
   height: 100px !important;
-  border-top: 2px solid #39ff14;
+  border-top: 2px solid #fff;
   border-left: 2px solid #fff !important;
   border-right: 2px solid #fff !important;
   background: transparent !important;
 }
 
 .wavesurfer-handle {
-  background-color: #fff !important;
+  background-color: skyblue !important;
   height: 1.8rem !important;
   width: 2.2rem !important;
   background-image: url("/grip.svg");
@@ -64,26 +64,7 @@ main {
 
 [data-id="selection"] .wavesurfer-handle {
   top: 0 !important;
-}
-
-.layer0 [data-id="selection"] .wavesurfer-handle {
-  background-color: #39ff14 !important;
-}
-
-.layer1 [data-id="selection"] .wavesurfer-handle {
-  background-color: gold !important;
-}
-
-.layer1 [data-id="selection"] {
-  border-top: 2px solid gold;
-}
-
-.layer2 [data-id="selection"] {
-  border-top: 2px solid #9d00ff;
-}
-
-.layer2 [data-id="selection"] .wavesurfer-handle {
-  background-color: #9d00ff !important;
+  background-color: #fff !important;
 }
 
 [data-id="selection"] .wavesurfer-handle-start {

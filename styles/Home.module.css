@@ -22,6 +22,7 @@
   align-items: center;
   justify-content: center;
   width: 20%;
+  color: skyblue;
 }
 
 .slider {
@@ -111,4 +112,8 @@
 .selected {
   color: #39ff14;
   background-color: rgba(135, 206, 235, 0.25);
+}
+
+.toolbar .white {
+  color: #fff;
 }
