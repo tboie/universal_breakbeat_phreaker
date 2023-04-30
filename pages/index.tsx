@@ -164,7 +164,7 @@ export default function Home(props: { folders: string[] }) {
 
       const configScroll = () => {
         const scrollEle = document.querySelector("#scroll") as HTMLInputElement;
-        const waveEle = document.querySelector("#ws0") as HTMLDivElement;
+        const waveEle = document.querySelector("#wsRegions") as HTMLDivElement;
 
         if (scrollEle && waveEle) {
           const scrollMax = waveEle.scrollWidth - window.innerWidth;
