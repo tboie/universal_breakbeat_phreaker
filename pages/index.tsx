@@ -1026,6 +1026,19 @@ export default function Home(props: { folders: string[] }) {
           <button
             disabled={loading || selectedLayer === 0}
             onClick={(e) => findMatches(e, selectedLayer)}
+            className={`${
+              selectedLayer === 0
+                ? styles.border0
+                : selectedLayer === 1
+                ? styles.border1
+                : styles.border2
+            } ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
           >
             Pallet
           </button>
@@ -1033,7 +1046,13 @@ export default function Home(props: { folders: string[] }) {
           <button
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={!selectedLayer || loading}
-            className={styles.white}
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
           >
             Flip
             {/*<Image
@@ -1047,7 +1066,13 @@ export default function Home(props: { folders: string[] }) {
           <button
             onClick={(e) => erase(e, selectedLayer)}
             disabled={loading}
-            className={styles.white}
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
           >
             Erase
           </button>
@@ -1081,7 +1106,13 @@ export default function Home(props: { folders: string[] }) {
           <button
             onClick={(e) => uneraseClick(e)}
             disabled={loading}
-            className={styles.white}
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
           >
             Unerase
           </button>
