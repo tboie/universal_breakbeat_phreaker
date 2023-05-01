@@ -12,7 +12,6 @@ import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
 import data from "../public/data.json";
-import { style } from "wavesurfer.js/src/util";
 
 let init = false;
 
@@ -127,7 +126,7 @@ export default function Home(props: { folders: string[] }) {
         height: 200,
         waveColor: "transparent",
         progressColor: "transparent",
-        cursorColor: "#fff",
+        cursorColor: "skyblue",
         fillParent: false,
         scrollParent: false,
         plugins: [
@@ -1068,7 +1067,7 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
-            {display === "controls" ? "List" : "Controls"}
+            {display === "controls" ? "Breaks" : "Controls"}
           </button>
 
           <button
@@ -1088,56 +1087,56 @@ export default function Home(props: { folders: string[] }) {
           </button>
         </div>
 
+        <input
+          id="scroll"
+          type="range"
+          min={0}
+          max={100}
+          value={scroll}
+          step={1}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const val = parseInt(e.target.value);
+
+            ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
+              const container = document.querySelector(n) as HTMLDivElement;
+
+              if (container) {
+                container.scrollLeft = val;
+              }
+            });
+
+            setScroll(val);
+          }}
+          disabled={
+            loading ||
+            zoom === Math.floor(window.innerWidth / wsRegions?.getDuration())
+          }
+        />
+        <input
+          id="zoom"
+          type="range"
+          step={20}
+          min={0}
+          max={100}
+          value={zoom}
+          className={styles.slider}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            changeZoom(parseInt(e.target.value));
+          }}
+          disabled={
+            loading ||
+            parseInt(
+              (document.querySelector("#zoom") as HTMLInputElement)?.min
+            ) >=
+              parseInt(
+                (document.querySelector("#zoom") as HTMLInputElement)?.max
+              )
+          }
+        />
+
         <div className={styles.content}>
           <div className={`${display === "playlist" ? styles.hide : ""}`}>
-            <input
-              id="scroll"
-              type="range"
-              min={0}
-              max={100}
-              value={scroll}
-              step={1}
-              className={styles.slider}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const val = parseInt(e.target.value);
-
-                ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
-                  const container = document.querySelector(n) as HTMLDivElement;
-
-                  if (container) {
-                    container.scrollLeft = val;
-                  }
-                });
-
-                setScroll(val);
-              }}
-              disabled={
-                loading ||
-                zoom ===
-                  Math.floor(window.innerWidth / wsRegions?.getDuration())
-              }
-            />
-            <input
-              id="zoom"
-              type="range"
-              step={20}
-              min={0}
-              max={100}
-              value={zoom}
-              className={styles.slider}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-                changeZoom(parseInt(e.target.value));
-              }}
-              disabled={
-                loading ||
-                parseInt(
-                  (document.querySelector("#zoom") as HTMLInputElement)?.min
-                ) >=
-                  parseInt(
-                    (document.querySelector("#zoom") as HTMLInputElement)?.max
-                  )
-              }
-            />
             <input
               id="speed"
               type="range"
