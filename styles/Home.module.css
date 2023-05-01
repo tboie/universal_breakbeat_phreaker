@@ -35,7 +35,14 @@
   flex-grow: 1;
   overflow-y: scroll;
   padding: 0.25rem 0;
-  margin: 0 auto;
+  justify-content: center;
+  width: 100%;
+}
+
+.content > div {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .content .hide {
