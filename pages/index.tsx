@@ -714,10 +714,15 @@ export default function Home(props: { folders: string[] }) {
 
     // load pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
-      const newPallet = table.filter(
-        (r) =>
-          r.n ===
-          props.folders[Math.floor(Math.random() * props.folders.length)]
+      let newPallet: any[] = [];
+      for (let i = 0; i < 50; i++) {
+        newPallet.push(table[Math.floor(Math.random() * table.length)]);
+      }
+
+      // remove duplicates
+      newPallet = newPallet.filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.n === value.n && t.i === value.i)
       );
 
       const pallet = pallets.find((p) => p.layer === layer);
