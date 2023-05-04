@@ -721,10 +721,10 @@ export default function Home(props: { folders: string[] }) {
         return { ...n, d: dataRow.d, f: dataRow.f };
       });
 
-    // load pallet
+    // load random sound pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       let newPallet: any[] = [];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 100; i++) {
         newPallet.push(table[Math.floor(Math.random() * table.length)]);
       }
 
