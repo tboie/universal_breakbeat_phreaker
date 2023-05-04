@@ -3,7 +3,7 @@ import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
 import path from "path";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import * as Tone from "tone";
 
@@ -86,6 +86,9 @@ export default function Home(props: { folders: string[] }) {
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
+
+  const refPlaying = useRef(playing);
+  refPlaying.current = playing;
 
   useEffect(() => {
     const initWaveSurfer = async () => {
@@ -390,7 +393,7 @@ export default function Home(props: { folders: string[] }) {
 
       // start playhead at piece
       Tone.Draw.schedule(() => {
-        if (regionLoop) {
+        if (regionLoop && refPlaying.current) {
           const piece = seq.find((s) => s.layer === 0 && s.time === value.time);
           if (piece) {
             wsRegions.play(piece.time);
