@@ -664,7 +664,7 @@ export default function Home(props: { folders: string[] }) {
         .filter((s) => s.layer === 1)
         .forEach((n) => {
           n.player.set({
-            volume: val,
+            volume: val === -20 ? val * 100 : val,
           });
         });
       seq
@@ -679,7 +679,7 @@ export default function Home(props: { folders: string[] }) {
         .filter((s) => s.layer === 0)
         .forEach((n) => {
           n.player.set({
-            volume: val * -1,
+            volume: val === 20 ? val * -100 : val * -1,
           });
         });
       seq
@@ -699,7 +699,7 @@ export default function Home(props: { folders: string[] }) {
       .filter((s) => s.layer === 2)
       .forEach((n) => {
         n.player.set({
-          volume: val,
+          volume: val === -20 ? val * 100 : val,
         });
       });
     setLayer2Volume(val);
