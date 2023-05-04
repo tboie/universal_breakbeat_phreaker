@@ -710,7 +710,13 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    let srcTable = table.filter((r) => r.n === selectedFolder);
+    // map table vals to seq notes
+    let srcTable = seq
+      .filter((n) => n.layer === 0)
+      .map((n) => {
+        const dataRow = table.find((r) => r.n === n.name && r.i === n.cutIdx);
+        return { ...n, d: dataRow.d, f: dataRow.f };
+      });
 
     // load pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
@@ -865,6 +871,7 @@ export default function Home(props: { folders: string[] }) {
 
     seq.sort((a, b) => a.time - b.time);
 
+    // set part
     part.clear();
     seq.forEach((n) => {
       part.add(n.time, { ...n });
