@@ -1043,12 +1043,6 @@ export default function Home(props: { folders: string[] }) {
             onClick={(e) => findMatches(e, selectedLayer)}
             className={`${
               selectedLayer === 0
-                ? styles.border0
-                : selectedLayer === 1
-                ? styles.border1
-                : styles.border2
-            } ${
-              selectedLayer === 0
                 ? styles.color0
                 : selectedLayer === 1
                 ? styles.color1
