@@ -508,17 +508,19 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(2);
   };
 
-  const downloadClick = (
+  const downloadClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     e.stopPropagation();
 
+    setLoading(true);
+
     const duration = seq
       .filter((s) => s.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
-    Tone.Offline(({ transport }) => {
+    await Tone.Offline(({ transport }) => {
       const notes = seq.map((p) => ({
         time: p.time,
         duration: p.duration,
@@ -530,7 +532,7 @@ export default function Home(props: { folders: string[] }) {
       }, notes).start(0);
 
       transport.start(0);
-    }, duration).then((buffer) => {
+    }, duration).then(async (buffer) => {
       const wavRender = toWav(buffer);
 
       const wavLayer0 = ws0.backend.buffer
@@ -551,7 +553,7 @@ export default function Home(props: { folders: string[] }) {
       if (wavLayer1) sounds?.file("layer_1.wav", wavLayer1);
       if (wavLayer2) sounds?.file("layer_2.wav", wavLayer2);
 
-      zip.generateAsync({ type: "blob" }).then(function (content) {
+      await zip.generateAsync({ type: "blob" }).then(function (content) {
         const blobUrl = window.URL.createObjectURL(content);
         const anchor = document.createElement("a");
 
@@ -562,6 +564,8 @@ export default function Home(props: { folders: string[] }) {
         window.URL.revokeObjectURL(blobUrl);
       });
     });
+
+    setLoading(false);
   };
 
   const playStopClick = async (
