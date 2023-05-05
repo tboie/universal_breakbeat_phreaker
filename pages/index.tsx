@@ -316,7 +316,9 @@ export default function Home(props: { folders: string[] }) {
     e?.preventDefault();
     e?.stopPropagation();
 
+    setSelectedFolder(folder);
     setLoading(true);
+
     resetWaveSurfer();
 
     let times: any[] = [];
@@ -411,14 +413,17 @@ export default function Home(props: { folders: string[] }) {
     setSpeed(1);
     setZoom(0);
     setFader(0);
-    setSelectedFolder(folder);
     setLoading(false);
     setSelectedLayer(0);
   };
 
-  const uneraseClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const uneraseClick = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     e.stopPropagation();
+
+    setLoading(true);
 
     seq
       .filter(
@@ -429,7 +434,9 @@ export default function Home(props: { folders: string[] }) {
       )
       .forEach((n) => n.player.set({ mute: false }));
 
-    drawLayer(selectedLayer);
+    await drawLayer(selectedLayer);
+
+    setLoading(false);
   };
 
   const shuffleClick = async (
@@ -437,6 +444,8 @@ export default function Home(props: { folders: string[] }) {
   ) => {
     e.preventDefault();
     e.stopPropagation();
+
+    setLoading(true);
 
     // group notes by time
     const timesSeq = seq.reduce(
@@ -507,6 +516,8 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
+
+    setLoading(false);
   };
 
   const downloadClick = async (
@@ -944,12 +955,14 @@ export default function Home(props: { folders: string[] }) {
     setSelectedLayer(layer === selectedLayer ? 0 : layer);
   };
 
-  const erase = (
+  const erase = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
   ) => {
     e.stopPropagation();
     e.preventDefault();
+
+    setLoading(true);
 
     seq
       .filter((s) => s.layer === layer)
@@ -963,7 +976,9 @@ export default function Home(props: { folders: string[] }) {
         }
       });
 
-    drawLayer(layer);
+    await drawLayer(layer);
+
+    setLoading(false);
   };
 
   const toggleDisplay = (
@@ -986,7 +1001,11 @@ export default function Home(props: { folders: string[] }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>Universal BreakBeat Phreaker</h1>
+        <h1 className={styles.title}>
+          {selectedFolder && loading
+            ? "Loading"
+            : "Universal Breakbeat Phreaker"}
+        </h1>
 
         <div
           id="ws0"
