@@ -316,6 +316,7 @@ export default function Home(props: { folders: string[] }) {
     e?.preventDefault();
     e?.stopPropagation();
 
+    setLoading(true);
     resetWaveSurfer();
 
     let times: any[] = [];
@@ -411,7 +412,7 @@ export default function Home(props: { folders: string[] }) {
     setZoom(0);
     setFader(0);
     setSelectedFolder(folder);
-    setLoading(true);
+    setLoading(false);
     setSelectedLayer(0);
   };
 
@@ -896,7 +897,7 @@ export default function Home(props: { folders: string[] }) {
       .filter((s) => s.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
-    Tone.Offline(({ transport }) => {
+    await Tone.Offline(({ transport }) => {
       if (layer !== "silence") {
         const notes = seq
           .filter((note) => note.layer === layer)
