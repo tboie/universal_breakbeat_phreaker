@@ -1023,7 +1023,7 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.toolbar}>
           <button
-            className={selectedLayer === 1 ? styles.selected : ""}
+            className={`${selectedLayer === 1 ? styles.selected1 : ""}`}
             onClick={(e) => layerClick(e, 1)}
             disabled={loading}
           >
@@ -1031,7 +1031,7 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
-            className={selectedLayer === 2 ? styles.selected : ""}
+            className={`${selectedLayer === 2 ? styles.selected2 : ""}`}
             onClick={(e) => layerClick(e, 2)}
             disabled={loading}
           >
