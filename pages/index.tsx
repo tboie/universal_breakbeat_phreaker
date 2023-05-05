@@ -713,6 +713,8 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
+    setLoading(true);
+
     // map table vals to seq notes
     let srcTable = seq
       .filter((n) => n.layer === 0)
@@ -881,6 +883,8 @@ export default function Home(props: { folders: string[] }) {
     });
 
     await drawLayer(layer);
+
+    setLoading(false);
   };
 
   const drawLayer = async (layer: number | "silence") => {
