@@ -133,6 +133,11 @@
   color: #bd53ff;
 }
 
+.selected {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #39ff14;
+}
+
 .toolbar .selected1 {
   background-color: rgba(255, 215, 0, 0.5);
 }
