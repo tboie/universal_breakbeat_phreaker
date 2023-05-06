@@ -698,7 +698,7 @@ export default function Home(props: { folders: string[] }) {
         .filter((s) => s.layer === 1)
         .forEach((n) => {
           n.player.set({
-            volume: val === -20 ? val * 100 : val,
+            volume: val === -20 ? -100 : val,
           });
         });
       seq
@@ -713,7 +713,7 @@ export default function Home(props: { folders: string[] }) {
         .filter((s) => s.layer === 0)
         .forEach((n) => {
           n.player.set({
-            volume: val === 20 ? val * -100 : val * -1,
+            volume: val === 20 ? -100 : val * -1,
           });
         });
       seq
@@ -733,10 +733,32 @@ export default function Home(props: { folders: string[] }) {
       .filter((s) => s.layer === 2)
       .forEach((n) => {
         n.player.set({
-          volume: val === -20 ? val * 100 : val,
+          volume: val === -20 ? -100 : val,
         });
       });
     setLayer2Volume(val);
+  };
+
+  const getLayerVolume = (layer: number) => {
+    let val = fader;
+
+    if (layer === 0) {
+      if (fader > 0) {
+        val = 0;
+      } else if (fader === 20) {
+        val = -100;
+      }
+    } else if (layer === 1) {
+      if (fader > 0) {
+        val = 0;
+      } else if (fader === -20) {
+        val = -100;
+      }
+    } else if (layer === 2) {
+      val = layer2Volume;
+    }
+
+    return val;
   };
 
   const findMatches = async (
@@ -896,7 +918,11 @@ export default function Home(props: { folders: string[] }) {
               duration: bufferObj
                 ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                 : 0,
-              player: new Tone.Player(bufferObj?.buffer).toDestination(),
+              player: new Tone.Player(bufferObj?.buffer)
+                .set({
+                  volume: getLayerVolume(layer),
+                })
+                .toDestination(),
               name: m.n,
               cutIdx: m.i,
             });
