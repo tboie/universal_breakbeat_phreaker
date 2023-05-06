@@ -83,6 +83,11 @@
   font-size: 1.1rem;
 }
 
+.controls .regionSelect {
+  color: #fff;
+  border: 1px solid #fff;
+}
+
 .toolbar .selected,
 .toolbar button:active,
 .controls button:active {

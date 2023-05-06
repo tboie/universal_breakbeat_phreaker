@@ -86,6 +86,9 @@ export default function Home(props: { folders: string[] }) {
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
+  const [selectedRegion, setSelectedRegion] = useState<"loop" | "select">(
+    "loop"
+  );
 
   const refPlaying = useRef(playing);
   refPlaying.current = playing;
@@ -243,7 +246,14 @@ export default function Home(props: { folders: string[] }) {
             end: end,
             loop: false,
           });
+
           regionSelect = Object.values(wsRegions.regions.list)[0];
+          regionSelect.on("click", (e: any) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            setSelectedRegion("select");
+          });
         }
 
         if (!regionLoop) {
@@ -259,6 +269,13 @@ export default function Home(props: { folders: string[] }) {
             if (wsRegions.getCurrentTime() > regionLoop.end) {
               wsRegions.play(regionLoop.start);
             }
+          });
+
+          regionLoop.on("click", (e: any) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            setSelectedRegion("loop");
           });
 
           configZoom();
@@ -601,17 +618,18 @@ export default function Home(props: { folders: string[] }) {
   const resizeRegion = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     pos: "start" | "end",
-    dir: "left" | "right"
+    dir: "left" | "right",
+    region: any
   ) => {
     e.preventDefault();
     e.stopPropagation();
 
-    let layerSeq = seq.filter((n) => n.layer === selectedLayer);
+    const layerSeq = seq.filter((n) => n.layer === 0);
 
     const times = layerSeq.map((s) => s.time);
     times.push(layerSeq.reduce((n, { duration }) => n + duration, 0));
 
-    const handle = pos === "start" ? regionLoop.start : regionLoop.end;
+    const handle = pos === "start" ? region.start : region.end;
     const result = closest(times, handle);
     let newPos = handle;
 
@@ -642,14 +660,14 @@ export default function Home(props: { folders: string[] }) {
     }
 
     if (
-      (pos === "start" && newPos < regionLoop.end) ||
-      (pos === "end" && newPos > regionLoop.start)
+      (pos === "start" && newPos < region.end) ||
+      (pos === "end" && newPos > region.start)
     ) {
-      const start = pos === "start" ? newPos : regionLoop.start;
-      const end = pos === "end" ? newPos : regionLoop.end;
+      const start = pos === "start" ? newPos : region.start;
+      const end = pos === "end" ? newPos : region.end;
 
       Tone.Transport.setLoopPoints(start / speed, end / speed);
-      regionLoop.update({
+      region.update({
         start: start,
         end: end,
       });
@@ -1023,26 +1041,68 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.controls}>
           <button
-            onClick={(e) => resizeRegion(e, "start", "left")}
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            }`}
+            onClick={(e) =>
+              resizeRegion(
+                e,
+                "start",
+                "left",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              )
+            }
             disabled={loading}
           >
             {"<"}
           </button>
           <button
-            onClick={(e) => resizeRegion(e, "start", "right")}
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            }`}
+            onClick={(e) =>
+              resizeRegion(
+                e,
+                "start",
+                "right",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              )
+            }
             disabled={loading}
           >
             {">"}
           </button>
+
           <span className={styles.info}>{speed + "x"}</span>
+
           <button
-            onClick={(e) => resizeRegion(e, "end", "left")}
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            }`}
+            onClick={(e) =>
+              resizeRegion(
+                e,
+                "end",
+                "left",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              )
+            }
             disabled={loading}
           >
             {"<"}
           </button>
           <button
-            onClick={(e) => resizeRegion(e, "end", "right")}
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            }`}
+            onClick={(e) =>
+              resizeRegion(
+                e,
+                "end",
+                "right",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              )
+            }
             disabled={loading}
           >
             {">"}
