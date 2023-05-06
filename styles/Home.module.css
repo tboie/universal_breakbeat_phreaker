@@ -49,8 +49,7 @@
   display: none;
 }
 
-.toolbar,
-.controls {
+.toolbar {
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -58,8 +57,7 @@
   margin: 0.25rem auto;
 }
 
-.toolbar button,
-.controls button {
+.toolbar button {
   height: 2.25rem;
   text-align: center;
   cursor: pointer;
@@ -69,33 +67,24 @@
   background-color: black;
   flex-grow: 1;
   font-size: 0.9rem;
-  border-left: none;
   width: 20%;
 }
 
-.controls button:nth-child(1),
-.controls button:nth-child(4),
 .toolbar button:nth-child(1) {
   border-left: 1px solid skyblue;
 }
 
-.controls button {
-  font-size: 1.1rem;
-}
-
-.controls .regionSelect {
+.toolbar .regionSelect {
   color: #fff;
   border: 1px solid #fff;
 }
 
 .toolbar .selected,
-.toolbar button:active,
-.controls button:active {
+.toolbar button:active {
   background-color: rgba(135, 206, 235, 0.25);
 }
 
-.toolbar button:disabled,
-.controls button:disabled {
+.toolbar button:disabled {
   color: gray;
   border-color: gray;
   background-color: black;

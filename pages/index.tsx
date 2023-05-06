@@ -1039,7 +1039,7 @@ export default function Home(props: { folders: string[] }) {
         />
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
-        <div className={styles.controls}>
+        <div className={styles.toolbar}>
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
