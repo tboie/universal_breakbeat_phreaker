@@ -1039,7 +1039,7 @@ export default function Home(props: { folders: string[] }) {
         />
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
-        <div className={styles.toolbar}>
+        <div className={`${styles.toolbar}`}>
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1078,7 +1078,7 @@ export default function Home(props: { folders: string[] }) {
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
-            }`}
+            } ${styles.borderLeft}`}
             onClick={(e) =>
               resizeRegion(
                 e,

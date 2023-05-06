@@ -68,6 +68,11 @@
   flex-grow: 1;
   font-size: 0.9rem;
   width: 20%;
+  border-left: 0;
+}
+
+.toolbar .borderLeft {
+  border-left: 1px solid skyblue;
 }
 
 .toolbar button:nth-child(1) {
@@ -88,26 +93,6 @@
   color: gray;
   border-color: gray;
   background-color: black;
-}
-
-.playlist {
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-  flex-grow: 1;
-  cursor: pointer;
-  color: skyblue;
-  width: 100%;
-  margin: 0.25rem auto 0;
-}
-
-.playlist li {
-  padding: 0.01rem;
-}
-
-/* hacky fix to show all playlist items for now */
-.playlist li:last-child {
-  margin-bottom: 12rem;
 }
 
 .toolbar .white {
@@ -138,4 +123,24 @@
 
 .toolbar .selected2 {
   background-color: rgba(157, 0, 255, 0.5);
+}
+
+.playlist {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  flex-grow: 1;
+  cursor: pointer;
+  color: skyblue;
+  width: 100%;
+  margin: 0.25rem auto 0;
+}
+
+.playlist li {
+  padding: 0.01rem;
+}
+
+/* hacky fix to show all playlist items for now */
+.playlist li:last-child {
+  margin-bottom: 12rem;
 }
