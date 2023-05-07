@@ -26,19 +26,19 @@ let regionSelect: any;
 let touchMoved = false;
 
 type TBuffer = {
+  layer: number;
   name: string;
   cutIdx: number;
-  layer: number;
   buffer: Tone.ToneAudioBuffer;
 };
 
 type TSeq = {
-  layer: number;
   time: number; // TODO: verify 6 decimal standard throughout
-  duration: number;
-  player: Tone.Player;
+  layer: number;
   name: string;
   cutIdx: number;
+  duration: number;
+  player: Tone.Player;
 };
 
 type TPallet = {
