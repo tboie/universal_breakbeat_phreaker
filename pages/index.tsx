@@ -76,19 +76,24 @@ const arrShuffle = (a: any[]) => {
 };
 
 export default function Home(props: { folders: string[] }) {
+  const [loading, setLoading] = useState(true);
+  const [playing, setPlaying] = useState(false);
+
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedLayer, setSelectedLayer] = useState(0);
+  const [selectedRegion, setSelectedRegion] = useState<"loop" | "select">(
+    "loop"
+  );
+
   const [speed, setSpeed] = useState(1);
   const [zoom, setZoom] = useState(0);
   const [scroll, setScroll] = useState(0);
   const [fader, setFader] = useState(0);
   const [layer2Volume, setLayer2Volume] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [playing, setPlaying] = useState(false);
+
   const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
-  const [selectedRegion, setSelectedRegion] = useState<"loop" | "select">(
-    "loop"
-  );
+  const [pallet1Loaded, setPallet1Loaded] = useState(false);
+  const [pallet2Loaded, setPallet2Loaded] = useState(false);
 
   const refPlaying = useRef(playing);
   refPlaying.current = playing;
@@ -432,6 +437,8 @@ export default function Home(props: { folders: string[] }) {
     setFader(0);
     setLoading(false);
     setSelectedLayer(0);
+    setPallet1Loaded(false);
+    setPallet2Loaded(false);
   };
 
   const uneraseClick = async (
@@ -945,6 +952,11 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(layer);
 
     setLoading(false);
+    if (layer === 1) {
+      setPallet1Loaded(true);
+    } else if (layer === 2) {
+      setPallet2Loaded(true);
+    }
   };
 
   const drawLayer = async (layer: number | "silence") => {
@@ -1168,7 +1180,12 @@ export default function Home(props: { folders: string[] }) {
 
           <button
             onClick={(e) => findMatches(e, selectedLayer, true)}
-            disabled={!selectedLayer || loading}
+            disabled={
+              !selectedLayer ||
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded)
+            }
             className={`${styles.white} ${
               selectedLayer === 0
                 ? styles.color0
@@ -1188,7 +1205,11 @@ export default function Home(props: { folders: string[] }) {
 
           <button
             onClick={(e) => erase(e, selectedLayer)}
-            disabled={loading}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded)
+            }
             className={`${styles.white} ${
               selectedLayer === 0
                 ? styles.color0
@@ -1228,7 +1249,11 @@ export default function Home(props: { folders: string[] }) {
 
           <button
             onClick={(e) => uneraseClick(e)}
-            disabled={loading}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded)
+            }
             className={`${styles.white} ${
               selectedLayer === 0
                 ? styles.color0
