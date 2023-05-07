@@ -49,14 +49,26 @@ type TPallet = {
 let buffers: TBuffer[] = [];
 let seq: TSeq[] = [];
 let pallets: TPallet[] = [];
-
 let part: Tone.Part;
 
 // all pieces data table
-const table: any[] = [];
-(data as any[]).forEach((b) => {
-  b.c.forEach((v: any, i: any) => {
-    const row = { n: b.n, i: i + 1, d: v[0], f: v[1] };
+// use indexdb?
+type TableRow = {
+  name: string;
+  cutIdx: number;
+  duration: number;
+  freq: number;
+};
+
+const table: TableRow[] = [];
+(data as { n: string; c: [[number, number]] }[]).forEach((b) => {
+  b.c.forEach((v, i) => {
+    const row = {
+      name: b.n,
+      cutIdx: i + 1,
+      duration: v[0],
+      freq: v[1],
+    };
     table.push(row);
   });
 });
@@ -782,16 +794,20 @@ export default function Home(props: { folders: string[] }) {
     setLoading(true);
 
     // map table vals to seq notes
-    let srcTable = seq
+    let srcTable: ((TableRow & { freq?: number }) | undefined)[] = seq
       .filter((n) => n.layer === 0)
       .map((n) => {
-        const dataRow = table.find((r) => r.n === n.name && r.i === n.cutIdx);
-        return { ...n, d: dataRow.d, f: dataRow.f };
+        const dataRow = table.find(
+          (r) => r.name === n.name && r.cutIdx === n.cutIdx
+        );
+        if (dataRow) {
+          return { ...n, duration: dataRow.duration, freq: dataRow.freq };
+        }
       });
 
     // load random sound pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
-      let newPallet: any[] = [];
+      let newPallet: TableRow[] = [];
       for (let i = 0; i < 100; i++) {
         newPallet.push(table[Math.floor(Math.random() * table.length)]);
       }
@@ -799,7 +815,10 @@ export default function Home(props: { folders: string[] }) {
       // remove duplicates
       newPallet = newPallet.filter(
         (value, index, self) =>
-          index === self.findIndex((t) => t.n === value.n && t.i === value.i)
+          index ===
+          self.findIndex(
+            (t) => t.name === value.name && t.cutIdx === value.cutIdx
+          )
       );
 
       const pallet = pallets.find((p) => p.layer === layer);
@@ -811,19 +830,21 @@ export default function Home(props: { folders: string[] }) {
     }
 
     // find matches
-    let matches: any = [];
+    let matches: (TableRow & { dDiff: number; fDiff: number; time: number })[] =
+      [];
+
     srcTable.forEach((src, idx) => {
       const pallet = pallets.find((p) => p.layer === layer);
 
-      if (pallet) {
+      if (pallet && src) {
         const t = pallet.sounds.map((r) => {
-          const freqDiff = Math.abs(r.f - src.f);
-          const durDiff = Math.abs(r.d - src.d);
+          const freqDiff = Math.abs(r.freq - src.freq);
+          const durDiff = Math.abs(r.duration - src.duration);
           return {
             ...r,
             fDiff: freqDiff,
             dDiff: durDiff,
-            t: seq.filter((s) => s.layer === 0)[idx].time,
+            time: seq.filter((s) => s.layer === 0)[idx].time,
           };
         });
 
@@ -836,7 +857,7 @@ export default function Home(props: { folders: string[] }) {
 
     if (selection) {
       matches = matches.filter(
-        (m: any) => m.t >= regionSelect.start && m.t < regionSelect.end
+        (m) => m.time >= regionSelect.start && m.time < regionSelect.end
       );
     }
 
@@ -899,8 +920,8 @@ export default function Home(props: { folders: string[] }) {
 
     // download and add buffers, sequence notes
     await Promise.all(
-      matches.map(async (m: any, idx: number) => {
-        await fetch(`/drums/${m.n}/${m.i}.wav`)
+      matches.map(async (m) => {
+        await fetch(`/drums/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
@@ -908,23 +929,25 @@ export default function Home(props: { folders: string[] }) {
             const buff = await Tone.context.decodeAudioData(arrayBuffer);
 
             let bufferObj = buffers.find(
-              (b) => b.name === m.n && b.cutIdx === m.i
+              (b) => b.name === m.name && b.cutIdx === m.cutIdx
             );
 
             if (!bufferObj) {
               buffers.push({
-                name: m.n,
-                cutIdx: m.i,
+                name: m.name,
+                cutIdx: m.cutIdx,
                 layer: layer,
                 buffer: new Tone.Buffer(buff),
               });
             }
 
-            bufferObj = buffers.find((b) => b.name === m.n && b.cutIdx === m.i);
+            bufferObj = buffers.find(
+              (b) => b.name === m.name && b.cutIdx === m.cutIdx
+            );
 
             seq.push({
               layer: layer,
-              time: m.t,
+              time: m.time,
               duration: bufferObj
                 ? parseFloat(bufferObj.buffer.duration.toFixed(6))
                 : 0,
@@ -933,8 +956,8 @@ export default function Home(props: { folders: string[] }) {
                   volume: getLayerVolume(layer),
                 })
                 .toDestination(),
-              name: m.n,
-              cutIdx: m.i,
+              name: m.name,
+              cutIdx: m.cutIdx,
             });
             //  }
           })
