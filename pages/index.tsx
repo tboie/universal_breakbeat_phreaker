@@ -355,7 +355,7 @@ export default function Home(props: { folders: string[] }) {
 
     resetWaveSurfer();
 
-    let times: any[] = [];
+    let times: number[] = [];
     await fetch(`/drums/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
@@ -373,7 +373,7 @@ export default function Home(props: { folders: string[] }) {
     pallets = [];
 
     await Promise.all(
-      times.map(async (t: number, idx: number) => {
+      times.map(async (t, idx) => {
         idx++;
         await fetch(`/drums/${folder}/${idx}.wav`)
           .then(async (response) => {
