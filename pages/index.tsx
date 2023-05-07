@@ -487,7 +487,7 @@ export default function Home(props: { folders: string[] }) {
     setLoading(true);
 
     // group notes by time
-    const timesSeq = seq.reduce(
+    const timesSeq: { [key: string]: TSeq[] } = seq.reduce(
       (groups: any, item) => ({
         ...groups,
         [item.time]: [...(groups[item.time] || []), item],
@@ -495,7 +495,7 @@ export default function Home(props: { folders: string[] }) {
       {}
     );
 
-    let noteArray: any[] = [];
+    let noteArray: TSeq[][] = [];
     Object.keys(timesSeq).forEach((k, i) => {
       noteArray.push(timesSeq[k]);
     });
@@ -522,7 +522,7 @@ export default function Home(props: { folders: string[] }) {
         durTotal += noteArray[idx - 1][0].duration;
       }
 
-      notes.forEach((n: any) => {
+      notes.forEach((n) => {
         const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
         part.add(ret.time, { ...ret });
         seq.push({ ...ret });
