@@ -433,10 +433,13 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(0);
 
     setSpeed(1);
+    setScroll(0);
     setZoom(0);
     setFader(0);
+    setLayer2Volume(0);
     setLoading(false);
     setSelectedLayer(0);
+    setSelectedRegion("loop");
     setPallet1Loaded(false);
     setPallet2Loaded(false);
   };
