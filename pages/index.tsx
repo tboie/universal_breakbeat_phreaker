@@ -1002,7 +1002,9 @@ export default function Home(props: { folders: string[] }) {
           }));
 
         new Tone.Part((time, value) => {
-          value.player.start(time);
+          if (!value.mute) {
+            value.player.start(time);
+          }
         }, notes).start(0);
       }
 
