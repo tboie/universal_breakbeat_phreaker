@@ -43,7 +43,7 @@ type TSeq = {
 
 type TPallet = {
   layer: number;
-  sounds: any[];
+  sounds: TableRow[];
 };
 
 let buffers: TBuffer[] = [];
@@ -794,7 +794,7 @@ export default function Home(props: { folders: string[] }) {
     setLoading(true);
 
     // map table vals to seq notes
-    let srcTable: ((TableRow & { freq?: number }) | undefined)[] = seq
+    let srcTable: (TableRow | undefined)[] = seq
       .filter((n) => n.layer === 0)
       .map((n) => {
         const dataRow = table.find(
