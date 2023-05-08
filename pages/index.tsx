@@ -11,7 +11,7 @@ import * as Tone from "tone";
 import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
-import data from "../public/data.json";
+import data from "../public/data/data.json";
 
 let init = false;
 
@@ -1217,7 +1217,7 @@ export default function Home(props: { folders: string[] }) {
           >
             Flip
             {/*<Image
-              src={loading ? "dice_disabled.svg" : "dice.svg"}
+              src={loading ? "icons/dice_disabled.svg" : "icons/dice.svg"}
               alt="dice"
               width={24}
               height={24}

@@ -61,7 +61,7 @@ main {
   background-color: skyblue !important;
   height: 1.8rem !important;
   width: 2.2rem !important;
-  background-image: url("/grip.svg");
+  background-image: url("/icons/grip.svg");
 }
 
 [data-id="loop"] .wavesurfer-handle {
@@ -137,23 +137,23 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 #scroll::-webkit-slider-thumb {
-  background-image: url("/scroll.svg");
+  background-image: url("/icons/scroll.svg");
 }
 
 #zoom::-webkit-slider-thumb {
-  background-image: url("/zoom.svg");
+  background-image: url("/icons/zoom.svg");
 }
 
 #speed::-webkit-slider-thumb {
-  background-image: url("/speed.svg");
+  background-image: url("/icons/speed.svg");
 }
 
 #fader::-webkit-slider-thumb {
-  background-image: url("/fader.svg");
+  background-image: url("/icons/fader.svg");
 }
 
 #layer2Volume::-webkit-slider-thumb {
-  background-image: url("/2.svg");
+  background-image: url("/icons/2.svg");
 }
 
 input[type="range"]:disabled::-webkit-slider-thumb,
