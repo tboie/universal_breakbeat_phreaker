@@ -1001,16 +1001,9 @@ export default function Home(props: { folders: string[] }) {
             mute: p.player.mute,
           }));
 
-        new Tone.Part(
-          (time, value) => {
-            const note = notes.find((o) => o.time === value.time);
-
-            if (note && !note.mute) {
-              note.player.start(time);
-            }
-          },
-          seq.filter((s) => s.layer === layer)
-        ).start(0);
+        new Tone.Part((time, value) => {
+          value.player.start(time);
+        }, notes).start(0);
       }
 
       transport.start(0);
