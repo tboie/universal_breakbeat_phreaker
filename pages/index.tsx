@@ -65,7 +65,7 @@ const table: TableRow[] = [];
   b.c.forEach((v, i) => {
     const row = {
       name: b.n,
-      cutIdx: i + 1,
+      cutIdx: i,
       duration: v[0],
       freq: v[1],
     };
@@ -374,7 +374,6 @@ export default function Home(props: { folders: string[] }) {
 
     await Promise.all(
       times.map(async (t, idx) => {
-        idx++;
         await fetch(`/drums/${folder}/${idx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
