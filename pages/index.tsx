@@ -419,7 +419,12 @@ export default function Home(props: { folders: string[] }) {
     Tone.Transport.loop = true;
 
     part = new Tone.Part((time, value) => {
-      value.player.start(time);
+      if (value.player.loaded) {
+        value.player.start(time);
+      } else {
+        console.log("buffer not loaded");
+        console.log(value);
+      }
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -581,7 +586,12 @@ export default function Home(props: { folders: string[] }) {
       }));
 
       new Tone.Part((time, value) => {
-        value.player.start(time);
+        if (value.player.loaded) {
+          value.player.start(time);
+        } else {
+          console.log("buffer not loaded");
+          console.log(value);
+        }
       }, notes).start(0);
 
       transport.start(0);
@@ -1007,8 +1017,13 @@ export default function Home(props: { folders: string[] }) {
           }));
 
         new Tone.Part((time, value) => {
-          if (!value.mute) {
-            value.player.start(time);
+          if (value.player.loaded) {
+            if (!value.mute) {
+              value.player.start(time);
+            }
+          } else {
+            console.log("buffer not loaded");
+            console.log(value);
           }
         }, notes).start(0);
       }
