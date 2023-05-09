@@ -419,12 +419,7 @@ export default function Home(props: { folders: string[] }) {
     Tone.Transport.loop = true;
 
     part = new Tone.Part((time, value) => {
-      if (value.player.loaded) {
-        value.player.start(time);
-      } else {
-        console.log("buffer not loaded");
-        console.log(value);
-      }
+      value.player.start(time);
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -586,12 +581,7 @@ export default function Home(props: { folders: string[] }) {
       }));
 
       new Tone.Part((time, value) => {
-        if (value.player.loaded) {
-          value.player.start(time);
-        } else {
-          console.log("buffer not loaded");
-          console.log(value);
-        }
+        value.player.start(time);
       }, notes).start(0);
 
       transport.start(0);
@@ -820,8 +810,11 @@ export default function Home(props: { folders: string[] }) {
     // load random sound pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       let newPallet: TableRow[] = [];
+      const sounds = table.filter((r) => r.name !== selectedFolder);
+
       for (let i = 0; i < 100; i++) {
-        newPallet.push(table[Math.floor(Math.random() * table.length)]);
+        const randSound = sounds[Math.floor(Math.random() * sounds.length)];
+        newPallet.push(randSound);
       }
 
       // remove duplicates
@@ -1015,12 +1008,7 @@ export default function Home(props: { folders: string[] }) {
 
         new Tone.Part((time, value) => {
           if (!value.mute) {
-            if (value.player.loaded) {
-              value.player.start(time);
-            } else {
-              console.log("buffer not loaded");
-              console.log(value);
-            }
+            value.player.start(time);
           }
         }, notes).start(0);
       }
