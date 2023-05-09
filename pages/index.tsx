@@ -419,7 +419,12 @@ export default function Home(props: { folders: string[] }) {
     Tone.Transport.loop = true;
 
     part = new Tone.Part((time, value) => {
-      value.player.start(time);
+      if (value.player.loaded) {
+        value.player.start(time);
+      } else {
+        console.log("buffer not loaded");
+        console.log(value);
+      }
 
       /* trim overlapping pieces
       players1[value.idx]?.stop(
@@ -507,15 +512,15 @@ export default function Home(props: { folders: string[] }) {
       endIdx = baseSeq.length;
     }
 
+    // shuffle
     const shuffled = arrShuffle(noteArray.slice(startIdx, endIdx));
     noteArray.splice(startIdx, shuffled.length, ...shuffled);
 
-    // dispose objects?
-    seq = [];
-
-    // could notes be scheduled more precisely to avoid dropouts?
-    part.clear();
+    // set sequence
     let durTotal = 0;
+    const seqTemp: TSeq[] = [];
+
+    part.clear();
     noteArray.forEach((notes, idx) => {
       if (idx) {
         durTotal += noteArray[idx - 1][0].duration;
@@ -524,10 +529,13 @@ export default function Home(props: { folders: string[] }) {
       notes.forEach((n) => {
         const ret = { ...n, time: parseFloat(durTotal.toFixed(6)) };
         part.add(ret.time, { ...ret });
-        seq.push({ ...ret });
+        seqTemp.push({ ...ret });
       });
     });
 
+    seq = seqTemp;
+
+    // set loop and regions
     let times = seq.filter((n) => n.layer === 0).map((s) => s.time);
     const end = seq
       .filter((n) => n.layer === 0)
@@ -578,7 +586,12 @@ export default function Home(props: { folders: string[] }) {
       }));
 
       new Tone.Part((time, value) => {
-        value.player.start(time);
+        if (value.player.loaded) {
+          value.player.start(time);
+        } else {
+          console.log("buffer not loaded");
+          console.log(value);
+        }
       }, notes).start(0);
 
       transport.start(0);
@@ -1002,7 +1015,12 @@ export default function Home(props: { folders: string[] }) {
 
         new Tone.Part((time, value) => {
           if (!value.mute) {
-            value.player.start(time);
+            if (value.player.loaded) {
+              value.player.start(time);
+            } else {
+              console.log("buffer not loaded");
+              console.log(value);
+            }
           }
         }, notes).start(0);
       }
