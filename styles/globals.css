@@ -51,7 +51,7 @@ main {
 
 [data-id="loop"] {
   height: 100px !important;
-  border-top: 2px solid skyblue;
+  border-top: 2px solid skyblue !important;
   border-left: 2px solid skyblue !important;
   border-right: 2px solid skyblue !important;
   background: transparent !important;
