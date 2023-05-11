@@ -558,6 +558,7 @@ export default function Home(props: { folders: string[] }) {
       end: closest(times, regionSelect.end),
     });
 
+    await drawLayer("silence");
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
