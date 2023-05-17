@@ -84,6 +84,11 @@
   border: 1px solid #fff;
 }
 
+.toolbar .regionSelect:nth-child(2),
+.toolbar .regionSelect:nth-child(5) {
+  border-left: 0;
+}
+
 .toolbar .selected,
 .toolbar button:active {
   background-color: rgba(135, 206, 235, 0.25);
