@@ -87,6 +87,7 @@ const arrShuffle = (a: any[]) => {
   return a;
 };
 
+// app
 export default function Home(props: { folders: string[] }) {
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
@@ -709,10 +710,8 @@ export default function Home(props: { folders: string[] }) {
   };
 
   const changeSpeed = (val: number) => {
-    console.log(Tone.Transport.position);
     part.playbackRate = val;
     seq.forEach((s: any) => (s.player.playbackRate = val));
-    console.log(Tone.Transport.position);
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
     wsRegions.setPlaybackRate(val);
