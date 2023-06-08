@@ -1064,15 +1064,17 @@ export default function Home(props: { folders: string[] }) {
     setLoading(true);
 
     seq
-      .filter((s) => s.layer === layer)
+      .filter(
+        (s) =>
+          s.layer === layer &&
+          s.time >= regionSelect.start &&
+          s.time < regionSelect.end &&
+          !s.player.mute
+      )
       .forEach((n) => {
-        if (n.time >= regionSelect.start && n.time < regionSelect.end) {
-          const mute = Math.round(Math.random()) ? true : false;
-
-          n.player.set({
-            mute: mute,
-          });
-        }
+        n.player.set({
+          mute: Math.round(Math.random()) ? true : false,
+        });
       });
 
     await drawLayer(layer);
