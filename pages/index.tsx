@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
 import path from "path";
@@ -711,7 +710,7 @@ export default function Home(props: { folders: string[] }) {
 
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
-    seq.forEach((s: any) => (s.player.playbackRate = val));
+    seq.forEach((s) => (s.player.playbackRate = val));
 
     Tone.Transport.setLoopPoints(regionLoop.start / val, regionLoop.end / val);
     wsRegions.setPlaybackRate(val);
@@ -970,6 +969,7 @@ export default function Home(props: { folders: string[] }) {
               player: new Tone.Player(bufferObj?.buffer)
                 .set({
                   volume: getLayerVolume(layer),
+                  playbackRate: speed,
                 })
                 .toDestination(),
               name: m.name,
