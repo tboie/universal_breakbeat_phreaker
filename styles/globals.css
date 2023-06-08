@@ -19,68 +19,78 @@ main {
   color: rgba(255, 255, 255, 0.96);
 }
 
-#waveform {
+.ws {
   overflow-x: hidden !important;
   min-height: 200px !important;
   margin-bottom: 0.25rem;
 }
 
-[data-id="loop"] {
-  border-left: 1px solid skyblue !important;
-  border-right: 1px solid skyblue !important;
-  height: 100px !important;
-  top: 100px !important;
-  background-image: linear-gradient(
-    to top,
-    rgba(135, 206, 235, 0.25),
-    transparent
-  ) !important;
+#ws0,
+#ws1,
+#ws2 {
+  margin-top: 1.1rem;
+  position: fixed !important;
+  width: 100% !important;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ws.selected {
+  z-index: 1 !important;
+  opacity: 1 !important;
 }
 
 [data-id="selection"] {
-  border-left: 1px solid #fff !important;
-  border-right: 1px solid #fff !important;
   height: 100px !important;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.25),
-    transparent
-  ) !important;
+  top: 100px !important;
+  border-bottom: 2px solid #fff !important;
+  border-left: 2px solid #fff !important;
+  border-right: 2px solid #fff !important;
+  background: transparent !important;
+}
+
+[data-id="loop"] {
+  height: 100px !important;
+  border-top: 2px solid skyblue !important;
+  border-left: 2px solid skyblue !important;
+  border-right: 2px solid skyblue !important;
+  background: transparent !important;
 }
 
 .wavesurfer-handle {
   background-color: skyblue !important;
   height: 1.8rem !important;
   width: 2.2rem !important;
-  background-image: url("/grip.svg");
+  background-image: url("/icons/grip.svg");
 }
 
-[data-id="selection"] .wavesurfer-handle {
-  background-color: #fff !important;
+[data-id="loop"] .wavesurfer-handle {
   top: 0 !important;
+  background-color: skyblue !important;
 }
 
-[data-id="selection"] .wavesurfer-handle-start {
+[data-id="loop"] .wavesurfer-handle-start {
   border-bottom-right-radius: 0.75rem !important;
   box-shadow: 3px 2px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
-[data-id="selection"] .wavesurfer-handle-end {
+[data-id="loop"] .wavesurfer-handle-end {
   border-bottom-left-radius: 0.75rem !important;
   box-shadow: -3px 2px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
-[data-id="loop"] .wavesurfer-handle {
+[data-id="selection"] .wavesurfer-handle {
   bottom: 0 !important;
   top: auto !important;
+  background-color: #fff !important;
 }
 
-[data-id="loop"] .wavesurfer-handle-start {
+[data-id="selection"] .wavesurfer-handle-start {
   border-top-right-radius: 0.75rem !important;
   box-shadow: 3px 2px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
-[data-id="loop"] .wavesurfer-handle-end {
+[data-id="selection"] .wavesurfer-handle-end {
   border-top-left-radius: 0.75rem !important;
   box-shadow: -3px 2px 2px rgba(0, 0, 0, 0.5) !important;
 }
@@ -127,15 +137,23 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 #scroll::-webkit-slider-thumb {
-  background-image: url("/scroll.svg");
+  background-image: url("/icons/scroll.svg");
 }
 
 #zoom::-webkit-slider-thumb {
-  background-image: url("/zoom.svg");
+  background-image: url("/icons/zoom.svg");
 }
 
 #speed::-webkit-slider-thumb {
-  background-image: url("/speed.svg");
+  background-image: url("/icons/speed.svg");
+}
+
+#fader::-webkit-slider-thumb {
+  background-image: url("/icons/fader.svg");
+}
+
+#layer2Volume::-webkit-slider-thumb {
+  background-image: url("/icons/2.svg");
 }
 
 input[type="range"]:disabled::-webkit-slider-thumb,
