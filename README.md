@@ -1,10 +1,11 @@
-# Universal Breakbeat Phreaker (Prototype)
+# Universal Breakbeat Phreaker
 
 ## Goal
 - Create and explore rhythms
 
 ## Screenshot
-<img width="600" alt="screenshot" src="https://user-images.githubusercontent.com/26150152/224183606-46d27898-1b65-42d2-b68f-287b1c64ce26.png">
+![bb_phreaker_screenshot](https://github.com/tboie/universal_breakbeat_phreaker/assets/26150152/c79184ba-2f4a-4124-8e31-b180ddba3100)
+
 
 ## Demo
 [https://phreaker.vercel.app](https://phreaker.vercel.app)
@@ -17,8 +18,3 @@ npm run dev
 
 ## Onset Detection
 - [https://github.com/aubio/aubio](https://github.com/aubio/aubio)
-- command used to process a directory of .wav files:
-
-```
-for x in ./*.wav ; do mkdir "${x%.*}" && cp "$x" "${x%.*}/audio.wav" && aubioonset -i "${x%.*}/audio.wav" > "${x%.*}/times.txt" ;done
-```
