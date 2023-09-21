@@ -5,6 +5,7 @@ import path from "path";
 import { useEffect, useRef, useState } from "react";
 
 import * as Tone from "tone";
+import * as realtimeBpm from "realtime-bpm-analyzer";
 
 //@ts-ignore
 import toWav from "audiobuffer-to-wav";
@@ -90,6 +91,7 @@ const arrShuffle = (a: any[]) => {
 export default function Home(props: { folders: string[] }) {
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const [bpm, setBPM] = useState(0);
 
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedLayer, setSelectedLayer] = useState(0);
@@ -218,7 +220,7 @@ export default function Home(props: { folders: string[] }) {
         configScroll();
       });
 
-      wsRegions.on("region-update-end", (region: any) => {
+      wsRegions.on("region-update-end", async (region: any) => {
         // fixes ignored first click after region resize on touch devices
         if (touchMoved) {
           document.body.click();
@@ -247,6 +249,8 @@ export default function Home(props: { folders: string[] }) {
           start: snapStart,
           end: snapEnd,
         });
+
+        calcBPM(snapStart, snapEnd);
       });
 
       wsRegions.on("ready", () => {
@@ -311,6 +315,13 @@ export default function Home(props: { folders: string[] }) {
 
         setLoading(false);
       });
+
+      ws0.on("ready", () => {
+        const duration = ws0.getDuration();
+        if (duration) {
+          calcBPM(0, duration);
+        }
+      });
     };
 
     if (!init) {
@@ -318,6 +329,84 @@ export default function Home(props: { folders: string[] }) {
       initWaveSurfer();
     }
   }, []);
+
+  // TODO: testing && bpm loading state?
+  const calcBPM = async (regionStart: number, regionEnd: number) => {
+    const duration = seq
+      .filter(
+        (s) => s.layer === 0 && s.time >= regionStart && s.time < regionEnd
+      )
+      .reduce((n, { duration }) => n + duration, 0);
+
+    let newDuration = duration;
+    let i = 2;
+
+    // increment duration if < 30 seconds (so it works & more precision)
+    while (newDuration < 30) {
+      newDuration = duration * i;
+      i++;
+    }
+
+    /*
+    console.log("duration " + duration);
+    console.log("loops " + (i - 1));
+    console.log(newDuration);
+    */
+
+    await Tone.Offline(({ transport }) => {
+      let notes = seq
+        .filter(
+          (s) => s.layer === 0 && s.time >= regionStart && s.time < regionEnd
+        )
+        .map((p) => ({
+          time: p.time,
+          duration: p.duration,
+          player: new Tone.Player(p.player.buffer.get()).toDestination(),
+        }));
+
+      //console.log(notes);
+
+      for (let n = 2; n <= i; n++) {
+        // console.log(n - 1);
+
+        let notesCopy = seq
+          .filter(
+            (s) => s.layer === 0 && s.time >= regionStart && s.time < regionEnd
+          )
+          .map((p) => ({
+            time: duration * (n - 2) + p.time,
+            duration: p.duration,
+            player: new Tone.Player(p.player.buffer.get()).toDestination(),
+          }));
+
+        notes = notes.concat(notesCopy);
+      }
+
+      //console.log(notes);
+
+      new Tone.Part((time, value) => {
+        if (value.player.loaded) {
+          value.player.start(time);
+        } else {
+          console.log("buffer not loaded");
+          console.log(value);
+        }
+      }, notes).start(0);
+
+      transport.start(0);
+    }, newDuration).then(async (buffer) => {
+      //console.log("finished offline render");
+      //console.log(buffer.duration);
+
+      const buff = buffer.get();
+      if (buff) {
+        realtimeBpm.analyzeFullBuffer(buff).then((topCandidates) => {
+          // console.log("topCandidates", topCandidates);
+          setBPM(parseFloat((topCandidates[0].tempo * speed).toFixed(1)));
+        });
+      }
+    });
+  };
 
   const resetWaveSurfer = () => {
     regionLoop = undefined;
@@ -350,6 +439,7 @@ export default function Home(props: { folders: string[] }) {
     e?.preventDefault();
     e?.stopPropagation();
 
+    setBPM(0);
     setSelectedFolder(folder);
     setLoading(true);
 
@@ -1089,6 +1179,16 @@ export default function Home(props: { folders: string[] }) {
     setDisplay(display === "controls" ? "playlist" : "controls");
   };
 
+  const getBPMText = () => {
+    if (bpm) {
+      const computedBPM = parseFloat((bpm * speed).toFixed(1));
+      const halfBPM = parseFloat((computedBPM / 2).toFixed(1));
+      return ` ${halfBPM} / ${computedBPM} bpm`;
+    } else {
+      return "";
+    }
+  };
+
   return (
     <>
       <Head>
@@ -1104,7 +1204,7 @@ export default function Home(props: { folders: string[] }) {
         <h1 className={styles.title}>
           {selectedFolder && loading
             ? "Loading"
-            : "Universal Breakbeat Phreaker"}
+            : `Universal Breakbeat Phreaker${getBPMText()}`}
         </h1>
 
         <div
