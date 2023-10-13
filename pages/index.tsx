@@ -535,7 +535,7 @@ export default function Home(props: { folders: string[] }) {
 
     Tone.Transport.position = "0:0:0";
 
-    await drawLayer("silence");
+    await drawLayer("regions");
     await drawLayer(0);
 
     setSpeed(1);
@@ -650,7 +650,7 @@ export default function Home(props: { folders: string[] }) {
       end: closest(times, regionSelect.end),
     });
 
-    await drawLayer("silence");
+    await drawLayer("regions");
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
@@ -1097,13 +1097,13 @@ export default function Home(props: { folders: string[] }) {
     }
   };
 
-  const drawLayer = async (layer: number | "silence") => {
+  const drawLayer = async (layer: number | "regions") => {
     const duration = seq
       .filter((s) => s.layer === 0)
       .reduce((n, { duration }) => n + duration, 0);
 
     await Tone.Offline(({ transport }) => {
-      if (layer !== "silence") {
+      if (layer !== "regions") {
         const notes = seq
           .filter((note) => note.layer === layer)
           .map((p) => ({
@@ -1127,7 +1127,7 @@ export default function Home(props: { folders: string[] }) {
 
       transport.start(0);
     }, duration).then((buffer) => {
-      if (layer === "silence") {
+      if (layer === "regions") {
         wsRegions.loadDecodedBuffer(buffer.get());
       } else if (layer === 0) {
         ws0.loadDecodedBuffer(buffer.get());
