@@ -565,7 +565,9 @@ export default function Home(props: { folders: string[] }) {
           n.time >= regionSelect.start &&
           n.time < regionSelect.end
       )
-      .forEach((n) => n.player.set({ mute: false }));
+      .forEach((n) =>
+        n.player.set({ mute: false, volume: getLayerVolume(n.layer) })
+      );
 
     await drawLayer(selectedLayer);
 
@@ -819,14 +821,14 @@ export default function Home(props: { folders: string[] }) {
   const changeFader = (val: number) => {
     if (val < 0) {
       seq
-        .filter((s) => s.layer === 1)
+        .filter((s) => s.layer === 1 && !s.player.mute)
         .forEach((n) => {
           n.player.set({
             volume: val === -20 ? -100 : val,
           });
         });
       seq
-        .filter((s) => s.layer === 0)
+        .filter((s) => s.layer === 0 && !s.player.mute)
         .forEach((n) => {
           n.player.set({
             volume: 0,
@@ -834,14 +836,14 @@ export default function Home(props: { folders: string[] }) {
         });
     } else if (val > 0) {
       seq
-        .filter((s) => s.layer === 0)
+        .filter((s) => s.layer === 0 && !s.player.mute)
         .forEach((n) => {
           n.player.set({
             volume: val === 20 ? -100 : val * -1,
           });
         });
       seq
-        .filter((s) => s.layer === 1)
+        .filter((s) => s.layer === 1 && !s.player.mute)
         .forEach((n) => {
           n.player.set({
             volume: 0,
@@ -854,7 +856,7 @@ export default function Home(props: { folders: string[] }) {
 
   const changeLayer2Volume = (val: number) => {
     seq
-      .filter((s) => s.layer === 2)
+      .filter((s) => s.layer === 2 && !s.player.mute)
       .forEach((n) => {
         n.player.set({
           volume: val === -20 ? -100 : val,
@@ -868,15 +870,19 @@ export default function Home(props: { folders: string[] }) {
 
     if (layer === 0) {
       if (fader > 0) {
-        val = 0;
+        val = fader * -1;
       } else if (fader === 20) {
         val = -100;
+      } else {
+        val = 0;
       }
     } else if (layer === 1) {
-      if (fader > 0) {
-        val = 0;
+      if (fader < 0) {
+        val = fader;
       } else if (fader === -20) {
         val = -100;
+      } else {
+        val = 0;
       }
     } else if (layer === 2) {
       val = layer2Volume;
