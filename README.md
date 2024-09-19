@@ -1,4 +1,4 @@
-# Universal Breakbeat Phreaker
+# Universal Rhythm Phreaker
 
 ## Goal
 - Create and explore rhythms
