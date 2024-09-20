@@ -1,7 +1,7 @@
-# Universal Rhythm Phreaker
+# Universal Rhythm and Sound Discovery
 
 ## Goal
-- Create and explore rhythms
+- Create and explore rhythms and sounds
 
 ## Screenshot
 ![bb_phreaker_screenshot](https://github.com/tboie/universal_breakbeat_phreaker/assets/26150152/c79184ba-2f4a-4124-8e31-b180ddba3100)
