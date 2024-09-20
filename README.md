@@ -1,4 +1,4 @@
-# Universal Rhythm and Sound Discovery
+# Universal Rhythm and Sound Mutator
 
 ## Goal
 - Create and explore rhythms and sounds
