@@ -387,6 +387,15 @@ export default function Home(props: { folders: string[] }) {
       new Tone.Part((time, value) => {
         if (value.player.loaded) {
           value.player.start(time);
+
+          /* trim audio notes omg clicks */
+          const baseSeqNote = seq
+            .filter((s) => s.layer === 0)
+            .find((s) => s.time === value.time);
+
+          if (baseSeqNote) {
+            value.player.stop(time + baseSeqNote.duration);
+          }
         } else {
           console.log("buffer not loaded");
           console.log(value);
@@ -511,18 +520,24 @@ export default function Home(props: { folders: string[] }) {
     part = new Tone.Part((time, value) => {
       if (value.player.loaded) {
         value.player.start(time);
+
+        /* trim audio notes omg clicks */
+        const baseSeqNote = seq
+          .filter((s) => s.layer === 0)
+          .find((s) => s.time === value.time);
+
+        if (baseSeqNote) {
+          value.player.stop(time + baseSeqNote.duration);
+        } else {
+          console.log("baseSeqNote undefined");
+        }
       } else {
         console.log("buffer not loaded");
         console.log(value);
       }
 
-      /* trim overlapping pieces
-      players1[value.idx]?.stop(
-        Tone.Time(time).toSeconds() + Tone.Time(value.duration).toSeconds()
-      );
-      */
-
       // start playhead at piece
+      // TODO: fix DuplicateSelection?
       Tone.Draw.schedule(() => {
         if (regionLoop && refPlaying.current) {
           const piece = seq.find((s) => s.layer === 0 && s.time === value.time);
@@ -573,6 +588,64 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(false);
   };
+
+  /*
+  const DuplicateSelection = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setLoading(true);
+
+    // seq.sort((a, b) => a.time - b.time);
+
+    let endSeq = seq.slice(-5);
+    let lastNote = endSeq[endSeq.length - 1];
+
+    let startTime = lastNote.time + lastNote.duration;
+    startTime = parseFloat(startTime.toFixed(6));
+
+    let finalSeq: TSeq[] = [];
+    seq.forEach((s) => {
+      finalSeq.push({ ...s });
+    });
+
+    endSeq[0].time = startTime;
+    endSeq.forEach((s, idx) => {
+      if (idx) {
+        const prevNote = endSeq[idx - 1];
+        const currNoteTime = parseFloat(
+          (prevNote.time + prevNote.duration).toFixed(6)
+        );
+        s.time = currNoteTime;
+      }
+
+      finalSeq.push({ ...s });
+      part.add(s.time, { ...s });
+    });
+
+    seq = finalSeq;
+
+    console.log("seq");
+    console.log(seq);
+
+    Tone.Transport.setLoopPoints(
+      0,
+      seq[seq.length - 1].time + seq[seq.length - 1].duration
+    );
+
+    await drawLayer("regions");
+    await drawLayer(0);
+    await drawLayer(1);
+    await drawLayer(2);
+
+    // resize window
+    // configScroll();
+
+    setLoading(false);
+  };
+  */
 
   const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -680,6 +753,15 @@ export default function Home(props: { folders: string[] }) {
       new Tone.Part((time, value) => {
         if (value.player.loaded) {
           value.player.start(time);
+
+          /* trim audio notes omg clicks and some missed/short duration notes?*/
+          const baseSeqNote = seq
+            .filter((s) => s.layer === 0)
+            .find((s) => s.time === value.time);
+
+          if (baseSeqNote) {
+            value.player.stop(time + baseSeqNote.duration);
+          }
         } else {
           console.log("buffer not loaded");
           console.log(value);
@@ -959,7 +1041,8 @@ export default function Home(props: { folders: string[] }) {
           };
         });
 
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
+        // Cooked in Flavor for now: reversed
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
 
         const r = Math.floor(Math.random() * 3);
         matches.push(t[r]);
@@ -1117,6 +1200,15 @@ export default function Home(props: { folders: string[] }) {
           if (value.player.loaded) {
             if (!value.mute) {
               value.player.start(time);
+
+              /* trim audio notes omg clicks */
+              const baseSeqNote = seq
+                .filter((s) => s.layer === 0)
+                .find((s) => s.time === value.time);
+
+              if (baseSeqNote) {
+                value.player.stop(time + baseSeqNote.duration);
+              }
             }
           } else {
             console.log("buffer not loaded");
@@ -1375,7 +1467,7 @@ export default function Home(props: { folders: string[] }) {
         <div className={styles.toolbar}>
           <button
             id="download"
-            onClick={(e) => downloadClick(e)}
+            onClick={(e) => /*DuplicateSelection(e)*/ downloadClick(e)}
             disabled={loading}
           >
             Download
