@@ -537,7 +537,6 @@ export default function Home(props: { folders: string[] }) {
       }
 
       // start playhead at piece
-      // TODO: fix DuplicateSelection?
       Tone.Draw.schedule(() => {
         if (regionLoop && refPlaying.current) {
           const piece = seq.find((s) => s.layer === 0 && s.time === value.time);
@@ -589,8 +588,7 @@ export default function Home(props: { folders: string[] }) {
     setLoading(false);
   };
 
-  /*
-  const DuplicateSelection = async (
+  const DuplicateLoop = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
@@ -598,54 +596,103 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(true);
 
-    // seq.sort((a, b) => a.time - b.time);
+    // verify time floats?
 
-    let endSeq = seq.slice(-5);
-    let lastNote = endSeq[endSeq.length - 1];
+    const calcSeqTimes = (startTime: number, sequence: TSeq[]) => {
+      const timesOut: number[] = [];
 
-    let startTime = lastNote.time + lastNote.duration;
-    startTime = parseFloat(startTime.toFixed(6));
+      if (sequence.length) {
+        sequence.forEach((s, idx) => {
+          if (idx) {
+            const prevNote = sequence[idx - 1];
+            const t = parseFloat(
+              (timesOut[idx - 1] + prevNote.duration).toFixed(6)
+            );
 
-    let finalSeq: TSeq[] = [];
-    seq.forEach((s) => {
-      finalSeq.push({ ...s });
-    });
-
-    endSeq[0].time = startTime;
-    endSeq.forEach((s, idx) => {
-      if (idx) {
-        const prevNote = endSeq[idx - 1];
-        const currNoteTime = parseFloat(
-          (prevNote.time + prevNote.duration).toFixed(6)
-        );
-        s.time = currNoteTime;
+            timesOut.push(t);
+          } else {
+            timesOut.push(startTime);
+          }
+        });
       }
 
-      finalSeq.push({ ...s });
-      part.add(s.time, { ...s });
+      return timesOut;
+    };
+
+    const insertSeq = (sequence: TSeq[], times: number[]) => {
+      if (times.length !== sequence.length) {
+        console.log("setSeqTimes: uneven array lengths");
+      } else {
+        const s = [...sequence];
+        s.forEach((ss, idx) => {
+          let note = { ...ss };
+          Object.assign(note, { time: times[idx] });
+
+          seq.push({ ...note });
+          part.add(note.time, { ...note });
+        });
+      }
+    };
+
+    const notes = [...seq.filter((s) => s.time >= regionLoop.start)];
+
+    const selectNotes = notes.filter(
+      (s) => s.layer === 0 && s.time < regionLoop.end
+    );
+    // verify sort?
+    const lastSelectNote = selectNotes[selectNotes.length - 1];
+    const tStart = parseFloat(
+      (lastSelectNote.time + lastSelectNote.duration).toFixed(6)
+    );
+
+    seq
+      .filter((ss) => ss.layer === 0 && ss.time >= regionLoop.end)
+      .forEach((n) => {
+        part.remove(n.time);
+      });
+
+    seq = seq.filter((ss) => ss.time < regionLoop.end);
+
+    const times = calcSeqTimes(
+      tStart,
+      notes.filter((n) => n.layer === 0)
+    );
+
+    [0, 1, 2].forEach((layer) => {
+      const layerNotes = notes.filter((n) => n.layer === layer);
+      if (layerNotes.length) {
+        insertSeq(layerNotes, times);
+      }
     });
 
-    seq = finalSeq;
-
-    console.log("seq");
-    console.log(seq);
+    regionLoop.update({
+      start: regionLoop.start,
+      end: tStart + (tStart - regionLoop.start),
+    });
 
     Tone.Transport.setLoopPoints(
-      0,
-      seq[seq.length - 1].time + seq[seq.length - 1].duration
+      regionLoop.start,
+      tStart + (tStart - regionLoop.start)
     );
+
+    /* todo
+    regionSelect.update({
+      start: regionSelect.start,
+      end: endTime,
+    });
+    */
 
     await drawLayer("regions");
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
 
-    // resize window
+    // see window resize callback
     // configScroll();
+    window.dispatchEvent(new Event("resize"));
 
     setLoading(false);
   };
-  */
 
   const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -1467,10 +1514,10 @@ export default function Home(props: { folders: string[] }) {
         <div className={styles.toolbar}>
           <button
             id="download"
-            onClick={(e) => /*DuplicateSelection(e)*/ downloadClick(e)}
+            onClick={(e) => DuplicateLoop(e) /* downloadClick(e) */}
             disabled={loading}
           >
-            Download
+            DupeLoop {/* Download */}
           </button>
 
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
