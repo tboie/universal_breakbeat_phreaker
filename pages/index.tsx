@@ -1517,7 +1517,7 @@ export default function Home(props: { folders: string[] }) {
             onClick={(e) => DuplicateLoop(e) /* downloadClick(e) */}
             disabled={loading}
           >
-            DupeLoop {/* Download */}
+            DupLoop {/* Download */}
           </button>
 
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
