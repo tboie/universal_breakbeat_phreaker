@@ -531,6 +531,7 @@ export default function Home(props: { folders: string[] }) {
           value.player.stop(time + baseSeqNote.duration);
         } else {
           console.log("baseSeqNote undefined");
+          console.log("value.time " + value.time);
         }
       } else {
         console.log("buffer not loaded");
@@ -597,129 +598,40 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(true);
 
-    // get seq array after loopstart
-    // set each time of array item + loop duration
-    // remove array after loop end
-    // add set array to base seq array
+    // TODO: verify selection handles and note times?
+    const loopStart = parseFloat(regionLoop.start.toFixed(6));
+    const loopEnd = parseFloat(regionLoop.end.toFixed(6));
+    const loopDur = loopEnd - loopStart;
 
     const appendLoop = (layer: number) => {
-      const loopStart = parseFloat(regionLoop.start.toFixed(6));
-      const loopEnd = parseFloat(regionLoop.end.toFixed(6));
-      const loopDur = loopEnd - loopStart;
-
+      // copy seq after loopstart
       const seqCopy = [
         ...seq.filter((s) => s.layer === layer && s.time >= loopStart),
       ];
 
-      seq = seq.filter((s) => s.layer === layer && s.time < loopEnd);
+      // remove after loopend from seq
+      seq = seq.filter(
+        (s) => s.layer !== layer || (s.layer === layer && s.time < loopEnd)
+      );
 
+      // add time calculated note to seq and part
       seqCopy.forEach((s) => {
-        const noteCopy = { ...s };
-        const calcTime = noteCopy.time + loopDur;
-
-        Object.assign(noteCopy, { time: calcTime });
-
-        console.log(noteCopy);
-
-        seq.push(noteCopy);
-        part.add(calcTime);
+        seq.push({
+          ...s,
+          time: parseFloat((s.time + loopDur).toFixed(6)),
+        });
       });
 
-      seq
-        .filter((s) => s.layer === layer && s.time >= loopEnd)
-        .forEach((s) => {
-          //s.player.dispose();
-          part.remove(s.time);
-        });
-
-      console.log(seq);
+      // add notes to part
+      seq.filter((s) => s.layer === layer).forEach((s) => part.add(s.time, s));
     };
 
+    part.clear();
     appendLoop(0);
+    appendLoop(1);
+    appendLoop(2);
 
-    // verify time floats?
-    /*
-    const calcSeqTimes = (startTime: number, sequence: TSeq[]) => {
-      const timesOut: number[] = [];
-
-      if (sequence.length) {
-        sequence.forEach((s, idx) => {
-          if (idx) {
-            const prevNote = sequence[idx - 1];
-            const t = parseFloat(
-              (timesOut[idx - 1] + prevNote.duration).toFixed(6)
-            );
-
-            timesOut.push(t);
-          } else {
-            timesOut.push(startTime);
-          }
-        });
-      }
-
-      return timesOut;
-    };
-
-    const insertSeq = (sequence: TSeq[], times: number[]) => {
-      if (times.length !== sequence.length) {
-        console.log("setSeqTimes: uneven array lengths");
-      } else {
-        const s = [...sequence];
-        s.forEach((ss, idx) => {
-          let note = { ...ss };
-          Object.assign(note, { time: times[idx] });
-
-          seq.push({ ...note });
-          part.add(note.time, { ...note });
-        });
-      }
-    };
-
-    const notes = [...seq.filter((s) => s.time >= regionLoop.start)];
-
-    const selectNotes = notes.filter(
-      (s) => s.layer === 0 && s.time < regionLoop.end
-    );
-    // verify sort?
-    const lastSelectNote = selectNotes[selectNotes.length - 1];
-    const tStart = parseFloat(
-      (lastSelectNote.time + lastSelectNote.duration).toFixed(6)
-    );
-
-    seq
-      .filter((ss) => ss.layer === 0 && ss.time >= regionLoop.end)
-      .forEach((n) => {
-        part.remove(n.time);
-      });
-
-    seq = seq.filter((ss) => ss.time < regionLoop.end);
-
-    const times = calcSeqTimes(
-      tStart,
-      notes.filter((n) => n.layer === 0)
-    );
-
-    [0, 1, 2].forEach((layer) => {
-      const layerNotes = notes.filter((n) => n.layer === layer);
-      if (layerNotes.length) {
-        insertSeq(layerNotes, times);
-      }
-    });
-    */
-
-    regionLoop.update({
-      start: regionLoop.start,
-      end: regionLoop.end,
-    });
-
-    Tone.Transport.setLoopPoints(regionLoop.start, regionLoop.end);
-
-    /* todo
-    regionSelect.update({
-      start: regionSelect.start,
-      end: endTime,
-    });
-    */
+    Tone.Transport.setLoopPoints(loopStart, loopEnd + loopDur);
 
     await drawLayer("regions");
     await drawLayer(0);
@@ -727,8 +639,20 @@ export default function Home(props: { folders: string[] }) {
     await drawLayer(2);
 
     // see window resize callback
-    // configScroll();
     window.dispatchEvent(new Event("resize"));
+
+    // put these in window resize func?
+    regionLoop.update({
+      start: loopStart,
+      end: loopEnd + loopDur,
+    });
+
+    if (regionSelect.end > loopEnd) {
+      regionSelect.update({
+        start: regionSelect.start,
+        end: regionSelect.end + loopDur,
+      });
+    }
 
     setLoading(false);
   };
