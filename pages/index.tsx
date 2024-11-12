@@ -38,6 +38,7 @@ type TSeq = {
   name: string;
   cutIdx: number;
   duration: number;
+  trim?: boolean; // TODO: implement?
   player: Tone.Player;
 };
 
@@ -596,8 +597,48 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(true);
 
-    // verify time floats?
+    // get seq array after loopstart
+    // set each time of array item + loop duration
+    // remove array after loop end
+    // add set array to base seq array
 
+    const appendLoop = (layer: number) => {
+      const loopStart = parseFloat(regionLoop.start.toFixed(6));
+      const loopEnd = parseFloat(regionLoop.end.toFixed(6));
+      const loopDur = loopEnd - loopStart;
+
+      const seqCopy = [
+        ...seq.filter((s) => s.layer === layer && s.time >= loopStart),
+      ];
+
+      seq = seq.filter((s) => s.layer === layer && s.time < loopEnd);
+
+      seqCopy.forEach((s) => {
+        const noteCopy = { ...s };
+        const calcTime = noteCopy.time + loopDur;
+
+        Object.assign(noteCopy, { time: calcTime });
+
+        console.log(noteCopy);
+
+        seq.push(noteCopy);
+        part.add(calcTime);
+      });
+
+      seq
+        .filter((s) => s.layer === layer && s.time >= loopEnd)
+        .forEach((s) => {
+          //s.player.dispose();
+          part.remove(s.time);
+        });
+
+      console.log(seq);
+    };
+
+    appendLoop(0);
+
+    // verify time floats?
+    /*
     const calcSeqTimes = (startTime: number, sequence: TSeq[]) => {
       const timesOut: number[] = [];
 
@@ -664,16 +705,14 @@ export default function Home(props: { folders: string[] }) {
         insertSeq(layerNotes, times);
       }
     });
+    */
 
     regionLoop.update({
       start: regionLoop.start,
-      end: tStart + (tStart - regionLoop.start),
+      end: regionLoop.end,
     });
 
-    Tone.Transport.setLoopPoints(
-      regionLoop.start,
-      tStart + (tStart - regionLoop.start)
-    );
+    Tone.Transport.setLoopPoints(regionLoop.start, regionLoop.end);
 
     /* todo
     regionSelect.update({
@@ -1047,6 +1086,7 @@ export default function Home(props: { folders: string[] }) {
       let newPallet: TableRow[] = [];
       const sounds = table.filter((r) => r.name !== selectedFolder);
 
+      // consider number of breaks?
       for (let i = 0; i < 100; i++) {
         const randSound = sounds[Math.floor(Math.random() * sounds.length)];
         newPallet.push(randSound);
