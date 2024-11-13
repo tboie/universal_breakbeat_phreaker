@@ -703,27 +703,6 @@ export default function Home(props: { folders: string[] }) {
     deleteSelectionLayer(1);
     deleteSelectionLayer(2);
 
-    /*
-    let times = seq.filter((n) => n.layer === 0).map((s) => s.time);
-    const end = seq
-      .filter((n) => n.layer === 0)
-      .reduce((n, { duration }) => n + duration, 0);
-
-    times.push(end);
-
-    if (regionLoop.start >= regionSelect.end) {
-      const loopStart = closest(times, regionLoop.start - selectDur);
-      const loopEnd = closest(times, regionLoop.end - selectDur);
-
-      regionLoop.update({
-        start: loopStart,
-        end: loopEnd,
-      });
-
-      Tone.Transport.setLoopPoints(loopStart, loopEnd);
-    }
-    */
-
     regionSelect.update({
       start: 0,
       end: seq
