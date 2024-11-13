@@ -646,18 +646,15 @@ export default function Home(props: { folders: string[] }) {
     // see window resize callback
     window.dispatchEvent(new Event("resize"));
 
-    // put these in window resize func?
     regionLoop.update({
       start: loopStart,
       end: loopEnd + loopDur,
     });
 
-    if (regionSelect.end > loopEnd) {
-      regionSelect.update({
-        start: regionSelect.start,
-        end: regionSelect.end + loopDur,
-      });
-    }
+    regionSelect.update({
+      start: regionSelect.start,
+      end: regionSelect.end,
+    });
 
     setLoading(false);
   };
