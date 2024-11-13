@@ -105,6 +105,7 @@ export default function Home(props: { folders: string[] }) {
   const [scroll, setScroll] = useState(0);
   const [fader, setFader] = useState(0);
   const [layer2Volume, setLayer2Volume] = useState(0);
+  const [allowDelete, setAllowDelete] = useState(false);
 
   const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
   const [pallet1Loaded, setPallet1Loaded] = useState(false);
@@ -251,7 +252,11 @@ export default function Home(props: { folders: string[] }) {
           end: snapEnd,
         });
 
-        calcBPM(snapStart, snapEnd);
+        if (region.id === "loop") {
+          calcBPM(snapStart, snapEnd);
+        }
+
+        setAllowDelete(regionSelect.start >= regionLoop.end ? true : false);
       });
 
       wsRegions.on("ready", () => {
@@ -590,7 +595,7 @@ export default function Home(props: { folders: string[] }) {
     setLoading(false);
   };
 
-  const DuplicateLoop = async (
+  const duplicateLoop = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
@@ -653,6 +658,89 @@ export default function Home(props: { folders: string[] }) {
         end: regionSelect.end + loopDur,
       });
     }
+
+    setLoading(false);
+  };
+
+  // TODO: Disable delete when loop in selection or after selection
+  const deleteSelection = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setLoading(true);
+    setAllowDelete(false);
+
+    // TODO: verify selection handles and note times?
+    const selectStart = parseFloat(regionSelect.start.toFixed(6));
+    const selectEnd = parseFloat(regionSelect.end.toFixed(6));
+    const selectDur = selectEnd - selectStart;
+
+    const deleteSelectionLayer = (layer: number) => {
+      // copy seq after loopend
+      const seqCopy = [
+        ...seq.filter((s) => s.layer === layer && s.time >= selectEnd),
+      ];
+
+      // remove after loopstart from seq
+      seq = seq.filter(
+        (s) => s.layer !== layer || (s.layer === layer && s.time < selectStart)
+      );
+
+      // add time calculated note to seq and part
+      seqCopy.forEach((s) => {
+        seq.push({
+          ...s,
+          time: parseFloat((s.time - selectDur).toFixed(6)),
+        });
+      });
+
+      // add notes to part
+      seq.filter((s) => s.layer === layer).forEach((s) => part.add(s.time, s));
+    };
+
+    part.clear();
+
+    deleteSelectionLayer(0);
+    deleteSelectionLayer(1);
+    deleteSelectionLayer(2);
+
+    /*
+    let times = seq.filter((n) => n.layer === 0).map((s) => s.time);
+    const end = seq
+      .filter((n) => n.layer === 0)
+      .reduce((n, { duration }) => n + duration, 0);
+
+    times.push(end);
+
+    if (regionLoop.start >= regionSelect.end) {
+      const loopStart = closest(times, regionLoop.start - selectDur);
+      const loopEnd = closest(times, regionLoop.end - selectDur);
+
+      regionLoop.update({
+        start: loopStart,
+        end: loopEnd,
+      });
+
+      Tone.Transport.setLoopPoints(loopStart, loopEnd);
+    }
+    */
+
+    regionSelect.update({
+      start: 0,
+      end: seq
+        .filter((n) => n.layer === 0)
+        .reduce((n, { duration }) => n + duration, 0),
+    });
+
+    await drawLayer("regions");
+    await drawLayer(0);
+    await drawLayer(1);
+    await drawLayer(2);
+
+    // see window resize callback
+    window.dispatchEvent(new Event("resize"));
 
     setLoading(false);
   };
@@ -1402,6 +1490,14 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.toolbar}>
           <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            DL
+          </button>
+
+          <button
             className={`${selectedLayer === 1 ? styles.selected1 : ""}`}
             onClick={(e) => layerClick(e, 1)}
             disabled={loading}
@@ -1471,17 +1567,20 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            Erase
+            Mute
           </button>
         </div>
 
         <div className={styles.toolbar}>
           <button
-            id="download"
-            onClick={(e) => DuplicateLoop(e) /* downloadClick(e) */}
-            disabled={loading}
+            onClick={(e) => deleteSelection(e)}
+            disabled={loading || !allowDelete}
           >
-            DupLoop {/* Download */}
+            DelSel
+          </button>
+
+          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
+            DoopLoop
           </button>
 
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
@@ -1489,7 +1588,7 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
-            {display === "controls" ? "Breaks" : "Controls"}
+            {display === "controls" ? "Breaks" : "Ctrls"}
           </button>
 
           <button
@@ -1497,7 +1596,7 @@ export default function Home(props: { folders: string[] }) {
             disabled={loading}
             className={styles.white}
           >
-            Shuffle
+            Shuff
           </button>
 
           <button
@@ -1515,7 +1614,7 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            Unerase
+            Unmute
           </button>
         </div>
 
