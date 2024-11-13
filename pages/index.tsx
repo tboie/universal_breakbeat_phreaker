@@ -659,7 +659,6 @@ export default function Home(props: { folders: string[] }) {
     setLoading(false);
   };
 
-  // TODO: Disable delete when loop in selection or after selection
   const deleteSelection = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
