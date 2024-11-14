@@ -368,6 +368,7 @@ export default function Home(props: { folders: string[] }) {
           time: p.time,
           duration: p.duration,
           player: new Tone.Player(p.player.buffer.get()).toDestination(),
+          trim: p.trim,
         }));
 
       //console.log(notes);
@@ -383,6 +384,7 @@ export default function Home(props: { folders: string[] }) {
             time: duration * (n - 2) + p.time,
             duration: p.duration,
             player: new Tone.Player(p.player.buffer.get()).toDestination(),
+            trim: p.trim,
           }));
 
         notes = notes.concat(notesCopy);
@@ -394,13 +396,8 @@ export default function Home(props: { folders: string[] }) {
         if (value.player.loaded) {
           value.player.start(time);
 
-          /* trim audio notes omg clicks */
-          const baseSeqNote = seq
-            .filter((s) => s.layer === 0)
-            .find((s) => s.time === value.time);
-
-          if (baseSeqNote) {
-            value.player.stop(time + baseSeqNote.duration);
+          if (value.trim) {
+            value.player.stop(time + value.duration);
           }
         } else {
           console.log("buffer not loaded");
@@ -527,16 +524,13 @@ export default function Home(props: { folders: string[] }) {
       if (value.player.loaded) {
         value.player.start(time);
 
-        /* trim audio notes omg clicks */
-        const baseSeqNote = seq
-          .filter((s) => s.layer === 0)
-          .find((s) => s.time === value.time);
+        // yikes, figure out how to set value with part.at?
+        const layerSeqNote = seq.find(
+          (s) => s.time === value.time && s.layer === value.layer
+        );
 
-        if (baseSeqNote) {
-          value.player.stop(time + baseSeqNote.duration);
-        } else {
-          console.log("baseSeqNote undefined");
-          console.log("value.time " + value.time);
+        if (layerSeqNote?.trim) {
+          value.player.stop(time + value.duration);
         }
       } else {
         console.log("buffer not loaded");
@@ -720,6 +714,26 @@ export default function Home(props: { folders: string[] }) {
     setLoading(false);
   };
 
+  const trimLayerSelection = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number,
+    disable?: boolean
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    seq
+      .filter(
+        (s) =>
+          s.layer === layer &&
+          s.time >= regionSelect.start &&
+          s.time < regionSelect.end
+      )
+      .forEach((ss) => Object.assign(ss, { trim: disable ? false : true }));
+
+    await drawLayer(layer);
+  };
+
   const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -821,19 +835,15 @@ export default function Home(props: { folders: string[] }) {
         time: p.time,
         duration: p.duration,
         player: new Tone.Player(p.player.buffer.get()).toDestination(),
+        trim: p.trim,
       }));
 
       new Tone.Part((time, value) => {
         if (value.player.loaded) {
           value.player.start(time);
 
-          /* trim audio notes omg clicks and some missed/short duration notes?*/
-          const baseSeqNote = seq
-            .filter((s) => s.layer === 0)
-            .find((s) => s.time === value.time);
-
-          if (baseSeqNote) {
-            value.player.stop(time + baseSeqNote.duration);
+          if (value.trim) {
+            value.player.stop(time + value.duration);
           }
         } else {
           console.log("buffer not loaded");
@@ -1216,9 +1226,9 @@ export default function Home(props: { folders: string[] }) {
             seq.push({
               layer: layer,
               time: m.time,
-              duration: bufferObj
-                ? parseFloat(bufferObj.buffer.duration.toFixed(6))
-                : 0,
+              duration:
+                seq.find((s) => s.layer === 0 && s.time === m.time)?.duration ||
+                0,
               player: new Tone.Player(bufferObj?.buffer)
                 .set({
                   volume: getLayerVolume(layer),
@@ -1268,6 +1278,7 @@ export default function Home(props: { folders: string[] }) {
             duration: p.duration,
             player: new Tone.Player(p.player.buffer.get()).toDestination(),
             mute: p.player.mute,
+            trim: p.trim,
           }));
 
         new Tone.Part((time, value) => {
@@ -1275,13 +1286,8 @@ export default function Home(props: { folders: string[] }) {
             if (!value.mute) {
               value.player.start(time);
 
-              /* trim audio notes omg clicks */
-              const baseSeqNote = seq
-                .filter((s) => s.layer === 0)
-                .find((s) => s.time === value.time);
-
-              if (baseSeqNote) {
-                value.player.stop(time + baseSeqNote.duration);
+              if (value.trim) {
+                value.player.stop(time + value.duration);
               }
             }
           } else {
@@ -1544,6 +1550,23 @@ export default function Home(props: { folders: string[] }) {
           >
             Mute
           </button>
+          <button
+            onClick={(e) => trimLayerSelection(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Trm
+          </button>
         </div>
 
         <div className={styles.toolbar}>
@@ -1590,6 +1613,23 @@ export default function Home(props: { folders: string[] }) {
             }`}
           >
             Unmute
+          </button>
+          <button
+            onClick={(e) => trimLayerSelection(e, selectedLayer, true)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Untrm
           </button>
         </div>
 
