@@ -1056,6 +1056,44 @@ export default function Home(props: { folders: string[] }) {
     return val;
   };
 
+  const splitSelectionNotes = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number
+  ) => {
+    const regionNotes = seq.filter(
+      (s) =>
+        s.layer === layer &&
+        s.time >= regionSelect.start &&
+        s.time <= regionSelect.end
+    );
+
+    regionNotes.forEach((n, idx) => {
+      const nextNote = regionNotes[idx + 1];
+
+      // check last note?
+      if (nextNote) {
+        const noteDur = nextNote.time - n.time;
+        const noteTime = parseFloat((n.time + noteDur / 2).toFixed(6));
+        const newNote = {
+          ...n,
+          time: noteTime,
+          layer: layer,
+          cutIdx: n.cutIdx,
+          duration: noteDur / 2,
+          player: new Tone.Player().toDestination(),
+        };
+
+        seq.push(newNote);
+        part.add(newNote.time, newNote);
+        //todo: fix markers?
+        wsRegions.addMarker({ time: noteTime });
+      }
+    });
+
+    seq.sort((a, b) => a.time - b.time);
+    findMatches(e, layer, true);
+  };
+
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -1068,13 +1106,26 @@ export default function Home(props: { folders: string[] }) {
 
     // map table vals to seq notes
     let srcTable: (TableRow | undefined)[] = seq
-      .filter((n) => n.layer === 0)
+      .filter((n) =>
+        seq.filter((s) => s.layer === layer).length === 0
+          ? n.layer === 0
+          : n.layer == layer
+      )
       .map((n) => {
+        let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
+
+        // get previous note from layer 0
+        if (!baseNote) {
+          baseNote = seq
+            .filter((s) => s.layer === 0 && s.time < n.time)
+            .slice(-1)[0];
+        }
+
         const dataRow = table.find(
-          (r) => r.name === n.name && r.cutIdx === n.cutIdx
+          (r) => r.name === baseNote.name && r.cutIdx === baseNote.cutIdx
         );
         if (dataRow) {
-          return { ...n, duration: dataRow.duration, freq: dataRow.freq };
+          return { ...n, freq: dataRow.freq };
         }
       });
 
@@ -1110,7 +1161,7 @@ export default function Home(props: { folders: string[] }) {
     let matches: (TableRow & { dDiff: number; fDiff: number; time: number })[] =
       [];
 
-    srcTable.forEach((src, idx) => {
+    srcTable.forEach((src: any, idx) => {
       const pallet = pallets.find((p) => p.layer === layer);
 
       if (pallet && src) {
@@ -1121,7 +1172,7 @@ export default function Home(props: { folders: string[] }) {
             ...r,
             fDiff: freqDiff,
             dDiff: durDiff,
-            time: seq.filter((s) => s.layer === 0)[idx].time,
+            time: src.time,
           };
         });
 
@@ -1226,9 +1277,7 @@ export default function Home(props: { folders: string[] }) {
             seq.push({
               layer: layer,
               time: m.time,
-              duration:
-                seq.find((s) => s.layer === 0 && s.time === m.time)?.duration ||
-                0,
+              duration: m.duration,
               player: new Tone.Player(bufferObj?.buffer)
                 .set({
                   volume: getLayerVolume(layer),
@@ -1566,6 +1615,23 @@ export default function Home(props: { folders: string[] }) {
             }`}
           >
             Trm
+          </button>
+          <button
+            onClick={(e) => splitSelectionNotes(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Half
           </button>
         </div>
 
