@@ -1083,7 +1083,7 @@ export default function Home(props: { folders: string[] }) {
       let newPallet: TableRow[] = [];
       const sounds = table.filter((r) => r.name !== selectedFolder);
 
-      // consider number of breaks?
+      // calibrate this? harmonics?
       for (let i = 0; i < 100; i++) {
         const randSound = sounds[Math.floor(Math.random() * sounds.length)];
         newPallet.push(randSound);
@@ -1125,8 +1125,8 @@ export default function Home(props: { folders: string[] }) {
           };
         });
 
-        // Cooked in Flavor for now: reversed
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
+        // Calibrate this? Harmonics? See other calibration
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
 
         const r = Math.floor(Math.random() * 3);
         matches.push(t[r]);
