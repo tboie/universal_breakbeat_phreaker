@@ -38,7 +38,7 @@ type TSeq = {
   name: string;
   cutIdx: number;
   duration: number;
-  trim?: boolean; // TODO: implement?
+  trim?: boolean;
   player: Tone.Player;
 };
 
