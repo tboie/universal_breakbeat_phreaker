@@ -1259,7 +1259,8 @@ export default function Home(props: { folders: string[] }) {
         // Calibrate this? Harmonics? See other calibration
         t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
 
-        const r = Math.floor(Math.random() * 3);
+        // Calibrate this?
+        const r = Math.floor(Math.random() * 4);
         matches.push(t[r]);
       }
     });
