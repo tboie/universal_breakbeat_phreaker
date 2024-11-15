@@ -1094,6 +1094,66 @@ export default function Home(props: { folders: string[] }) {
     findMatches(e, layer, true);
   };
 
+  // 1 note for every 2 base seq notes
+  const combineSelectionNotes = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number
+  ) => {
+    const selectionNotes = [
+      ...seq.filter(
+        (s) =>
+          s.layer === layer &&
+          s.time >= regionSelect.start &&
+          s.time < regionSelect.end
+      ),
+    ];
+
+    const combinedNotes = selectionNotes.filter((s, idx) => idx % 2 === 0);
+    combinedNotes.forEach((n, idx) => {
+      const nextNote = combinedNotes[idx + 1];
+
+      if (nextNote) {
+        const noteDur = parseFloat((nextNote.time - n.time).toFixed(6));
+        Object.assign(n, { duration: noteDur });
+      } else {
+        const noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
+        Object.assign(n, { duration: noteDur });
+      }
+    });
+
+    seq = seq.filter(
+      (s) =>
+        s.layer !== layer ||
+        (s.layer === layer &&
+          (s.time < regionSelect.start || s.time >= regionSelect.end))
+    );
+
+    combinedNotes.forEach((n) => {
+      seq.push(n);
+    });
+    seq.sort((a, b) => a.time - b.time);
+
+    /*
+    console.log(
+      seq.filter(
+        (s) =>
+          s.layer === layer &&
+          s.time >= regionSelect.start &&
+          s.time < regionSelect.end
+      )
+    );
+    */
+
+    // clear entire part :(
+    // todo: set part event values
+    part.clear();
+    seq.forEach((s) => {
+      part.add(s.time, s);
+    });
+
+    findMatches(e, layer, true);
+  };
+
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -1112,9 +1172,19 @@ export default function Home(props: { folders: string[] }) {
           : n.layer == layer
       )
       .map((n) => {
-        let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
+        // use next note for duration not buffer
+        let noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
+        let nextNote = seq.filter(
+          (s) =>
+            s.layer === layer && s.time > n.time && s.time < regionSelect.end
+        )[0];
+        if (nextNote) {
+          noteDur = parseFloat((nextNote.time - n.time).toFixed(6));
+        }
 
-        // get previous note from layer 0
+        // base note freq
+        let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
+        // prev base note
         if (!baseNote) {
           baseNote = seq
             .filter((s) => s.layer === 0 && s.time < n.time)
@@ -1124,8 +1194,9 @@ export default function Home(props: { folders: string[] }) {
         const dataRow = table.find(
           (r) => r.name === baseNote.name && r.cutIdx === baseNote.cutIdx
         );
+
         if (dataRow) {
-          return { ...n, freq: dataRow.freq };
+          return { ...n, duration: noteDur, freq: dataRow.freq };
         }
       });
 
@@ -1173,11 +1244,12 @@ export default function Home(props: { folders: string[] }) {
             fDiff: freqDiff,
             dDiff: durDiff,
             time: src.time,
+            duration: src.duration,
           };
         });
 
         // Calibrate this? Harmonics? See other calibration
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
 
         const r = Math.floor(Math.random() * 3);
         matches.push(t[r]);
@@ -1631,7 +1703,7 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            Half
+            Splt
           </button>
         </div>
 
@@ -1696,6 +1768,23 @@ export default function Home(props: { folders: string[] }) {
             }`}
           >
             Untrm
+          </button>
+          <button
+            onClick={(e) => combineSelectionNotes(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Cmbn
           </button>
         </div>
 
