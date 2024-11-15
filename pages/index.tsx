@@ -1085,8 +1085,6 @@ export default function Home(props: { folders: string[] }) {
 
         seq.push(newNote);
         part.add(newNote.time, newNote);
-        //todo: fix markers?
-        wsRegions.addMarker({ time: noteTime });
       }
     });
 
