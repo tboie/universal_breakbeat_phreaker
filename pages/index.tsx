@@ -1162,23 +1162,33 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(true);
 
+    const layerHasNotes =
+      seq.filter((s) => s.layer === layer).length === 0 ? false : true;
+
     // map table vals to seq notes
     let srcTable: (TableRow | undefined)[] = seq
-      .filter((n) =>
-        seq.filter((s) => s.layer === layer).length === 0
-          ? n.layer === 0
-          : n.layer == layer
-      )
+      .filter((n) => n.layer === (layerHasNotes ? layer : 0))
       .map((n) => {
-        // use next note for duration not buffer/
-        let noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
-        let nextNote = seq.filter(
+        // set note duration using next note
+        const selectNotes = seq.filter(
           (s) =>
-            s.layer === layer && s.time > n.time && s.time < regionSelect.end
-        )[0];
+            s.layer === (layerHasNotes ? layer : 0) &&
+            s.time >= regionSelect.start &&
+            s.time < regionSelect.end
+        );
+        const noteIdx = selectNotes.findIndex((s) => s.time === n.time);
+        const nextNote = selectNotes[noteIdx + 1];
+        let noteDur = 0;
+
         if (nextNote) {
-          noteDur = parseFloat((nextNote.time - n.time).toFixed(6));
+          noteDur = nextNote.time - n.time;
         }
+        // last note
+        else if (n.time === selectNotes[selectNotes.length - 1].time) {
+          noteDur = regionSelect.end - selectNotes[selectNotes.length - 1].time;
+        }
+
+        noteDur = parseFloat(noteDur.toFixed(6));
 
         // base note freq
         let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
