@@ -1170,7 +1170,7 @@ export default function Home(props: { folders: string[] }) {
           : n.layer == layer
       )
       .map((n) => {
-        // use next note for duration not buffer
+        // use next note for duration not buffer/
         let noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
         let nextNote = seq.filter(
           (s) =>
@@ -1356,6 +1356,7 @@ export default function Home(props: { folders: string[] }) {
                 .toDestination(),
               name: m.name,
               cutIdx: m.cutIdx,
+              trim: true,
             });
             //  }
           })
