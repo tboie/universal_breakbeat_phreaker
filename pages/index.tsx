@@ -1472,7 +1472,7 @@ export default function Home(props: { folders: string[] }) {
     e.stopPropagation();
     e.preventDefault();
 
-    setSelectedLayer(layer === selectedLayer ? 0 : layer);
+    setSelectedLayer(layer);
   };
 
   const erase = async (
@@ -1543,14 +1543,17 @@ export default function Home(props: { folders: string[] }) {
           id="ws0"
           className={`ws ${selectedLayer === 0 ? "selected" : ""}`}
         />
+
         <div
           id="ws1"
           className={`ws ${selectedLayer === 1 ? "selected" : ""}`}
         />
+
         <div
           id="ws2"
           className={`ws ${selectedLayer === 2 ? "selected" : ""}`}
         />
+
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
         <div className={`${styles.toolbar}`}>
@@ -1570,6 +1573,7 @@ export default function Home(props: { folders: string[] }) {
           >
             {"<"}
           </button>
+
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1605,6 +1609,7 @@ export default function Home(props: { folders: string[] }) {
           >
             {"<"}
           </button>
+
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1625,11 +1630,11 @@ export default function Home(props: { folders: string[] }) {
 
         <div className={styles.toolbar}>
           <button
-            id="download"
-            onClick={(e) => downloadClick(e)}
+            className={`${selectedLayer === 0 ? styles.selected0 : ""}`}
+            onClick={(e) => layerClick(e, 0)}
             disabled={loading}
           >
-            DL
+            0
           </button>
 
           <button
@@ -1646,6 +1651,16 @@ export default function Home(props: { folders: string[] }) {
             disabled={loading}
           >
             2
+          </button>
+        </div>
+
+        <div className={styles.toolbar}>
+          <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            DL
           </button>
 
           <button
@@ -1704,8 +1719,27 @@ export default function Home(props: { folders: string[] }) {
           >
             Mute
           </button>
+
           <button
-            onClick={(e) => trimLayerSelection(e, selectedLayer)}
+            onClick={(e) => uneraseClick(e)}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded)
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Unmute
+          </button>
+
+          <button
+            onClick={(e) => combineSelectionNotes(e, selectedLayer)}
             disabled={
               loading ||
               !selectedLayer ||
@@ -1719,8 +1753,9 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            Trm
+            Cmbn
           </button>
+
           <button
             onClick={(e) => splitSelectionNotes(e, selectedLayer)}
             disabled={
@@ -1741,17 +1776,6 @@ export default function Home(props: { folders: string[] }) {
         </div>
 
         <div className={styles.toolbar}>
-          <button
-            onClick={(e) => deleteSelection(e)}
-            disabled={loading || !allowDelete}
-          >
-            DelSel
-          </button>
-
-          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
-            DoopLoop
-          </button>
-
           <button disabled={loading} onClick={(e) => playStopClick(e)}>
             {playing ? "Stop" : "Play"}
           </button>
@@ -1769,11 +1793,11 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
-            onClick={(e) => uneraseClick(e)}
+            onClick={(e) => trimLayerSelection(e, selectedLayer)}
             disabled={
               loading ||
-              (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded)
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
             }
             className={`${styles.white} ${
               selectedLayer === 0
@@ -1783,8 +1807,9 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            Unmute
+            Trm
           </button>
+
           <button
             onClick={(e) => trimLayerSelection(e, selectedLayer, true)}
             disabled={
@@ -1802,23 +1827,18 @@ export default function Home(props: { folders: string[] }) {
           >
             Untrm
           </button>
-          <button
-            onClick={(e) => combineSelectionNotes(e, selectedLayer)}
-            disabled={
-              loading ||
-              !selectedLayer ||
-              !seq.filter((s) => s.layer === selectedLayer).length
-            }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
-          >
-            Cmbn
+
+          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
+            DoopLoop
           </button>
+
+          <button
+            onClick={(e) => deleteSelection(e)}
+            disabled={loading || !allowDelete}
+          >
+            DelSel
+          </button>
+
           <button
             onClick={(e) => resetSelectionNotes(e, selectedLayer)}
             disabled={
@@ -1834,7 +1854,7 @@ export default function Home(props: { folders: string[] }) {
                 : styles.color2
             }`}
           >
-            orig
+            Orig
           </button>
         </div>
 
@@ -1864,6 +1884,7 @@ export default function Home(props: { folders: string[] }) {
             zoom === Math.floor(window.innerWidth / wsRegions?.getDuration())
           }
         />
+
         <input
           id="zoom"
           type="range"
@@ -1901,6 +1922,7 @@ export default function Home(props: { folders: string[] }) {
               }}
               disabled={loading}
             />
+
             <input
               id="fader"
               type="range"
@@ -1914,6 +1936,7 @@ export default function Home(props: { folders: string[] }) {
               }}
               disabled={loading}
             />
+
             <input
               id="layer2Volume"
               type="range"

@@ -66,7 +66,7 @@
   color: skyblue;
   background-color: black;
   flex-grow: 1;
-  font-size: 0.9rem;
+  font-size: 1rem;
   width: 20%;
   border-left: 0;
 }
@@ -122,12 +122,19 @@
   color: #39ff14;
 }
 
+.toolbar .selected0 {
+  background-color: #39ff14;
+  color: #000;
+}
+
 .toolbar .selected1 {
-  background-color: rgba(255, 215, 0, 0.5);
+  background-color: gold;
+  color: #000;
 }
 
 .toolbar .selected2 {
-  background-color: rgba(157, 0, 255, 0.5);
+  background-color: #9d00ff;
+  color: #000;
 }
 
 .playlist {
