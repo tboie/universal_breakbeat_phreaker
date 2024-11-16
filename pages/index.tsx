@@ -1152,6 +1152,37 @@ export default function Home(props: { folders: string[] }) {
     findMatches(e, layer, true);
   };
 
+  const resetSelectionNotes = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    layer: number
+  ) => {
+    const baseSelectionNotes = [
+      ...seq.filter(
+        (s) =>
+          s.layer === 0 &&
+          s.time >= regionSelect.start &&
+          s.time < regionSelect.end
+      ),
+    ];
+
+    seq = seq.filter(
+      (s) =>
+        s.layer !== layer ||
+        s.time < regionSelect.start ||
+        s.time >= regionSelect.end
+    );
+
+    baseSelectionNotes.forEach((s) => {
+      seq.push({
+        ...s,
+        layer: layer,
+        player: new Tone.Player().toDestination(),
+      });
+    });
+
+    findMatches(e, layer, true);
+  };
+
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -1257,7 +1288,7 @@ export default function Home(props: { folders: string[] }) {
         });
 
         // Calibrate this? Harmonics? See other calibration
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
 
         // Calibrate this?
         const r = Math.floor(Math.random() * 4);
@@ -1795,6 +1826,23 @@ export default function Home(props: { folders: string[] }) {
             }`}
           >
             Cmbn
+          </button>
+          <button
+            onClick={(e) => resetSelectionNotes(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            orig
           </button>
         </div>
 
