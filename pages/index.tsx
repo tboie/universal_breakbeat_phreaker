@@ -1107,40 +1107,32 @@ export default function Home(props: { folders: string[] }) {
     ];
 
     const combinedNotes = selectionNotes.filter((s, idx) => idx % 2 === 0);
+
     combinedNotes.forEach((n, idx) => {
       const nextNote = combinedNotes[idx + 1];
+      let noteDur = 0;
 
       if (nextNote) {
-        const noteDur = parseFloat((nextNote.time - n.time).toFixed(6));
-        Object.assign(n, { duration: noteDur });
+        noteDur = parseFloat((nextNote.time - n.time).toFixed(6));
       } else {
-        const noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
-        Object.assign(n, { duration: noteDur });
+        noteDur = parseFloat((regionSelect.end - n.time).toFixed(6));
       }
+
+      Object.assign(n, { duration: noteDur });
     });
 
     seq = seq.filter(
       (s) =>
         s.layer !== layer ||
-        (s.layer === layer &&
-          (s.time < regionSelect.start || s.time >= regionSelect.end))
+        s.time < regionSelect.start ||
+        s.time >= regionSelect.end
     );
 
     combinedNotes.forEach((n) => {
       seq.push(n);
     });
-    seq.sort((a, b) => a.time - b.time);
 
-    /*
-    console.log(
-      seq.filter(
-        (s) =>
-          s.layer === layer &&
-          s.time >= regionSelect.start &&
-          s.time < regionSelect.end
-      )
-    );
-    */
+    seq.sort((a, b) => a.time - b.time);
 
     // clear entire part :(
     // todo: set part event values
@@ -1288,7 +1280,7 @@ export default function Home(props: { folders: string[] }) {
         });
 
         // Calibrate this? Harmonics? See other calibration
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
 
         // Calibrate this?
         const r = Math.floor(Math.random() * 4);
