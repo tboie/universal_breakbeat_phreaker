@@ -15,6 +15,7 @@
 # production
 /build
 /public/drums/*
+/public/pallets/*
 
 # misc
 .DS_Store

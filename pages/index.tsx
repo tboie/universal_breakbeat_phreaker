@@ -11,7 +11,7 @@ import * as realtimeBpm from "realtime-bpm-analyzer";
 import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
-import data from "../public/data/data.json";
+import dataPallet0 from "../public/pallets/0/data.json";
 
 let init = false;
 
@@ -62,7 +62,7 @@ type TableRow = {
 };
 
 const table: TableRow[] = [];
-(data as { n: string; c: [[number, number]] }[]).forEach((b) => {
+(dataPallet0 as { n: string; c: [[number, number]] }[]).forEach((b) => {
   b.c.forEach((v, i) => {
     const row = {
       name: b.n,
@@ -458,7 +458,7 @@ export default function Home(props: { folders: string[] }) {
     resetWaveSurfer();
 
     let times: number[] = [];
-    await fetch(`/drums/${folder}/times.txt`)
+    await fetch(`/pallets/0/${folder}/times.txt`)
       .then((response) => response.text())
       .then((text) => {
         times = text
@@ -476,7 +476,7 @@ export default function Home(props: { folders: string[] }) {
 
     await Promise.all(
       times.map(async (t, idx) => {
-        await fetch(`/drums/${folder}/${idx}.wav`)
+        await fetch(`/pallets/0/${folder}/${idx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
@@ -1368,7 +1368,7 @@ export default function Home(props: { folders: string[] }) {
     // download and add buffers, sequence notes
     await Promise.all(
       matches.map(async (m) => {
-        await fetch(`/drums/${m.name}/${m.cutIdx}.wav`)
+        await fetch(`/pallets/0/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
@@ -1990,8 +1990,9 @@ export default function Home(props: { folders: string[] }) {
 }
 
 export async function getStaticProps() {
-  const drumsDir = path.join(process.cwd(), "public/drums");
-  const folders = await fs.readdir(drumsDir);
+  // TODO: implement multiple pallets
+  const pallet0 = path.join(process.cwd(), "public/pallets/0");
+  const folders = await fs.readdir(pallet0);
 
   return {
     props: {
