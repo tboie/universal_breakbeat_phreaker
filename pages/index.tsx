@@ -1234,7 +1234,18 @@ export default function Home(props: { folders: string[] }) {
     // load random sound pallet
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       let newPallet: TableRow[] = [];
-      const sounds = table.filter((r) => r.name !== selectedFolder);
+
+      // filter sounds > min note length
+      const minDur = seq
+        .filter((s) => s.layer === (layerHasNotes ? layer : 0))
+        .reduce((min, current) =>
+          current.duration < min.duration ? current : min
+        );
+
+      const sounds = table.filter(
+        (r) =>
+          r.name !== selectedFolder && r.duration > 0.2 /* && max length? */
+      );
 
       // calibrate this? harmonics?
       for (let i = 0; i < 100; i++) {
@@ -1268,7 +1279,10 @@ export default function Home(props: { folders: string[] }) {
 
       if (pallet && src) {
         const t = pallet.sounds.map((r) => {
-          const freqDiff = Math.abs(r.freq - src.freq);
+          // Calibrate this?
+          // Sound selection freq multiplier
+          const srcFreq = src.freq * (Math.floor(Math.random() * 2) + 1);
+          const freqDiff = Math.abs(r.freq - srcFreq);
           const durDiff = Math.abs(r.duration - src.duration);
           return {
             ...r,
