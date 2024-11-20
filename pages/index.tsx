@@ -12,6 +12,8 @@ import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
 import dataPallet0 from "../public/pallets/0/data.json";
+import dataPallet1 from "../public/pallets/1/data.json";
+import dataPallet2 from "../public/pallets/2/data.json";
 
 let init = false;
 
@@ -61,7 +63,7 @@ type TableRow = {
   freq: number;
 };
 
-const table: TableRow[] = [];
+const tablePallet0: TableRow[] = [];
 (dataPallet0 as { n: string; c: [[number, number]] }[]).forEach((b) => {
   b.c.forEach((v, i) => {
     const row = {
@@ -70,7 +72,33 @@ const table: TableRow[] = [];
       duration: v[0],
       freq: v[1],
     };
-    table.push(row);
+    tablePallet0.push(row);
+  });
+});
+
+const tablePallet1: TableRow[] = [];
+(dataPallet1 as { n: string; c: [[number, number]] }[]).forEach((b) => {
+  b.c.forEach((v, i) => {
+    const row = {
+      name: b.n,
+      cutIdx: i,
+      duration: v[0],
+      freq: v[1],
+    };
+    tablePallet1.push(row);
+  });
+});
+
+const tablePallet2: TableRow[] = [];
+(dataPallet2 as { n: string; c: [[number, number]] }[]).forEach((b) => {
+  b.c.forEach((v, i) => {
+    const row = {
+      name: b.n,
+      cutIdx: i,
+      duration: v[0],
+      freq: v[1],
+    };
+    tablePallet2.push(row);
   });
 });
 
@@ -1185,6 +1213,14 @@ export default function Home(props: { folders: string[] }) {
 
     setLoading(true);
 
+    let table = tablePallet0;
+
+    if (selectedLayer === 1) {
+      table = tablePallet1;
+    } else if (selectedLayer == 2) {
+      table = tablePallet2;
+    }
+
     const layerHasNotes =
       seq.filter((s) => s.layer === layer).length === 0 ? false : true;
 
@@ -1222,7 +1258,7 @@ export default function Home(props: { folders: string[] }) {
             .slice(-1)[0];
         }
 
-        const dataRow = table.find(
+        const dataRow = tablePallet0.find(
           (r) => r.name === baseNote.name && r.cutIdx === baseNote.cutIdx
         );
 
@@ -1294,7 +1330,7 @@ export default function Home(props: { folders: string[] }) {
         });
 
         // Calibrate this? Harmonics? See other calibration
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff).reverse();
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
 
         // Calibrate this?
         const r = Math.floor(Math.random() * 4);
@@ -1368,7 +1404,7 @@ export default function Home(props: { folders: string[] }) {
     // download and add buffers, sequence notes
     await Promise.all(
       matches.map(async (m) => {
-        await fetch(`/pallets/0/${m.name}/${m.cutIdx}.wav`)
+        await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
@@ -1990,7 +2026,7 @@ export default function Home(props: { folders: string[] }) {
 }
 
 export async function getStaticProps() {
-  // TODO: implement multiple pallets
+  // loads pallet0 names into playlist
   const pallet0 = path.join(process.cwd(), "public/pallets/0");
   const folders = await fs.readdir(pallet0);
 
