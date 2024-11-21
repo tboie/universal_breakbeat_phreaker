@@ -1728,6 +1728,18 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
+            disabled={true}
+            onClick={(e) => {
+              /* TODO: set pallet from 1 sample by selected region */
+            }}
+            className={styles.color0}
+          >
+            Track
+          </button>
+
+          {/* Load and Save? */}
+
+          <button
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={
               !selectedLayer ||
@@ -1879,7 +1891,7 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
-            DoopLoop
+            DupLoop
           </button>
 
           <button
