@@ -117,7 +117,7 @@ const arrShuffle = (a: any[]) => {
 };
 
 // app
-export default function Home(props: { folders: string[] }) {
+export default function Home(props: { folders: any }) {
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [bpm, setBPM] = useState(0);
@@ -1206,7 +1206,8 @@ export default function Home(props: { folders: string[] }) {
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
-    selection?: boolean
+    selection?: boolean,
+    singleSample?: boolean
   ) => {
     e.stopPropagation();
     e.preventDefault();
@@ -1278,15 +1279,29 @@ export default function Home(props: { folders: string[] }) {
           current.duration < min.duration ? current : min
         );
 
-      const sounds = table.filter(
+      let sounds = table.filter(
         (r) =>
           r.name !== selectedFolder && r.duration > 0.2 /* && max length? */
       );
 
+      if (singleSample) {
+        const sampleNames = props.folders[layer].map((item: any) => item);
+        const uniqueNames = sampleNames.filter(
+          (value: any, index: any, self: any) => self.indexOf(value) === index
+        );
+        const randomIndex = Math.floor(Math.random() * uniqueNames.length);
+
+        sounds = table.filter((r) => r.name === uniqueNames[randomIndex]);
+        sounds.forEach((s) => {
+          newPallet.push(s);
+        });
+      }
       // calibrate this? harmonics?
-      for (let i = 0; i < 100; i++) {
-        const randSound = sounds[Math.floor(Math.random() * sounds.length)];
-        newPallet.push(randSound);
+      else {
+        for (let i = 0; i < 100; i++) {
+          const randSound = sounds[Math.floor(Math.random() * sounds.length)];
+          newPallet.push(randSound);
+        }
       }
 
       // remove duplicates
@@ -1728,11 +1743,15 @@ export default function Home(props: { folders: string[] }) {
           </button>
 
           <button
-            disabled={true}
-            onClick={(e) => {
-              /* TODO: set pallet from 1 sample by selected region */
-            }}
-            className={styles.color0}
+            disabled={loading || selectedLayer === 0}
+            onClick={(e) => findMatches(e, selectedLayer, false, true)}
+            className={`${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
           >
             Track
           </button>
@@ -2019,7 +2038,7 @@ export default function Home(props: { folders: string[] }) {
               display === "controls" ? styles.hide : ""
             }`}
           >
-            {props.folders.map((folder) => {
+            {props.folders[0]?.map((folder: any) => {
               return (
                 <li
                   className={folder === selectedFolder ? styles.selected : ""}
@@ -2038,9 +2057,18 @@ export default function Home(props: { folders: string[] }) {
 }
 
 export async function getStaticProps() {
-  // loads pallet0 names into playlist
-  const pallet0 = path.join(process.cwd(), "public/pallets/0");
-  const folders = await fs.readdir(pallet0);
+  // loads pallet sample names into props
+  const palletDirs = [
+    "public/pallets/0",
+    "public/pallets/1",
+    "public/pallets/2",
+  ];
+  const folders: any = [];
+
+  palletDirs.forEach(async (dir) => {
+    const pallet = path.join(process.cwd(), dir);
+    await folders.push(fs.readdir(pallet));
+  });
 
   return {
     props: {
