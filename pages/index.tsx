@@ -1739,7 +1739,7 @@ export default function Home(props: { folders: any }) {
                 : styles.color2
             }`}
           >
-            Pallet
+            RndPlt
           </button>
 
           <button
@@ -1753,7 +1753,7 @@ export default function Home(props: { folders: any }) {
                 : styles.color2
             }`}
           >
-            Track
+            RndSmpl
           </button>
 
           {/* Load and Save? */}
