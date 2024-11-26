@@ -1260,7 +1260,7 @@ export default function Home(props: { folders: any }) {
         }
 
         const dataRow = tablePallet0.find(
-          (r) => r.name === baseNote.name && r.cutIdx === baseNote.cutIdx
+          (r) => r.name === baseNote?.name && r.cutIdx === baseNote?.cutIdx
         );
 
         if (dataRow) {
@@ -1298,6 +1298,7 @@ export default function Home(props: { folders: any }) {
       }
       // calibrate this? harmonics?
       else {
+        // does creating a smaller pallet create diversity in selected sounds?
         for (let i = 0; i < 100; i++) {
           const randSound = sounds[Math.floor(Math.random() * sounds.length)];
           newPallet.push(randSound);
@@ -1331,7 +1332,8 @@ export default function Home(props: { folders: any }) {
       if (pallet && src) {
         const t = pallet.sounds.map((r) => {
           // Calibrate this?
-          // Sound selection freq multiplier
+          // Sound selection freq multiplier range
+          // diversity/consistency
           const srcFreq = src.freq * (Math.floor(Math.random() * 2) + 1);
           const freqDiff = Math.abs(r.freq - srcFreq);
           const durDiff = Math.abs(r.duration - src.duration);
@@ -1345,9 +1347,16 @@ export default function Home(props: { folders: any }) {
         });
 
         // Calibrate this? Harmonics? See other calibration
-        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff); //.reverse();
+        t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
+
+        /* potential diversity in selected sounds? depends on threshold of cuts?
+        if (!singleSample) {
+          t.reverse();
+        }
+        */
 
         // Calibrate this?
+        // first x matches? consistency/diversity
         const r = Math.floor(Math.random() * 4);
         matches.push(t[r]);
       }
