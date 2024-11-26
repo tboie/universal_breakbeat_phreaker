@@ -1272,7 +1272,7 @@ export default function Home(props: { folders: any }) {
     if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       let newPallet: TableRow[] = [];
 
-      // filter sounds > min note length
+      // filter sounds > min note length?
       const minDur = seq
         .filter((s) => s.layer === (layerHasNotes ? layer : 0))
         .reduce((min, current) =>
@@ -1280,8 +1280,7 @@ export default function Home(props: { folders: any }) {
         );
 
       let sounds = table.filter(
-        (r) =>
-          r.name !== selectedFolder && r.duration > 0.2 /* && max length? */
+        (r) => r.name !== selectedFolder && r.duration > 0.2 /* && minDur? */
       );
 
       if (singleSample) {
