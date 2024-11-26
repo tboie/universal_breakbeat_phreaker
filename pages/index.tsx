@@ -1244,6 +1244,7 @@ export default function Home(props: { folders: any }) {
           noteDur = nextNote.time - n.time;
         }
         // last note
+        // this errors?
         else if (n.time === selectNotes[selectNotes.length - 1].time) {
           noteDur = regionSelect.end - selectNotes[selectNotes.length - 1].time;
         }
@@ -1427,6 +1428,8 @@ export default function Home(props: { folders: any }) {
     // download and add buffers, sequence notes
     await Promise.all(
       matches.map(async (m) => {
+        // this errors?
+        console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
         await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
@@ -1607,9 +1610,11 @@ export default function Home(props: { folders: any }) {
       </Head>
       <main className={styles.main}>
         <h1 className={styles.title}>
-          {selectedFolder && loading
-            ? "Loading"
-            : `Universal Breakbeat Phreaker${getBPMText()}`}
+          {
+            selectedFolder && loading
+              ? "Loading"
+              : `Universal Breakbeat Phreaker` /*${getBPMText()}*/
+          }
         </h1>
 
         <div
@@ -1844,24 +1849,6 @@ export default function Home(props: { folders: any }) {
           >
             Cmbn
           </button>
-
-          <button
-            onClick={(e) => splitSelectionNotes(e, selectedLayer)}
-            disabled={
-              loading ||
-              !selectedLayer ||
-              !seq.filter((s) => s.layer === selectedLayer).length
-            }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
-          >
-            Splt
-          </button>
         </div>
 
         <div className={styles.toolbar}>
@@ -1880,7 +1867,7 @@ export default function Home(props: { folders: any }) {
           >
             Shuff
           </button>
-
+          {/*
           <button
             onClick={(e) => trimLayerSelection(e, selectedLayer)}
             disabled={
@@ -1898,7 +1885,7 @@ export default function Home(props: { folders: any }) {
           >
             Trm
           </button>
-
+          
           <button
             onClick={(e) => trimLayerSelection(e, selectedLayer, true)}
             disabled={
@@ -1916,6 +1903,7 @@ export default function Home(props: { folders: any }) {
           >
             Untrm
           </button>
+          */}
 
           <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
             DupLoop
@@ -1944,6 +1932,24 @@ export default function Home(props: { folders: any }) {
             }`}
           >
             Orig
+          </button>
+
+          <button
+            onClick={(e) => splitSelectionNotes(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={`${styles.white} ${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : styles.color2
+            }`}
+          >
+            Splt
           </button>
         </div>
 
