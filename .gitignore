@@ -20,9 +20,9 @@
 /public/pallets/2/*
 
 # allow
-!public/pallets/0/data.json
-!public/pallets/1/data.json
-!public/pallets/2/data.json
+!/public/pallets/0/data.json
+!/public/pallets/1/data.json
+!/public/pallets/2/data.json
 
 # misc
 .DS_Store

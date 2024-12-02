@@ -1429,6 +1429,7 @@ export default function Home(props: { folders: any }) {
     await Promise.all(
       matches.map(async (m) => {
         // this errors?
+        // /pallets/2/Tony Cook & The GA's - Time Out (part1).rx2/1.wav
         console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
         await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
@@ -1752,7 +1753,7 @@ export default function Home(props: { folders: any }) {
                 : styles.color2
             }`}
           >
-            RndPlt
+            RndPal
           </button>
 
           <button
