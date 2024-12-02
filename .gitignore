@@ -17,6 +17,10 @@
 /public/drums/*
 /public/pallets/*
 
+!/public/pallets/0/data.json
+!/public/pallets/1/data.json
+!/public/pallets/2/data.json
+
 # misc
 .DS_Store
 *.pem
