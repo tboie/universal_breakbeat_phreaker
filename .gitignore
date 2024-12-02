@@ -15,9 +15,7 @@
 # production
 /build
 /public/drums/*
-/public/pallets/0/*
-/public/pallets/1/*
-/public/pallets/2/*
+/public/pallets/*
 
 # allow
 !/public/pallets/0/data.json
