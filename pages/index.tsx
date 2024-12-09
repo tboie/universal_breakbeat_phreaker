@@ -143,6 +143,14 @@ export default function Home(props: { folders: any }) {
   refPlaying.current = playing;
 
   useEffect(() => {
+    // required for mobile audio
+    (document.querySelector("body") as HTMLBodyElement).addEventListener(
+      "touchstart",
+      async () => {
+        await Tone.start();
+      }
+    );
+
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
@@ -1430,7 +1438,10 @@ export default function Home(props: { folders: any }) {
       matches.map(async (m) => {
         // this errors?
         // /pallets/2/Tony Cook & The GA's - Time Out (part1).rx2/1.wav
-        console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
+        // /pallets/1/Edwin Starr - Who Cares If You're Happy Or Not (I Do)_0/0.wav
+        // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
+        // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
+        // console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
         await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
