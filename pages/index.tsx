@@ -1646,7 +1646,10 @@ export default function Home(props: { folders: any }) {
 
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
+        {/* region move button bar */
+        /* optional button bar?  increased accessibility? */}
         <div className={`${styles.toolbar}`}>
+          {/* start handles */}
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1681,8 +1684,56 @@ export default function Home(props: { folders: any }) {
             {">"}
           </button>
 
-          <span className={styles.info}>{speed + "x"}</span>
+          {/*<span className={styles.info}>{speed + "x"}</span>*/}
 
+          {/* middle buttons */}
+          <button
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            } ${styles.borderLeft}`}
+            onClick={(e) => {
+              resizeRegion(
+                e,
+                "start",
+                "left",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              );
+              resizeRegion(
+                e,
+                "end",
+                "left",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              );
+            }}
+            disabled={loading}
+          >
+            {"<"}
+          </button>
+
+          <button
+            className={`${
+              selectedRegion === "select" ? styles.regionSelect : ""
+            }`}
+            onClick={(e) => {
+              resizeRegion(
+                e,
+                "start",
+                "right",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              );
+              resizeRegion(
+                e,
+                "end",
+                "right",
+                selectedRegion === "loop" ? regionLoop : regionSelect
+              );
+            }}
+            disabled={loading}
+          >
+            {">"}
+          </button>
+
+          {/* end handles */}
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1718,6 +1769,7 @@ export default function Home(props: { folders: any }) {
           </button>
         </div>
 
+        {/* layer button bar */}
         <div className={styles.toolbar}>
           <button
             className={`${selectedLayer === 0 ? styles.selected0 : ""}`}
