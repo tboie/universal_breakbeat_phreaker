@@ -142,6 +142,9 @@ export default function Home(props: { folders: any }) {
   const refPlaying = useRef(playing);
   refPlaying.current = playing;
 
+  const refSelectedLayer = useRef(selectedLayer);
+  refSelectedLayer.current = selectedLayer;
+
   useEffect(() => {
     // required for mobile audio
     (document.querySelector("body") as HTMLBodyElement).addEventListener(
@@ -172,6 +175,11 @@ export default function Home(props: { folders: any }) {
         waveColor: "gold",
         fillParent: false,
         scrollParent: false,
+        plugins: [
+          markers.create({
+            markers: [],
+          }),
+        ],
       });
 
       ws2 = WaveSurfer.create({
@@ -179,6 +187,11 @@ export default function Home(props: { folders: any }) {
         waveColor: "#9D00FF",
         fillParent: false,
         scrollParent: false,
+        plugins: [
+          markers.create({
+            markers: [],
+          }),
+        ],
       });
 
       wsRegions = WaveSurfer.create({
@@ -354,6 +367,18 @@ export default function Home(props: { folders: any }) {
         });
 
         setLoading(false);
+      });
+
+      ws1.on("ready", () => {
+        if (refSelectedLayer.current === 1) {
+          drawLayerMarkers(1);
+        }
+      });
+
+      ws2.on("ready", () => {
+        if (refSelectedLayer.current === 2) {
+          drawLayerMarkers(2);
+        }
       });
 
       /*
@@ -1553,6 +1578,21 @@ export default function Home(props: { folders: any }) {
     });
   };
 
+  const drawLayerMarkers = (layer: number) => {
+    ws1.clearMarkers();
+    ws2.clearMarkers();
+
+    seq
+      .filter((s) => s.layer === layer)
+      .forEach((n) => {
+        if (layer === 1) {
+          ws1.addMarker({ time: n.time });
+        } else if (layer === 2) {
+          ws2.addMarker({ time: n.time });
+        }
+      });
+  };
+
   const layerClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
@@ -1560,6 +1600,7 @@ export default function Home(props: { folders: any }) {
     e.stopPropagation();
     e.preventDefault();
 
+    drawLayerMarkers(layer);
     setSelectedLayer(layer);
   };
 

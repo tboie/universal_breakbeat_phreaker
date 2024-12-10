@@ -106,8 +106,19 @@ main {
 }
 
 .wavesurfer-marker > div {
-  background: gray !important;
+  background: lightgray !important;
   opacity: 0.75 !important;
+}
+
+#ws1 .wavesurfer-marker > div,
+#ws2 .wavesurfer-marker > div {
+  background: #fb48c4 !important;
+  opacity: 0.75 !important;
+}
+
+#ws1 .wavesurfer-marker,
+#ws2 .wavesurfer-marker {
+  height: 1rem !important;
 }
 
 .marker-label {
