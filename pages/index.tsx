@@ -162,7 +162,6 @@ export default function Home(props: { folders: any }) {
 
       ws0 = WaveSurfer.create({
         container: "#ws0",
-        height: 200,
         waveColor: "#39FF14",
         fillParent: false,
         scrollParent: false,
@@ -170,7 +169,6 @@ export default function Home(props: { folders: any }) {
 
       ws1 = WaveSurfer.create({
         container: "#ws1",
-        height: 200,
         waveColor: "gold",
         fillParent: false,
         scrollParent: false,
@@ -178,7 +176,6 @@ export default function Home(props: { folders: any }) {
 
       ws2 = WaveSurfer.create({
         container: "#ws2",
-        height: 200,
         waveColor: "#9D00FF",
         fillParent: false,
         scrollParent: false,
@@ -186,7 +183,6 @@ export default function Home(props: { folders: any }) {
 
       wsRegions = WaveSurfer.create({
         container: "#wsRegions",
-        height: 200,
         waveColor: "transparent",
         progressColor: "transparent",
         cursorColor: "skyblue",
@@ -302,23 +298,6 @@ export default function Home(props: { folders: any }) {
           .filter((s) => s.layer === 0)
           .reduce((n, { duration }) => n + duration, 0);
 
-        if (!regionSelect) {
-          wsRegions.addRegion({
-            id: "selection",
-            start: 0,
-            end: end,
-            loop: false,
-          });
-
-          regionSelect = Object.values(wsRegions.regions.list)[0];
-          regionSelect.on("click", (e: any) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            setSelectedRegion("select");
-          });
-        }
-
         if (!regionLoop) {
           wsRegions.addRegion({
             id: "loop",
@@ -327,7 +306,7 @@ export default function Home(props: { folders: any }) {
             loop: true,
           });
 
-          regionLoop = Object.values(wsRegions.regions.list)[1];
+          regionLoop = Object.values(wsRegions.regions.list)[0];
           regionLoop.on("out", (e: any) => {
             if (wsRegions.getCurrentTime() > regionLoop.end) {
               wsRegions.play(regionLoop.start);
@@ -348,6 +327,23 @@ export default function Home(props: { folders: any }) {
             Tone.Time(Tone.Transport.position).toSeconds() /
               wsRegions.getDuration()
           );
+        }
+
+        if (!regionSelect) {
+          wsRegions.addRegion({
+            id: "selection",
+            start: 0,
+            end: end,
+            loop: false,
+          });
+
+          regionSelect = Object.values(wsRegions.regions.list)[1];
+          regionSelect.on("click", (e: any) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            setSelectedRegion("select");
+          });
         }
 
         wsRegions.clearMarkers();
@@ -1621,14 +1617,16 @@ export default function Home(props: { folders: any }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        {/* 
         <h1 className={styles.title}>
           {
             selectedFolder && loading
               ? "Loading"
               : `Universal Breakbeat Phreaker` /*${getBPMText()}*/
-          }
+        /*}*/
+        /*  }
         </h1>
-
+        */}
         <div
           id="ws0"
           className={`ws ${selectedLayer === 0 ? "selected" : ""}`}
@@ -1646,10 +1644,8 @@ export default function Home(props: { folders: any }) {
 
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
-        {/* region move button bar */
-        /* optional button bar?  increased accessibility? */}
+        {/* region move button bar, optional button bar?  increased accessibility?
         <div className={`${styles.toolbar}`}>
-          {/* start handles */}
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1684,9 +1680,6 @@ export default function Home(props: { folders: any }) {
             {">"}
           </button>
 
-          {/*<span className={styles.info}>{speed + "x"}</span>*/}
-
-          {/* middle buttons */}
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1733,7 +1726,6 @@ export default function Home(props: { folders: any }) {
             {">"}
           </button>
 
-          {/* end handles */}
           <button
             className={`${
               selectedRegion === "select" ? styles.regionSelect : ""
@@ -1768,6 +1760,7 @@ export default function Home(props: { folders: any }) {
             {">"}
           </button>
         </div>
+        */}
 
         {/* layer button bar */}
         <div className={styles.toolbar}>
