@@ -1881,13 +1881,7 @@ export default function Home(props: { folders: any }) {
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded)
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Flip
             {/*<Image
@@ -1905,13 +1899,7 @@ export default function Home(props: { folders: any }) {
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded)
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Mute
           </button>
@@ -1923,13 +1911,7 @@ export default function Home(props: { folders: any }) {
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded)
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Unmute
           </button>
@@ -1941,13 +1923,7 @@ export default function Home(props: { folders: any }) {
               !selectedLayer ||
               !seq.filter((s) => s.layer === selectedLayer).length
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Cmbn
           </button>
@@ -2014,6 +1990,7 @@ export default function Home(props: { folders: any }) {
           <button
             onClick={(e) => deleteSelection(e)}
             disabled={loading || !allowDelete}
+            className={styles.white}
           >
             DelSel
           </button>
@@ -2025,13 +2002,7 @@ export default function Home(props: { folders: any }) {
               !selectedLayer ||
               !seq.filter((s) => s.layer === selectedLayer).length
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Orig
           </button>
@@ -2043,13 +2014,7 @@ export default function Home(props: { folders: any }) {
               !selectedLayer ||
               !seq.filter((s) => s.layer === selectedLayer).length
             }
-            className={`${styles.white} ${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : styles.color2
-            }`}
+            className={styles.white}
           >
             Splt
           </button>
