@@ -284,9 +284,11 @@ export default function Home(props: { folders: any }) {
           end: snapEnd,
         });
 
+        /*
         if (region.id === "loop") {
           calcBPM(snapStart, snapEnd);
         }
+        */
 
         setAllowDelete(regionSelect.start >= regionLoop.end ? true : false);
       });
@@ -354,12 +356,14 @@ export default function Home(props: { folders: any }) {
         setLoading(false);
       });
 
+      /*
       ws0.on("ready", () => {
         const duration = ws0.getDuration();
         if (duration) {
           calcBPM(0, duration);
         }
       });
+      */
     };
 
     if (!init) {
