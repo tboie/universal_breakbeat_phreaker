@@ -113,7 +113,6 @@ main {
 #ws1 .wavesurfer-marker > div,
 #ws2 .wavesurfer-marker > div {
   background: red !important;
-  opacity: 0.75 !important;
 }
 
 #ws1 .wavesurfer-marker,

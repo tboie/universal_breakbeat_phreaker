@@ -2020,57 +2020,58 @@ export default function Home(props: { folders: any }) {
           </button>
         </div>
 
-        <input
-          id="scroll"
-          type="range"
-          min={0}
-          max={100}
-          value={scroll}
-          step={1}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const val = parseInt(e.target.value);
-
-            ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
-              const container = document.querySelector(n) as HTMLDivElement;
-
-              if (container) {
-                container.scrollLeft = val;
-              }
-            });
-
-            setScroll(val);
-          }}
-          disabled={
-            loading ||
-            zoom === Math.floor(window.innerWidth / wsRegions?.getDuration())
-          }
-        />
-
-        <input
-          id="zoom"
-          type="range"
-          step={20}
-          min={0}
-          max={100}
-          value={zoom}
-          className={styles.slider}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-            changeZoom(parseInt(e.target.value));
-          }}
-          disabled={
-            loading ||
-            parseInt(
-              (document.querySelector("#zoom") as HTMLInputElement)?.min
-            ) >=
-              parseInt(
-                (document.querySelector("#zoom") as HTMLInputElement)?.max
-              )
-          }
-        />
-
         <div className={styles.content}>
           <div className={`${display === "playlist" ? styles.hide : ""}`}>
+            <input
+              id="scroll"
+              type="range"
+              min={0}
+              max={100}
+              value={scroll}
+              step={1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const val = parseInt(e.target.value);
+
+                ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
+                  const container = document.querySelector(n) as HTMLDivElement;
+
+                  if (container) {
+                    container.scrollLeft = val;
+                  }
+                });
+
+                setScroll(val);
+              }}
+              disabled={
+                loading ||
+                zoom ===
+                  Math.floor(window.innerWidth / wsRegions?.getDuration())
+              }
+            />
+
+            <input
+              id="zoom"
+              type="range"
+              step={20}
+              min={0}
+              max={100}
+              value={zoom}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeZoom(parseInt(e.target.value));
+              }}
+              disabled={
+                loading ||
+                parseInt(
+                  (document.querySelector("#zoom") as HTMLInputElement)?.min
+                ) >=
+                  parseInt(
+                    (document.querySelector("#zoom") as HTMLInputElement)?.max
+                  )
+              }
+            />
+
             <input
               id="speed"
               type="range"
