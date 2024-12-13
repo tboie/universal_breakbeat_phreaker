@@ -16,7 +16,7 @@ for root, dirs, files in os.walk(drums_path):
         obj["c"] = []
         for file in sorted(glob.glob("*.txt")):
             if file != "times.txt":
-                print("get_freqAvg_Duration " + file);
+                print("get_freqAvg_Duration.py\n " + file + "\n");
                 
                 time = "{:.6f}".format(
                     float(file[file.rindex('_')+1:].replace(".txt", "")))

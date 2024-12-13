@@ -11,7 +11,7 @@ def find_closest(arr, val):
 
 for filename in os.listdir(path):
     if filename.endswith('.wav'):
-        print("cutting smaller segments of audio file" + filename)
+        print("cut_Segments.py cutting smaller segments of audio file\n" + filename + "\n")
         
         # Path to your audio file
         audio_path = filename

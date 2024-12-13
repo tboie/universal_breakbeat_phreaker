@@ -176,12 +176,12 @@ input[type="range"]:disabled::-webkit-slider-thumb {
   background-image: url("/icons/fader.svg");
 }
 
-#slider3::-webkit-slider-thumb {
-  background-image: url("/icons/3.svg");
+#sliderVol2::-webkit-slider-thumb {
+  background-image: url("/icons/2.svg");
 }
 
-#slider4::-webkit-slider-thumb {
-  background-image: url("/icons/4.svg");
+#sliderVol3::-webkit-slider-thumb {
+  background-image: url("/icons/3.svg");
 }
 
 input[type="range"]:disabled::-webkit-slider-thumb,
