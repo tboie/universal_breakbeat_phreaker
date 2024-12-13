@@ -2192,7 +2192,7 @@ export default function Home(props: { folders: any }) {
             />
 
             <input
-              id="layer2Volume"
+              id="slider3"
               type="range"
               min={-20}
               max={0}
@@ -2206,7 +2206,7 @@ export default function Home(props: { folders: any }) {
             />
 
             <input
-              id="layer3Volume"
+              id="slider4"
               type="range"
               min={-20}
               max={0}
