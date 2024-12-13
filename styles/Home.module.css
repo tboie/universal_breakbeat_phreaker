@@ -137,6 +137,11 @@
   color: #000;
 }
 
+.toolbar .selected3 {
+  background-color: lightgray;
+  color: #000;
+}
+
 .playlist {
   display: flex;
   flex-direction: column;

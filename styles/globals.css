@@ -27,7 +27,8 @@ main {
 
 #ws0,
 #ws1,
-#ws2 {
+#ws2,
+#ws3 {
   position: fixed !important;
   width: 100% !important;
   opacity: 0.5;
@@ -37,6 +38,7 @@ main {
 #ws0 wave,
 #ws1 wave,
 #ws2 wave,
+#ws3 wave,
 #wsRegions wave {
   height: 190px !important;
 }
@@ -111,12 +113,14 @@ main {
 }
 
 #ws1 .wavesurfer-marker > div,
-#ws2 .wavesurfer-marker > div {
+#ws2 .wavesurfer-marker > div,
+#ws3 .wavesurfer-marker > div {
   background: red !important;
 }
 
 #ws1 .wavesurfer-marker,
-#ws2 .wavesurfer-marker {
+#ws2 .wavesurfer-marker,
+#ws3 .wavesurfer-marker {
   height: 1rem !important;
 }
 
@@ -173,6 +177,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 #layer2Volume::-webkit-slider-thumb {
+  background-image: url("/icons/2.svg");
+}
+
+#layer3Volume::-webkit-slider-thumb {
   background-image: url("/icons/2.svg");
 }
 

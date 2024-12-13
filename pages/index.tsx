@@ -14,12 +14,14 @@ import JSZip from "jszip";
 import dataPallet0 from "../public/pallets/0/data.json";
 import dataPallet1 from "../public/pallets/1/data.json";
 import dataPallet2 from "../public/pallets/2/data.json";
+import dataPallet3 from "../public/pallets/3/data.json";
 
 let init = false;
 
 let ws0: any;
 let ws1: any;
 let ws2: any;
+let ws3: any;
 let wsRegions: any;
 
 let regionLoop: any;
@@ -102,6 +104,19 @@ const tablePallet2: TableRow[] = [];
   });
 });
 
+const tablePallet3: TableRow[] = [];
+(dataPallet3 as { n: string; c: [[number, number]] }[]).forEach((b) => {
+  b.c.forEach((v, i) => {
+    const row = {
+      name: b.n,
+      cutIdx: i,
+      duration: v[0],
+      freq: v[1],
+    };
+    tablePallet3.push(row);
+  });
+});
+
 // utils
 const closest = (array: number[], goal: number) =>
   array.reduce((prev, curr) =>
@@ -133,11 +148,14 @@ export default function Home(props: { folders: any }) {
   const [scroll, setScroll] = useState(0);
   const [fader, setFader] = useState(0);
   const [layer2Volume, setLayer2Volume] = useState(0);
+  const [layer3Volume, setLayer3Volume] = useState(0);
+
   const [allowDelete, setAllowDelete] = useState(false);
 
   const [display, setDisplay] = useState<"playlist" | "controls">("playlist");
   const [pallet1Loaded, setPallet1Loaded] = useState(false);
   const [pallet2Loaded, setPallet2Loaded] = useState(false);
+  const [pallet3Loaded, setPallet3Loaded] = useState(false);
 
   const refPlaying = useRef(playing);
   refPlaying.current = playing;
@@ -194,6 +212,18 @@ export default function Home(props: { folders: any }) {
         ],
       });
 
+      ws3 = WaveSurfer.create({
+        container: "#ws3",
+        waveColor: "lightgray",
+        fillParent: false,
+        scrollParent: false,
+        plugins: [
+          markers.create({
+            markers: [],
+          }),
+        ],
+      });
+
       wsRegions = WaveSurfer.create({
         container: "#wsRegions",
         waveColor: "transparent",
@@ -225,6 +255,7 @@ export default function Home(props: { folders: any }) {
           ws0.zoom(minZoom);
           ws1.zoom(minZoom);
           ws2.zoom(minZoom);
+          ws3.zoom(minZoom);
           zoomEle.min = minZoom.toString();
           zoomEle.max = maxZoom.toString();
           zoomEle.value = minZoom.toString();
@@ -257,6 +288,7 @@ export default function Home(props: { folders: any }) {
         ws0.drawer.fireEvent("redraw");
         ws1.drawer.fireEvent("redraw");
         ws2.drawer.fireEvent("redraw");
+        ws3.drawer.fireEvent("redraw");
       });
 
       document.body.addEventListener("touchmove", (event) => {
@@ -378,6 +410,12 @@ export default function Home(props: { folders: any }) {
       ws2.on("ready", () => {
         if (refSelectedLayer.current === 2) {
           drawLayerMarkers(2);
+        }
+      });
+
+      ws3.on("ready", () => {
+        if (refSelectedLayer.current === 3) {
+          drawLayerMarkers(3);
         }
       });
 
@@ -503,6 +541,10 @@ export default function Home(props: { folders: any }) {
     ws2.zoom(0);
     ws2.empty();
     ws2.backend.buffer = undefined;
+
+    ws3.zoom(0);
+    ws3.empty();
+    ws3.backend.buffer = undefined;
   };
 
   const listClick = async (
@@ -619,6 +661,7 @@ export default function Home(props: { folders: any }) {
     setZoom(0);
     setFader(0);
     setLayer2Volume(0);
+    setLayer3Volume(0);
     setLoading(false);
     setSelectedLayer(0);
     setSelectedRegion("loop");
@@ -768,6 +811,7 @@ export default function Home(props: { folders: any }) {
     await drawLayer(0);
     await drawLayer(1);
     await drawLayer(2);
+    await drawLayer(3);
 
     // see window resize callback
     window.dispatchEvent(new Event("resize"));
@@ -925,6 +969,9 @@ export default function Home(props: { folders: any }) {
       const wavLayer2 = ws2.backend.buffer
         ? toWav(ws2.backend.buffer)
         : undefined;
+      const wavLayer3 = ws3.backend.buffer
+        ? toWav(ws3.backend.buffer)
+        : undefined;
 
       const zip = new JSZip();
       const sounds = zip.folder("universal breakbeat phreaker");
@@ -933,6 +980,7 @@ export default function Home(props: { folders: any }) {
       if (wavLayer0) sounds?.file("layer_0.wav", wavLayer0);
       if (wavLayer1) sounds?.file("layer_1.wav", wavLayer1);
       if (wavLayer2) sounds?.file("layer_2.wav", wavLayer2);
+      if (wavLayer3) sounds?.file("layer_3.wav", wavLayer3);
 
       await zip.generateAsync({ type: "blob" }).then(function (content) {
         const blobUrl = window.URL.createObjectURL(content);
@@ -1041,6 +1089,7 @@ export default function Home(props: { folders: any }) {
     ws0.zoom(val);
     ws1.zoom(val);
     ws2.zoom(val);
+    ws3.zoom(val);
     setZoom(val);
   };
 
@@ -1091,6 +1140,17 @@ export default function Home(props: { folders: any }) {
     setLayer2Volume(val);
   };
 
+  const changeLayer3Volume = (val: number) => {
+    seq
+      .filter((s) => s.layer === 3 && !s.player.mute)
+      .forEach((n) => {
+        n.player.set({
+          volume: val === -20 ? -100 : val,
+        });
+      });
+    setLayer3Volume(val);
+  };
+
   const getLayerVolume = (layer: number) => {
     let val = fader;
 
@@ -1112,6 +1172,8 @@ export default function Home(props: { folders: any }) {
       }
     } else if (layer === 2) {
       val = layer2Volume;
+    } else if (layer === 3) {
+      val = layer3Volume;
     }
 
     return val;
@@ -1253,6 +1315,8 @@ export default function Home(props: { folders: any }) {
       table = tablePallet1;
     } else if (selectedLayer == 2) {
       table = tablePallet2;
+    } else if (selectedLayer == 3) {
+      table = tablePallet3;
     }
 
     const layerHasNotes =
@@ -1528,6 +1592,8 @@ export default function Home(props: { folders: any }) {
       setPallet1Loaded(true);
     } else if (layer === 2) {
       setPallet2Loaded(true);
+    } else if (layer === 3) {
+      setPallet3Loaded(true);
     }
   };
 
@@ -1574,6 +1640,8 @@ export default function Home(props: { folders: any }) {
         ws1.loadDecodedBuffer(buffer.get());
       } else if (layer === 2) {
         ws2.loadDecodedBuffer(buffer.get());
+      } else if (layer === 3) {
+        ws3.loadDecodedBuffer(buffer.get());
       }
     });
   };
@@ -1581,6 +1649,7 @@ export default function Home(props: { folders: any }) {
   const drawLayerMarkers = (layer: number) => {
     ws1.clearMarkers();
     ws2.clearMarkers();
+    ws3.clearMarkers();
 
     seq
       .filter((s) => s.layer === layer)
@@ -1589,6 +1658,8 @@ export default function Home(props: { folders: any }) {
           ws1.addMarker({ time: n.time });
         } else if (layer === 2) {
           ws2.addMarker({ time: n.time });
+        } else if (layer === 3) {
+          ws3.addMarker({ time: n.time });
         }
       });
   };
@@ -1685,6 +1756,11 @@ export default function Home(props: { folders: any }) {
         <div
           id="ws2"
           className={`ws ${selectedLayer === 2 ? "selected" : ""}`}
+        />
+
+        <div
+          id="ws3"
+          className={`ws ${selectedLayer === 3 ? "selected" : ""}`}
         />
 
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
@@ -1832,6 +1908,14 @@ export default function Home(props: { folders: any }) {
           >
             2
           </button>
+
+          <button
+            className={`${selectedLayer === 3 ? styles.selected3 : ""}`}
+            onClick={(e) => layerClick(e, 3)}
+            disabled={loading}
+          >
+            3
+          </button>
         </div>
 
         <div className={styles.toolbar}>
@@ -1851,7 +1935,9 @@ export default function Home(props: { folders: any }) {
                 ? styles.color0
                 : selectedLayer === 1
                 ? styles.color1
-                : styles.color2
+                : selectedLayer === 2
+                ? styles.color2
+                : styles.color3
             }`}
           >
             RndPal
@@ -1865,7 +1951,9 @@ export default function Home(props: { folders: any }) {
                 ? styles.color0
                 : selectedLayer === 1
                 ? styles.color1
-                : styles.color2
+                : selectedLayer === 2
+                ? styles.color2
+                : styles.color3
             }`}
           >
             RndSmpl
@@ -1879,7 +1967,8 @@ export default function Home(props: { folders: any }) {
               !selectedLayer ||
               loading ||
               (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded)
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
             }
             className={styles.white}
           >
@@ -1897,7 +1986,8 @@ export default function Home(props: { folders: any }) {
             disabled={
               loading ||
               (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded)
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
             }
             className={styles.white}
           >
@@ -1909,7 +1999,8 @@ export default function Home(props: { folders: any }) {
             disabled={
               loading ||
               (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded)
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
             }
             className={styles.white}
           >
@@ -2033,7 +2124,7 @@ export default function Home(props: { folders: any }) {
               onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const val = parseInt(e.target.value);
 
-                ["#wsRegions", "#ws0", "#ws1", "#ws2"].forEach((n) => {
+                ["#wsRegions", "#ws0", "#ws1", "#ws2", "#ws3"].forEach((n) => {
                   const container = document.querySelector(n) as HTMLDivElement;
 
                   if (container) {
@@ -2113,6 +2204,71 @@ export default function Home(props: { folders: any }) {
               }}
               disabled={loading}
             />
+
+            <input
+              id="layer3Volume"
+              type="range"
+              min={-20}
+              max={0}
+              value={layer3Volume}
+              step={0.1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                changeLayer3Volume(parseFloat(e.target.value));
+              }}
+              disabled={loading}
+            />
+
+            {/* TODO: onset threshold */}
+            {/*
+            <input
+              id="threshold"
+              type="range"
+              min={0}
+              max={1.5}
+              value={0}
+              step={0.001}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {}}
+              disabled={true}
+            />
+
+            // every N onsets?
+            // https://aubio.org/manual/latest/cli.html#aubiocut
+            <input
+              id="threshold"
+              type="range"
+              min={0}
+              max={10}
+              value={0}
+              step={1}
+              className={styles.slider}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) => {}}
+              disabled={true}
+            />
+
+            // lol?
+            <button
+              onClick={(e) => {}}
+              disabled={true}
+            >
+              Apply to Lib
+            </button>
+
+             <button
+              onClick={(e) => {}}
+              disabled={true}
+            >
+              Add File
+            </button>
+
+             <button
+              onClick={(e) => {}}
+              disabled={true}
+            >
+              Remove File
+            </button>
+            */}
           </div>
 
           <ul
@@ -2144,6 +2300,7 @@ export async function getStaticProps() {
     "public/pallets/0",
     "public/pallets/1",
     "public/pallets/2",
+    "public/pallets/3",
   ];
   const folders: any = [];
 

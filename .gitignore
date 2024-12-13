@@ -18,11 +18,13 @@
 /public/pallets/0/*
 /public/pallets/1/*
 /public/pallets/2/*
+/public/pallets/3/*
 
 # allow
 !/public/pallets/0/data.json
 !/public/pallets/1/data.json
 !/public/pallets/2/data.json
+!/public/pallets/3/data.json
 
 # misc
 .DS_Store
