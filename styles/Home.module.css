@@ -110,11 +110,15 @@
 }
 
 .toolbar .color1 {
-  color: gold;
+  color: yellow;
 }
 
 .toolbar .color2 {
   color: #bd53ff;
+}
+
+.toolbar .color3 {
+  color: #c19a6b;
 }
 
 .selected {
@@ -128,7 +132,7 @@
 }
 
 .toolbar .selected1 {
-  background-color: gold;
+  background-color: yellow;
   color: #000;
 }
 
@@ -138,7 +142,7 @@
 }
 
 .toolbar .selected3 {
-  background-color: lightgray;
+  background-color: #c19a6b;
   color: #000;
 }
 

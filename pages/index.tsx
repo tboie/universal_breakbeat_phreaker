@@ -190,7 +190,7 @@ export default function Home(props: { folders: any }) {
 
       ws1 = WaveSurfer.create({
         container: "#ws1",
-        waveColor: "gold",
+        waveColor: "yellow",
         fillParent: false,
         scrollParent: false,
         plugins: [
@@ -214,7 +214,7 @@ export default function Home(props: { folders: any }) {
 
       ws3 = WaveSurfer.create({
         container: "#ws3",
-        waveColor: "lightgray",
+        waveColor: "#c19a6b",
         fillParent: false,
         scrollParent: false,
         plugins: [
