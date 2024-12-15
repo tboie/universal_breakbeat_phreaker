@@ -5,8 +5,7 @@
 - Create and explore rhythms and sounds
 
 ## Screenshot
-
-![bb_phreaker_screenshot](https://github.com/tboie/universal_breakbeat_phreaker/assets/26150152/c79184ba-2f4a-4124-8e31-b180ddba3100)
+![bb phreaker screenshot](https://github.com/user-attachments/assets/d00df33e-7dcd-4844-bbab-234d452aac5b)
 
 ## Audio Data Generation Scripts
 
