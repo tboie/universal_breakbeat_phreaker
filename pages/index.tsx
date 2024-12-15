@@ -1530,7 +1530,7 @@ export default function Home(props: { folders: any }) {
         // /pallets/1/Edwin Starr - Who Cares If You're Happy Or Not (I Do)_0/0.wav
         // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
         // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
-        // console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
+        console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
         await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
@@ -1928,7 +1928,7 @@ export default function Home(props: { folders: any }) {
           </button>
 
           <button
-            disabled={loading || selectedLayer === 0}
+            disabled={loading}
             onClick={(e) => findMatches(e, selectedLayer)}
             className={`${
               selectedLayer === 0
@@ -1944,7 +1944,7 @@ export default function Home(props: { folders: any }) {
           </button>
 
           <button
-            disabled={loading || selectedLayer === 0}
+            disabled={loading}
             onClick={(e) => findMatches(e, selectedLayer, false, true)}
             className={`${
               selectedLayer === 0
@@ -1962,15 +1962,18 @@ export default function Home(props: { folders: any }) {
           {/* Load and Save? */}
 
           <button
-            onClick={(e) => findMatches(e, selectedLayer, true)}
+            onClick={(e) =>
+              selectedLayer == 0
+                ? findMatches(e, selectedLayer, false, true)
+                : findMatches(e, selectedLayer, true)
+            }
             disabled={
-              !selectedLayer ||
               loading ||
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded) ||
               (selectedLayer === 3 && !pallet3Loaded)
             }
-            className={styles.white}
+            className={selectedLayer === 0 ? styles.color0 : styles.white}
           >
             Flip
             {/*<Image
@@ -2095,7 +2098,7 @@ export default function Home(props: { folders: any }) {
             }
             className={styles.white}
           >
-            Orig
+            Reset
           </button>
 
           <button
@@ -2195,7 +2198,7 @@ export default function Home(props: { folders: any }) {
               id="sliderVol2"
               type="range"
               min={-20}
-              max={0}
+              max={0.2}
               value={layer2Volume}
               step={0.1}
               className={styles.slider}
@@ -2209,7 +2212,7 @@ export default function Home(props: { folders: any }) {
               id="sliderVol3"
               type="range"
               min={-20}
-              max={0}
+              max={0.2}
               value={layer3Volume}
               step={0.1}
               className={styles.slider}

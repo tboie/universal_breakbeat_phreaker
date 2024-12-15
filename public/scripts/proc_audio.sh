@@ -5,9 +5,9 @@
 # CHANGE PATHS IN OTHER SCRIPTS
 
 # download audio:
-# yt-dlp -x --audio-format "wav" --audio-quality 0 "URLhere"
 # playlist options:
 # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#video-selection
+# yt-dlp -x --audio-format "wav" --audio-quality 0 --match-filters "title~=experimental" --playlist-random  --skip-playlist-after-errors 999 "https://www.youtube.com/@mishapanfilov/videos"
 
 python "cut_Segments.py"
 
