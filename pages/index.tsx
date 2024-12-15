@@ -1956,13 +1956,10 @@ export default function Home(props: { folders: any }) {
           {/* Load and Save? */}
 
           <button
-            onClick={(e) =>
-              selectedLayer == 0
-                ? findMatches(e, selectedLayer, false, true)
-                : findMatches(e, selectedLayer, true)
-            }
+            onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={
               loading ||
+              !selectedLayer ||
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded) ||
               (selectedLayer === 3 && !pallet3Loaded)
@@ -1970,12 +1967,6 @@ export default function Home(props: { folders: any }) {
             className={selectedLayer === 0 ? styles.color0 : styles.white}
           >
             Flip
-            {/*<Image
-              src={loading ? "icons/dice_disabled.svg" : "icons/dice.svg"}
-              alt="dice"
-              width={24}
-              height={24}
-              />*/}
           </button>
 
           <button
@@ -2093,7 +2084,7 @@ export default function Home(props: { folders: any }) {
             }
             className={styles.white}
           >
-            Reset
+            0Time
           </button>
 
           <button
