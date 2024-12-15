@@ -2032,13 +2032,6 @@ export default function Home(props: { folders: any }) {
             {display === "controls" ? "Breaks" : "Ctrls"}
           </button>
 
-          <button
-            onClick={(e) => shuffleClick(e)}
-            disabled={loading}
-            className={styles.white}
-          >
-            Shuff
-          </button>
           {/*
           <button
             onClick={(e) => trimLayerSelection(e, selectedLayer)}
@@ -2087,6 +2080,14 @@ export default function Home(props: { folders: any }) {
             className={styles.white}
           >
             DelSel
+          </button>
+
+          <button
+            onClick={(e) => shuffleClick(e)}
+            disabled={loading}
+            className={styles.white}
+          >
+            Shuff
           </button>
 
           <button
