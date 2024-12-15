@@ -164,14 +164,6 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
-    // required for mobile audio
-    (document.querySelector("body") as HTMLBodyElement).addEventListener(
-      "touchstart",
-      async () => {
-        await Tone.start();
-      }
-    );
-
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
@@ -553,6 +545,8 @@ export default function Home(props: { folders: any }) {
   ) => {
     e?.preventDefault();
     e?.stopPropagation();
+
+    await Tone.start();
 
     setBPM(0);
     setSelectedFolder(folder);
