@@ -2199,7 +2199,7 @@ export default function Home(props: { folders: any }) {
               id="sliderVol2"
               type="range"
               min={-20}
-              max={0.2}
+              max={0}
               value={layer2Volume}
               step={0.1}
               className={styles.slider}
@@ -2213,7 +2213,7 @@ export default function Home(props: { folders: any }) {
               id="sliderVol3"
               type="range"
               min={-20}
-              max={0.2}
+              max={0}
               value={layer3Volume}
               step={0.1}
               className={styles.slider}
