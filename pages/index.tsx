@@ -1322,10 +1322,7 @@ export default function Home(props: { folders: any }) {
       .map((n) => {
         // set note duration using next note
         const selectNotes = seq.filter(
-          (s) =>
-            s.layer === (layerHasNotes ? layer : 0) &&
-            s.time >= regionSelect.start &&
-            s.time < regionSelect.end
+          (s) => s.layer === (layerHasNotes ? layer : 0)
         );
         const noteIdx = selectNotes.findIndex((s) => s.time === n.time);
         const nextNote = selectNotes[noteIdx + 1];
