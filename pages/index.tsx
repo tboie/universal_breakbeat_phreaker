@@ -1368,7 +1368,7 @@ export default function Home(props: { folders: any }) {
         }
       });
 
-    if (!pallets.length) {
+    if (layer == 0 && !pallets.length) {
       pallets.push({
         layer: 0,
         sounds: table.filter((r) => r.name === selectedFolder),
