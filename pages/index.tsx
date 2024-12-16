@@ -1471,9 +1471,11 @@ export default function Home(props: { folders: any }) {
     });
 
     if (selection) {
-      matches = matches.filter(
-        (m) => m.time >= regionSelect.start && m.time < regionSelect.end
-      );
+      matches = matches
+        .filter((m) => m)
+        .filter(
+          (m) => m.time >= regionSelect.start && m.time < regionSelect.end
+        );
     }
 
     // dispose buffer and remove duplicate buffers
@@ -1535,57 +1537,59 @@ export default function Home(props: { folders: any }) {
 
     // download and add buffers, sequence notes
     await Promise.all(
-      matches.map(async (m) => {
-        // this errors?
-        // /pallets/2/Tony Cook & The GA's - Time Out (part1).rx2/1.wav
-        // /pallets/1/Edwin Starr - Who Cares If You're Happy Or Not (I Do)_0/0.wav
-        // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
-        // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
-        // console.log(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`);
-        await fetch(`/pallets/${selectedLayer}/${m?.name}/${m?.cutIdx}.wav`)
-          .then(async (response) => {
-            return await response.arrayBuffer();
-          })
-          .then(async (arrayBuffer) => {
-            const buff = await Tone.context.decodeAudioData(arrayBuffer);
+      matches
+        .filter((m) => m)
+        .map(async (m) => {
+          // this errors?
+          // /pallets/2/Tony Cook & The GA's - Time Out (part1).rx2/1.wav
+          // /pallets/1/Edwin Starr - Who Cares If You're Happy Or Not (I Do)_0/0.wav
+          // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
+          // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
+          // console.log(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`);
+          await fetch(`/pallets/${selectedLayer}/${m?.name}/${m?.cutIdx}.wav`)
+            .then(async (response) => {
+              return await response.arrayBuffer();
+            })
+            .then(async (arrayBuffer) => {
+              const buff = await Tone.context.decodeAudioData(arrayBuffer);
 
-            let bufferObj = buffers.find(
-              (b) => b.name === m.name && b.cutIdx === m.cutIdx
-            );
+              let bufferObj = buffers.find(
+                (b) => b.name === m.name && b.cutIdx === m.cutIdx
+              );
 
-            if (!bufferObj) {
-              buffers.push({
+              if (!bufferObj) {
+                buffers.push({
+                  name: m.name,
+                  cutIdx: m.cutIdx,
+                  layer: layer,
+                  buffer: new Tone.Buffer(buff),
+                });
+              }
+
+              bufferObj = buffers.find(
+                (b) => b.name === m.name && b.cutIdx === m.cutIdx
+              );
+
+              seq.push({
+                layer: layer,
+                time: m.time,
+                duration: m.duration,
+                player: new Tone.Player(bufferObj?.buffer)
+                  .set({
+                    volume: getLayerVolume(layer),
+                    playbackRate: speed,
+                  })
+                  .toDestination(),
                 name: m.name,
                 cutIdx: m.cutIdx,
-                layer: layer,
-                buffer: new Tone.Buffer(buff),
+                trim: true,
               });
-            }
-
-            bufferObj = buffers.find(
-              (b) => b.name === m.name && b.cutIdx === m.cutIdx
-            );
-
-            seq.push({
-              layer: layer,
-              time: m.time,
-              duration: m.duration,
-              player: new Tone.Player(bufferObj?.buffer)
-                .set({
-                  volume: getLayerVolume(layer),
-                  playbackRate: speed,
-                })
-                .toDestination(),
-              name: m.name,
-              cutIdx: m.cutIdx,
-              trim: true,
+              //  }
+            })
+            .catch((error) => {
+              throw Error(`Asset failed to load: ${error.message}`);
             });
-            //  }
-          })
-          .catch((error) => {
-            throw Error(`Asset failed to load: ${error.message}`);
-          });
-      })
+        })
     );
 
     seq.sort((a, b) => a.time - b.time);
