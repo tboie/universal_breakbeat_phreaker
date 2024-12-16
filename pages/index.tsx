@@ -1,7 +1,7 @@
 import Head from "next/head";
 import styles from "@/styles/Home.module.css";
 import { promises as fs } from "fs";
-import path from "path";
+import path, { normalize } from "path";
 import { useEffect, useRef, useState } from "react";
 
 import * as Tone from "tone";
@@ -1320,40 +1320,51 @@ export default function Home(props: { folders: any }) {
     let srcTable: (TableRow | undefined)[] = seq
       .filter((n) => n.layer === (layerHasNotes ? layer : 0))
       .map((n) => {
-        // set note duration using next note
-        const selectNotes = seq.filter(
-          (s) => s.layer === (layerHasNotes ? layer : 0)
-        );
-        const noteIdx = selectNotes.findIndex((s) => s.time === n.time);
-        const nextNote = selectNotes[noteIdx + 1];
-        let noteDur = 0;
+        if (layer) {
+          // set note duration using next note
+          const selectNotes = seq.filter(
+            (s) => s.layer === (layerHasNotes ? layer : 0)
+          );
+          const noteIdx = selectNotes.findIndex((s) => s.time === n.time);
+          const nextNote = selectNotes[noteIdx + 1];
+          let noteDur = 0;
 
-        if (nextNote) {
-          noteDur = nextNote.time - n.time;
-        }
-        // last note
-        // this errors?
-        else if (n.time === selectNotes[selectNotes.length - 1].time) {
-          noteDur = regionSelect.end - selectNotes[selectNotes.length - 1].time;
-        }
+          if (nextNote) {
+            noteDur = nextNote.time - n.time;
+          }
+          // last note
+          // this errors?
+          else if (n.time === selectNotes[selectNotes.length - 1].time) {
+            noteDur =
+              regionSelect.end - selectNotes[selectNotes.length - 1].time;
+          }
 
-        noteDur = parseFloat(noteDur.toFixed(6));
+          noteDur = parseFloat(noteDur.toFixed(6));
 
-        // base note freq
-        let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
-        // prev base note
-        if (!baseNote) {
-          baseNote = seq
-            .filter((s) => s.layer === 0 && s.time < n.time)
-            .slice(-1)[0];
-        }
+          // base note freq
+          let baseNote = seq.find((s) => s.layer === 0 && s.time === n.time);
+          // prev base note
+          if (!baseNote) {
+            baseNote = seq
+              .filter((s) => s.layer === 0 && s.time < n.time)
+              .slice(-1)[0];
+          }
 
-        const dataRow = tablePallet0.find(
-          (r) => r.name === baseNote?.name && r.cutIdx === baseNote?.cutIdx
-        );
+          const dataRow = tablePallet0.find(
+            (r) => r.name === baseNote?.name && r.cutIdx === baseNote?.cutIdx
+          );
 
-        if (dataRow) {
-          return { ...n, duration: noteDur, freq: dataRow.freq };
+          if (dataRow) {
+            return { ...n, duration: noteDur, freq: dataRow.freq };
+          }
+        } else {
+          const dataRow = tablePallet0.find(
+            (r) => r.name === n.name && r.cutIdx === n.cutIdx
+          );
+
+          if (dataRow) {
+            return { ...n, freq: dataRow.freq };
+          }
         }
       });
 
@@ -1394,13 +1405,15 @@ export default function Home(props: { folders: any }) {
       }
 
       // remove duplicates
-      newPallet = newPallet.filter(
-        (value, index, self) =>
-          index ===
-          self.findIndex(
-            (t) => t.name === value.name && t.cutIdx === value.cutIdx
-          )
-      );
+      if (layer) {
+        newPallet = newPallet.filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.name === value.name && t.cutIdx === value.cutIdx
+            )
+        );
+      }
 
       const pallet = pallets.find((p) => p.layer === layer);
       if (pallet) {
@@ -1521,8 +1534,8 @@ export default function Home(props: { folders: any }) {
         // /pallets/1/Edwin Starr - Who Cares If You're Happy Or Not (I Do)_0/0.wav
         // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
         // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
-        console.log(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`);
-        await fetch(`/pallets/${selectedLayer}/${m.name}/${m.cutIdx}.wav`)
+        // console.log(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`);
+        await fetch(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
