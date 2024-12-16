@@ -1368,16 +1368,23 @@ export default function Home(props: { folders: any }) {
         }
       });
 
+    if (!pallets.find((p) => p.layer === 0)) {
+      pallets.push({
+        layer: 0,
+        sounds: table.filter((r) => r.name === selectedFolder),
+      });
+    }
     // load random sound pallet
-    if (!selection || !buffers.filter((b) => b.layer === layer).length) {
+    else if (!selection || !buffers.filter((b) => b.layer === layer).length) {
       let newPallet: TableRow[] = [];
 
-      // filter sounds > min note length?
+      /* filter sounds > min note length?
       const minDur = seq
         .filter((s) => s.layer === (layerHasNotes ? layer : 0))
         .reduce((min, current) =>
           current.duration < min.duration ? current : min
         );
+      */
 
       let sounds = table.filter(
         (r) => r.name !== selectedFolder && r.duration > 0.2 /* && minDur? */
@@ -1535,7 +1542,7 @@ export default function Home(props: { folders: any }) {
         // /pallets/1/The New Mastersounds - Nervous 1_0/0.wav
         // /pallets/1/Ralph Carmichael - The Addicts Psalm (part6)_0/0.wav
         // console.log(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`);
-        await fetch(`/pallets/${selectedLayer}/${m?.name}/${m.cutIdx}.wav`)
+        await fetch(`/pallets/${selectedLayer}/${m?.name}/${m?.cutIdx}.wav`)
           .then(async (response) => {
             return await response.arrayBuffer();
           })
@@ -1969,12 +1976,11 @@ export default function Home(props: { folders: any }) {
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={
               loading ||
-              !selectedLayer ||
               (selectedLayer === 1 && !pallet1Loaded) ||
               (selectedLayer === 2 && !pallet2Loaded) ||
               (selectedLayer === 3 && !pallet3Loaded)
             }
-            className={selectedLayer === 0 ? styles.color0 : styles.white}
+            className={styles.white}
           >
             Flip
           </button>
