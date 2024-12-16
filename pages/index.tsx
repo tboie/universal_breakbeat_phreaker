@@ -1472,6 +1472,7 @@ export default function Home(props: { folders: any }) {
 
     if (selection) {
       matches = matches
+        // TODO: undefined
         .filter((m) => m)
         .filter(
           (m) => m.time >= regionSelect.start && m.time < regionSelect.end
@@ -1538,6 +1539,7 @@ export default function Home(props: { folders: any }) {
     // download and add buffers, sequence notes
     await Promise.all(
       matches
+        // TODO: undefined
         .filter((m) => m)
         .map(async (m) => {
           // this errors?
