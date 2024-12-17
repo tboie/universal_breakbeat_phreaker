@@ -1317,7 +1317,7 @@ export default function Home(props: { folders: any }) {
       seq.filter((s) => s.layer === layer).length === 0 ? false : true;
 
     // map table vals to seq notes
-    let srcTable: (TableRow | undefined)[] = seq
+    let srcTable: any[] = seq
       .filter((n) => n.layer === (layerHasNotes ? layer : 0))
       .map((n) => {
         if (layer) {
@@ -1355,7 +1355,12 @@ export default function Home(props: { folders: any }) {
           );
 
           if (dataRow) {
-            return { ...n, duration: noteDur, freq: dataRow.freq };
+            return {
+              ...n,
+              duration: noteDur,
+              freq: dataRow.freq,
+              mute: n.player.mute,
+            };
           }
         } else {
           const dataRow = tablePallet0.find(
@@ -1363,7 +1368,7 @@ export default function Home(props: { folders: any }) {
           );
 
           if (dataRow) {
-            return { ...n, freq: dataRow.freq };
+            return { ...n, freq: dataRow.freq, mute: n.player.mute };
           }
         }
       });
@@ -1432,8 +1437,12 @@ export default function Home(props: { folders: any }) {
     }
 
     // find matches
-    let matches: (TableRow & { dDiff: number; fDiff: number; time: number })[] =
-      [];
+    let matches: (TableRow & {
+      dDiff: number;
+      fDiff: number;
+      time: number;
+      mute: boolean;
+    })[] = [];
 
     srcTable.forEach((src: any, idx) => {
       const pallet = pallets.find((p) => p.layer === layer);
@@ -1452,6 +1461,7 @@ export default function Home(props: { folders: any }) {
             dDiff: durDiff,
             time: src.time,
             duration: src.duration,
+            mute: src.mute,
           };
         });
 
@@ -1581,6 +1591,7 @@ export default function Home(props: { folders: any }) {
                   .set({
                     volume: getLayerVolume(layer),
                     playbackRate: speed,
+                    mute: m.mute,
                   })
                   .toDestination(),
                 name: m.name,
