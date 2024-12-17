@@ -15,7 +15,8 @@ for root, dirs, files in os.walk(drums_path):
         obj["n"] = dir
         obj["c"] = []
         for file in sorted(glob.glob("*.txt")):
-            if file != "times.txt":
+            # TODO *.txt bug?
+            if file != "times.txt" and file != "*.txt":
                 print("\nget_freqAvg_Duration.py\n " + file + "\n");
                 
                 time = "{:.6f}".format(

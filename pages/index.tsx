@@ -1405,7 +1405,8 @@ export default function Home(props: { folders: any }) {
       // calibrate this? harmonics?
       else {
         // does creating a smaller pallet create diversity in selected sounds?
-        for (let i = 0; i < 100; i++) {
+        // TODO: performance
+        for (let i = 0; i < 200; i++) {
           const randSound = sounds[Math.floor(Math.random() * sounds.length)];
           newPallet.push(randSound);
         }
