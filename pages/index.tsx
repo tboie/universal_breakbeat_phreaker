@@ -1411,7 +1411,7 @@ export default function Home(props: { folders: any }) {
       else {
         // does creating a smaller pallet create diversity in selected sounds?
         // TODO: performance
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 150; i++) {
           const randSound = sounds[Math.floor(Math.random() * sounds.length)];
           newPallet.push(randSound);
         }
@@ -1476,7 +1476,14 @@ export default function Home(props: { folders: any }) {
 
         // Calibrate this?
         // first x matches? consistency/diversity
-        const r = Math.floor(Math.random() * 4);
+        // 4 pieces in 30 seconds?
+        // first 1-4 random list selection of pieces
+        let r = 0;
+        if (t.length >= 4) {
+          r = Math.floor(Math.random() * 4);
+        } else if (t.length >= 2 && t.length < 4) {
+          r = Math.floor(Math.random() * t.length);
+        }
         matches.push(t[r]);
       }
     });
@@ -1484,7 +1491,6 @@ export default function Home(props: { folders: any }) {
     if (selection) {
       matches = matches
         // TODO: undefined
-        .filter((m) => m)
         .filter(
           (m) => m.time >= regionSelect.start && m.time < regionSelect.end
         );
@@ -1551,7 +1557,6 @@ export default function Home(props: { folders: any }) {
     await Promise.all(
       matches
         // TODO: undefined
-        .filter((m) => m)
         .map(async (m) => {
           // this errors?
           // /pallets/2/Tony Cook & The GA's - Time Out (part1).rx2/1.wav
