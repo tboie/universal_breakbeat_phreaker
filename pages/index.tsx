@@ -164,6 +164,7 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
+    // TODO: draw waveform outlines?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
@@ -627,6 +628,7 @@ export default function Home(props: { folders: any }) {
         );
 
         if (layerSeqNote?.trim) {
+          // next note?
           value.player.stop(time + value.duration);
         }
       } else {
@@ -1253,10 +1255,12 @@ export default function Home(props: { folders: any }) {
 
     // clear entire part :(
     // todo: set part event values
+    /*
     part.clear();
     seq.forEach((s) => {
       part.add(s.time, s);
     });
+    */
 
     findMatches(e, layer, true);
   };
@@ -1312,6 +1316,21 @@ export default function Home(props: { folders: any }) {
     } else if (selectedLayer == 3) {
       table = tablePallet3;
     }
+
+    /* filter sounds > min note length?
+      const minDur = seq
+        .filter((s) => s.layer === (layerHasNotes ? layer : 0))
+        .reduce((min, current) =>
+          current.duration < min.duration ? current : min
+        );
+      */
+
+    // TODO: duration constraints?
+    table = table.filter(
+      (n) =>
+        /*n.duration < regionLoop.end + 1 - regionLoop.start &&*/ n.duration >
+        0.1
+    );
 
     const layerHasNotes =
       seq.filter((s) => s.layer === layer).length === 0 ? false : true;
@@ -1373,36 +1392,26 @@ export default function Home(props: { folders: any }) {
         }
       });
 
-    if (layer == 0 && !pallets.length) {
+    if (layer == 0 && !pallets.filter((p) => p.layer === 0).length) {
       pallets.push({
         layer: 0,
         sounds: table.filter((r) => r.name === selectedFolder),
       });
     }
+
     // load random sound pallet
-    else if (!selection || !buffers.filter((b) => b.layer === layer).length) {
+    if (
+      !selection ||
+      (layer && !buffers.filter((b) => b.layer === layer).length)
+    ) {
       let newPallet: TableRow[] = [];
-
-      /* filter sounds > min note length?
-      const minDur = seq
-        .filter((s) => s.layer === (layerHasNotes ? layer : 0))
-        .reduce((min, current) =>
-          current.duration < min.duration ? current : min
-        );
-      */
-
-      let sounds = table.filter(
-        (r) => r.name !== selectedFolder && r.duration > 0.2 /* && minDur? */
-      );
+      let sounds: TableRow[] = [];
 
       if (singleSample) {
         const sampleNames = props.folders[layer].map((item: any) => item);
-        const uniqueNames = sampleNames.filter(
-          (value: any, index: any, self: any) => self.indexOf(value) === index
-        );
-        const randomIndex = Math.floor(Math.random() * uniqueNames.length);
+        const randomIndex = Math.floor(Math.random() * sampleNames.length);
 
-        sounds = table.filter((r) => r.name === uniqueNames[randomIndex]);
+        sounds = table.filter((r) => r.name === sampleNames[randomIndex]);
         sounds.forEach((s) => {
           newPallet.push(s);
         });
@@ -1410,7 +1419,8 @@ export default function Home(props: { folders: any }) {
       // calibrate this? harmonics?
       else {
         // does creating a smaller pallet create diversity in selected sounds?
-        // TODO: performance
+        // TODO: refactor
+        sounds = table.filter((r) => r.name !== selectedFolder);
         for (let i = 0; i < 150; i++) {
           const randSound = sounds[Math.floor(Math.random() * sounds.length)];
           newPallet.push(randSound);
@@ -2126,6 +2136,7 @@ export default function Home(props: { folders: any }) {
             0Time
           </button>
 
+          {/* TODO: triples? */}
           <button
             onClick={(e) => splitSelectionNotes(e, selectedLayer)}
             disabled={
