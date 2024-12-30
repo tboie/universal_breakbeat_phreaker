@@ -57,7 +57,7 @@ let pallets: TPallet[] = [];
 let part: Tone.Part;
 
 // all pieces data table
-// use indexdb?
+// TODO: indexdb?
 type TableRow = {
   name: string;
   cutIdx: number;
