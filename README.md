@@ -34,3 +34,7 @@ npm run dev
 ## Onset Detection
 
 - [https://github.com/aubio/aubio](https://github.com/aubio/aubio)
+
+## Conceptual Notes for Later
+
+<img width="546" alt="conceptual diagram" src="https://github.com/user-attachments/assets/6cbccaa3-ca52-4734-8200-8c56b656ffc3" />
