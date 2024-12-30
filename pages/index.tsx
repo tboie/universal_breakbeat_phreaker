@@ -235,6 +235,7 @@ export default function Home(props: { folders: any }) {
         ],
       });
 
+      // TODO: auto zoom center loop/selection regions?
       const configZoom = () => {
         const zoomEle = document.querySelector("#zoom") as HTMLInputElement;
         if (zoomEle) {
