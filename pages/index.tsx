@@ -1461,7 +1461,7 @@ export default function Home(props: { folders: any }) {
         const t = pallet.sounds.map((r) => {
           // Calibrate this?
           // Sound selection freq multiplier range
-          // diversity/consistency
+          // for octave like selections?
           const srcFreq = src.freq * (Math.floor(Math.random() * 2) + 1);
           const freqDiff = Math.abs(r.freq - srcFreq);
           const durDiff = Math.abs(r.duration - src.duration);
@@ -1690,6 +1690,7 @@ export default function Home(props: { folders: any }) {
     });
   };
 
+  // TODO: better UI indication?
   const drawLayerMarkers = (layer: number) => {
     ws1.clearMarkers();
     ws2.clearMarkers();
