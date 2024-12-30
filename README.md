@@ -38,3 +38,11 @@ npm run dev
 ## Conceptual Notes for Later
 
 <img width="546" alt="conceptual diagram" src="https://github.com/user-attachments/assets/6cbccaa3-ca52-4734-8200-8c56b656ffc3" />
+
+Audio Script Workflow:
+
+1. cut audio file into 30 second segments
+2. cut onsets of all segments
+3. get freq data of all onsets
+4. get avg freq of onsets and duration
+5. rename onset files to index numbers
