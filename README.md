@@ -40,7 +40,7 @@ How to generate:
 - create folder
 - add above scripts
 - add .wav audio files
-- configure proc_audio.sh (more info in file)
+- configure [proc_audio.sh](https://github.com/tboie/universal_breakbeat_phreaker/tree/main/public/scripts/proc_audio.sh)
 - run `./proc_audio.sh`
 - move generated folders and data.json to pallet number in public/pallets
 
