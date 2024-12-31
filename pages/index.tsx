@@ -1465,6 +1465,7 @@ export default function Home(props: { folders: any }) {
           // Calibrate this?
           // Sound selection freq multiplier range
           // for octave like selections?
+          // TODO: listen on studio monitors (currently headphones)
           const srcFreq = src.freq * (Math.floor(Math.random() * 2) + 1);
           const freqDiff = Math.abs(r.freq - srcFreq);
           const durDiff = Math.abs(r.duration - src.duration);
