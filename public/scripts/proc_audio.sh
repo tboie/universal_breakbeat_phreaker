@@ -9,6 +9,8 @@
 # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#video-selection
 # yt-dlp -x --audio-format "wav" --audio-quality 0 --match-filters "title~=experimental" --playlist-random  --skip-playlist-after-errors 999 "https://www.youtube.com/@mishapanfilov/videos"
 
+# cut 30 second segments
+# TODO: rethink this?
 python "cut_Segments.py"
 
 # default 0.3
