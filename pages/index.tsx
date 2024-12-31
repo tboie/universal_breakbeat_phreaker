@@ -1176,6 +1176,7 @@ export default function Home(props: { folders: any }) {
     return val;
   };
 
+  // TODO: enable for layer 0
   const splitSelectionNotes = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
@@ -1213,6 +1214,7 @@ export default function Home(props: { folders: any }) {
   };
 
   // 1 note for every 2 base seq notes
+  // TODO: enable for layer 0
   const combineSelectionNotes = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
