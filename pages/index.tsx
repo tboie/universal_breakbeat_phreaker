@@ -2112,6 +2112,7 @@ export default function Home(props: { folders: any }) {
             DupLoop
           </button>
 
+          {/* TODO: delete time markers instead? */}
           <button
             onClick={(e) => deleteSelection(e)}
             disabled={loading || !allowDelete}
@@ -2119,6 +2120,8 @@ export default function Home(props: { folders: any }) {
           >
             DelSel
           </button>
+
+          {/* TODO: Add time marker? */}
 
           <button
             onClick={(e) => shuffleClick(e)}
@@ -2140,7 +2143,6 @@ export default function Home(props: { folders: any }) {
             0Time
           </button>
 
-          {/* TODO: triples? */}
           <button
             onClick={(e) => splitSelectionNotes(e, selectedLayer)}
             disabled={
@@ -2152,6 +2154,8 @@ export default function Home(props: { folders: any }) {
           >
             Splt
           </button>
+
+          {/* TODO: triples? */}
         </div>
 
         <div className={styles.content}>
