@@ -18,6 +18,7 @@ import dataPallet3 from "../public/pallets/3/data.json";
 
 let init = false;
 
+// TODO: dynamic number of layers?
 let ws0: any;
 let ws1: any;
 let ws2: any;
