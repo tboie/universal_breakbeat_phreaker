@@ -38,7 +38,8 @@ type TBuffer = {
 };
 
 type TSeq = {
-  time: number; // TODO: verify 6 decimal standard throughout
+  // TODO: verify time decimal standard throughout
+  time: number;
   layer: number;
   name: string;
   cutIdx: number;
