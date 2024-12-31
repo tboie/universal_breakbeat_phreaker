@@ -39,6 +39,7 @@ type TBuffer = {
 
 type TSeq = {
   // TODO: verify time decimal standard throughout
+  // TODO: investigate audio clicking of pieces
   time: number;
   layer: number;
   name: string;

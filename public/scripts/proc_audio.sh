@@ -17,6 +17,7 @@ python "cut_Segments.py"
 # 0.001 less threshold 
 # ~1.1 for more threshold?
 # TODO: use aubionotes?
+# TODO: investigate audio clicking of cuts?
 for x in ./*.wav ; do printf "\naubiocutting\n $x \n"; mkdir "${x%.*}"; aubiocut -t 0.3 -i "$x" -c -o "${x%.*}"; done
 
 for dir in ./*/; do
