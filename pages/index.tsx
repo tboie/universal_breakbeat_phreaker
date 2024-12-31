@@ -2321,6 +2321,7 @@ export default function Home(props: { folders: any }) {
             */}
           </div>
 
+          {/* TODO: display selected layer samples? */}
           <ul
             className={`${styles.playlist} ${
               display === "controls" ? styles.hide : ""
