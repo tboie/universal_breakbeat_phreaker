@@ -11,7 +11,8 @@ import * as realtimeBpm from "realtime-bpm-analyzer";
 import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
-// TODO: library & onset management?
+// TODO: library/onset(cut)/config management for another project?
+// For now: sound data can be set manually to be more than drum machine
 import dataPallet0 from "../public/pallets/0/data.json";
 import dataPallet1 from "../public/pallets/1/data.json";
 import dataPallet2 from "../public/pallets/2/data.json";
