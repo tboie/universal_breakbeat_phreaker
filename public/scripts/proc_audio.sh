@@ -3,6 +3,7 @@
 # MAIN SCRIPT
 # RUN THIS SCRIPT
 # CHANGE PATHS IN OTHER SCRIPTS
+# TODO: onset management from app?
 
 # download audio:
 # playlist options:
