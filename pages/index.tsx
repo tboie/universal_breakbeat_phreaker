@@ -2157,9 +2157,9 @@ export default function Home(props: { folders: any }) {
             Splt
           </button>
 
-          {/* TODO: replace this with triplets for this version? */}
+          {/* TODO: triplets */}
           <button
-            onClick={(e) => deleteSelection(e)}
+            /*onClick={(e) => deleteSelection(e)}*/
             //disabled={loading || !allowDelete}
             // TODO
             disabled={true}
