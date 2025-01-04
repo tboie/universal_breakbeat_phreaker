@@ -1820,7 +1820,7 @@ export default function Home(props: { folders: any }) {
 
         <div id="wsRegions" className={`ws layer${selectedLayer}`} />
 
-        {/* region move button bar, optional button bar?  increased accessibility?
+        {/* region move button bar, optional button bar?  increased accessibility? simulated hardware controls?
         <div className={`${styles.toolbar}`}>
           <button
             className={`${
@@ -1941,6 +1941,29 @@ export default function Home(props: { folders: any }) {
         {/* layer button bar */}
         <div className={styles.toolbar}>
           <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            DL
+          </button>
+
+          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
+            {display === "controls" ? "Breaks" : "Ctrls"}
+          </button>
+
+          <button disabled={loading} onClick={(e) => playStopClick(e)}>
+            {playing ? "Stop" : "Play"}
+          </button>
+
+          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
+            DupLoop
+          </button>
+        </div>
+
+        {/* layer button bar */}
+        <div className={styles.toolbar}>
+          <button
             className={`${selectedLayer === 0 ? styles.selected0 : ""}`}
             onClick={(e) => layerClick(e, 0)}
             disabled={loading}
@@ -1974,28 +1997,32 @@ export default function Home(props: { folders: any }) {
         </div>
 
         <div className={styles.toolbar}>
+          {/* Load and Save? */}
+
           <button
-            id="download"
-            onClick={(e) => downloadClick(e)}
-            disabled={loading}
+            onClick={(e) => erase(e, selectedLayer)}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
+            }
+            className={styles.white}
           >
-            DL
+            Mute
           </button>
 
           <button
-            disabled={loading}
-            onClick={(e) => findMatches(e, selectedLayer)}
-            className={`${
-              selectedLayer === 0
-                ? styles.color0
-                : selectedLayer === 1
-                ? styles.color1
-                : selectedLayer === 2
-                ? styles.color2
-                : styles.color3
-            }`}
+            onClick={(e) => findMatches(e, selectedLayer, true)}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
+            }
+            className={styles.white}
           >
-            RndPal
+            Flip
           </button>
 
           <button
@@ -2014,47 +2041,6 @@ export default function Home(props: { folders: any }) {
             RndSmpl
           </button>
 
-          {/* Load and Save? */}
-
-          <button
-            onClick={(e) => findMatches(e, selectedLayer, true)}
-            disabled={
-              loading ||
-              (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded) ||
-              (selectedLayer === 3 && !pallet3Loaded)
-            }
-            className={styles.white}
-          >
-            Flip
-          </button>
-
-          <button
-            onClick={(e) => erase(e, selectedLayer)}
-            disabled={
-              loading ||
-              (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded) ||
-              (selectedLayer === 3 && !pallet3Loaded)
-            }
-            className={styles.white}
-          >
-            Mute
-          </button>
-
-          <button
-            onClick={(e) => uneraseClick(e)}
-            disabled={
-              loading ||
-              (selectedLayer === 1 && !pallet1Loaded) ||
-              (selectedLayer === 2 && !pallet2Loaded) ||
-              (selectedLayer === 3 && !pallet3Loaded)
-            }
-            className={styles.white}
-          >
-            Unmute
-          </button>
-
           <button
             onClick={(e) => combineSelectionNotes(e, selectedLayer)}
             disabled={
@@ -2066,17 +2052,21 @@ export default function Home(props: { folders: any }) {
           >
             Cmbn
           </button>
+
+          <button
+            onClick={(e) => resetSelectionNotes(e, selectedLayer)}
+            disabled={
+              loading ||
+              !selectedLayer ||
+              !seq.filter((s) => s.layer === selectedLayer).length
+            }
+            className={styles.white}
+          >
+            0Time
+          </button>
         </div>
 
         <div className={styles.toolbar}>
-          <button disabled={loading} onClick={(e) => playStopClick(e)}>
-            {playing ? "Stop" : "Play"}
-          </button>
-
-          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
-            {display === "controls" ? "Breaks" : "Ctrls"}
-          </button>
-
           {/*
           <button
             onClick={(e) => trimLayerSelection(e, selectedLayer)}
@@ -2115,20 +2105,20 @@ export default function Home(props: { folders: any }) {
           </button>
           */}
 
-          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
-            DupLoop
-          </button>
+          {/* TODO: Add time marker? */}
 
-          {/* TODO: delete time markers instead? */}
           <button
-            onClick={(e) => deleteSelection(e)}
-            disabled={loading || !allowDelete}
+            onClick={(e) => uneraseClick(e)}
+            disabled={
+              loading ||
+              (selectedLayer === 1 && !pallet1Loaded) ||
+              (selectedLayer === 2 && !pallet2Loaded) ||
+              (selectedLayer === 3 && !pallet3Loaded)
+            }
             className={styles.white}
           >
-            DelSel
+            Unmute
           </button>
-
-          {/* TODO: Add time marker? */}
 
           <button
             onClick={(e) => shuffleClick(e)}
@@ -2139,15 +2129,19 @@ export default function Home(props: { folders: any }) {
           </button>
 
           <button
-            onClick={(e) => resetSelectionNotes(e, selectedLayer)}
-            disabled={
-              loading ||
-              !selectedLayer ||
-              !seq.filter((s) => s.layer === selectedLayer).length
-            }
-            className={styles.white}
+            disabled={loading}
+            onClick={(e) => findMatches(e, selectedLayer)}
+            className={`${
+              selectedLayer === 0
+                ? styles.color0
+                : selectedLayer === 1
+                ? styles.color1
+                : selectedLayer === 2
+                ? styles.color2
+                : styles.color3
+            }`}
           >
-            0Time
+            RndPal
           </button>
 
           <button
@@ -2162,7 +2156,18 @@ export default function Home(props: { folders: any }) {
             Splt
           </button>
 
-          {/* TODO: triples? */}
+          {/* TODO: replace this with triplets for this version? */}
+          <button
+            onClick={(e) => deleteSelection(e)}
+            //disabled={loading || !allowDelete}
+            // TODO
+            disabled={true}
+            className={styles.white}
+          >
+            Trip
+          </button>
+
+          {/* TODO: re-visit trim feature? */}
         </div>
 
         <div className={styles.content}>
