@@ -1305,6 +1305,7 @@ export default function Home(props: { folders: any }) {
     findMatches(e, layer, true);
   };
 
+  // the "pallet" concept was early prototype to avoid the same selection of sounds for default sample cuts
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -2277,6 +2278,8 @@ export default function Home(props: { folders: any }) {
               }}
               disabled={loading}
             />
+
+            {/* TODO: edit formula config values? (pallet size, findMatches random values) */}
 
             {/* TODO: onset threshold */}
             {/*
