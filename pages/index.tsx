@@ -1306,7 +1306,8 @@ export default function Home(props: { folders: any }) {
   };
 
   // the "pallet" concept was early prototype to avoid the same selection of sounds for default sample cuts
-  // TODO: creative pallets
+  // TODO: remove pallet?
+  // TODO: creative pallets?
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
