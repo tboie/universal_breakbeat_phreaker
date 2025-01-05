@@ -1306,6 +1306,7 @@ export default function Home(props: { folders: any }) {
   };
 
   // the "pallet" concept was early prototype to avoid the same selection of sounds for default sample cuts
+  // TODO: creative pallets
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -1942,29 +1943,6 @@ export default function Home(props: { folders: any }) {
         {/* layer button bar */}
         <div className={styles.toolbar}>
           <button
-            id="download"
-            onClick={(e) => downloadClick(e)}
-            disabled={loading}
-          >
-            DL
-          </button>
-
-          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
-            {display === "controls" ? "Breaks" : "Ctrls"}
-          </button>
-
-          <button disabled={loading} onClick={(e) => playStopClick(e)}>
-            {playing ? "Stop" : "Play"}
-          </button>
-
-          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
-            DupLoop
-          </button>
-        </div>
-
-        {/* layer button bar */}
-        <div className={styles.toolbar}>
-          <button
             className={`${selectedLayer === 0 ? styles.selected0 : ""}`}
             onClick={(e) => layerClick(e, 0)}
             disabled={loading}
@@ -2169,6 +2147,29 @@ export default function Home(props: { folders: any }) {
           </button>
 
           {/* TODO: re-visit trim feature? */}
+        </div>
+
+        {/* layer button bar */}
+        <div className={styles.toolbar}>
+          <button
+            id="download"
+            onClick={(e) => downloadClick(e)}
+            disabled={loading}
+          >
+            DL
+          </button>
+
+          <button onClick={(e) => toggleDisplay(e)} disabled={loading}>
+            {display === "controls" ? "Breaks" : "Ctrls"}
+          </button>
+
+          <button disabled={loading} onClick={(e) => playStopClick(e)}>
+            {playing ? "Stop" : "Play"}
+          </button>
+
+          <button onClick={(e) => duplicateLoop(e)} disabled={loading}>
+            DupLoop
+          </button>
         </div>
 
         <div className={styles.content}>
