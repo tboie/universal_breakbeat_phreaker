@@ -1311,6 +1311,8 @@ export default function Home(props: { folders: any }) {
   // TODO: remove pallet?
   // TODO: creative pallets?
   // TODO: singleSample sorts table by samples having closest matching pieces to current loop pieces?
+  // TODO: how to deal with longer duration samples switching during playback?
+  //       (trigger playback at playhead time?)
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
