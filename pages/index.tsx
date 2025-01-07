@@ -1312,7 +1312,7 @@ export default function Home(props: { folders: any }) {
   // TODO: creative pallets?
   // TODO: singleSample sorts table by samples having closest matching pieces to current loop pieces?
   // TODO: how to deal with longer duration samples switching during playback?
-  //       (trigger playback at playhead time?)
+  //       (trigger piece playback at playhead time?)
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
@@ -1476,6 +1476,7 @@ export default function Home(props: { folders: any }) {
 
       if (pallet && src) {
         const t = pallet.sounds.map((r) => {
+          // TODO: add control?
           // Calibrate this?
           // Sound selection freq multiplier range
           // for octave like selections?
@@ -1493,6 +1494,7 @@ export default function Home(props: { folders: any }) {
           };
         });
 
+        // TODO: add control?
         // Calibrate this? Harmonics? See other calibration
         t.sort((a, b) => a.dDiff - b.dDiff || a.fDiff - b.fDiff);
 
@@ -1502,6 +1504,7 @@ export default function Home(props: { folders: any }) {
         }
         */
 
+        // TODO: add control?
         // Calibrate this?
         // first x matches? consistency/diversity
         // 4 pieces in 30 seconds?
