@@ -1078,7 +1078,7 @@ export default function Home(props: { folders: any }) {
     }
   };
 
-  // TODO: change note times by percent not playbackRate?
+  // TODO: change note times by percent and findMatches without playBackRate change??
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
     seq.forEach((s) => (s.player.playbackRate = val));
