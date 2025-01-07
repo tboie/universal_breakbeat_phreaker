@@ -171,6 +171,7 @@ export default function Home(props: { folders: any }) {
   useEffect(() => {
     // TODO: draw waveform outlines?
     // TODO: swap loop/selection handles?
+    // TODO: pointerdown drag select pieces?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
