@@ -1310,6 +1310,7 @@ export default function Home(props: { folders: any }) {
   // the "pallet" concept was early prototype to avoid the same selection of sounds for default sample cuts
   // TODO: remove pallet?
   // TODO: creative pallets?
+  // TODO: singleSample sorts table by samples having closest matching pieces to current loop pieces?
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
