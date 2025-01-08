@@ -1763,7 +1763,7 @@ export default function Home(props: { folders: any }) {
         !s.player.mute
     );
 
-    seqCopy.forEach((n, idx) => {
+    seqCopy.forEach((n) => {
       n.player.set({
         mute:
           seqCopy.length === 1
