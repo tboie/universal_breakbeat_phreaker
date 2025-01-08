@@ -173,6 +173,9 @@ export default function Home(props: { folders: any }) {
     // TODO: swap loop/selection handles?
     // TODO: pointerdown drag select pieces?
     // TODO: pointerdown drag accordian stretches selection times?
+    // TODO: lock/unlock layer findMatches on time changes?
+    // TODO: pitch/speed change interaction?
+    // TODO: zoom interaction?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
@@ -1314,6 +1317,7 @@ export default function Home(props: { folders: any }) {
   // TODO: singleSample sorts table by samples having closest matching pieces to current loop pieces?
   // TODO: how to deal with longer duration samples switching during playback?
   //       (trigger piece playback at playhead time?)
+  // TODO: lock/unlock layer findMatches?
   const findMatches = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number,
