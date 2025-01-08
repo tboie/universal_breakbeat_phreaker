@@ -1343,7 +1343,7 @@ export default function Home(props: { folders: any }) {
         );
       */
 
-    // TODO: duration constraints?
+    // TODO: duration constraints and remove times from sequence?
     table = table.filter(
       (n) =>
         /*n.duration < regionLoop.end + 1 - regionLoop.start &&*/ n.duration >
