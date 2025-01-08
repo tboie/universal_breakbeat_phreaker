@@ -1755,19 +1755,24 @@ export default function Home(props: { folders: any }) {
 
     setLoading(true);
 
-    seq
-      .filter(
-        (s) =>
-          s.layer === layer &&
-          s.time >= regionSelect.start &&
-          s.time < regionSelect.end &&
-          !s.player.mute
-      )
-      .forEach((n) => {
-        n.player.set({
-          mute: Math.round(Math.random()) ? true : false,
-        });
+    let seqCopy = seq.filter(
+      (s) =>
+        s.layer === layer &&
+        s.time >= regionSelect.start &&
+        s.time < regionSelect.end &&
+        !s.player.mute
+    );
+
+    seqCopy.forEach((n, idx) => {
+      n.player.set({
+        mute:
+          seqCopy.length === 1
+            ? true
+            : Math.round(Math.random())
+            ? true
+            : false,
       });
+    });
 
     await drawLayer(layer);
 
