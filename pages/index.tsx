@@ -172,6 +172,7 @@ export default function Home(props: { folders: any }) {
     // TODO: draw waveform outlines?
     // TODO: swap loop/selection handles?
     // TODO: pointerdown drag select pieces?
+    // TODO: pointerdown drag accordian stretches selection times?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
