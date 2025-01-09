@@ -176,6 +176,7 @@ export default function Home(props: { folders: any }) {
     // TODO: lock/unlock layer findMatches on time changes?
     // TODO: pitch/speed change interaction?
     // TODO: zoom interaction?
+    // TODO: record/tap rhythm?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
