@@ -6,7 +6,7 @@
 
 ## Screenshot
 
-![bb phreaker screenshot](https://github.com/user-attachments/assets/d00df33e-7dcd-4844-bbab-234d452aac5b)
+<img width="800" alt="ss" src="https://github.com/user-attachments/assets/3162090c-a816-45d1-a6bd-be30104f03b2" />
 
 ## Demo
 
