@@ -568,6 +568,7 @@ export default function Home(props: { folders: any }) {
 
     resetWaveSurfer();
 
+    // TODO: fix times in 2 places? (data.json & times.txt)
     let times: number[] = [];
     await fetch(`/pallets/0/${folder}/times.txt`)
       .then((response) => response.text())
