@@ -1103,6 +1103,7 @@ export default function Home(props: { folders: any }) {
     setZoom(val);
   };
 
+  // TODO: fix no volume sound still playing after adjustment (throttle/debounce?)
   const changeFader = (val: number) => {
     if (val < 0) {
       seq
