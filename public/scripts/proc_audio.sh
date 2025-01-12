@@ -17,6 +17,7 @@ python "cut_Segments.py"
 # default 0.3
 # 0.001 less threshold 
 # ~1.1 for more threshold?
+# TODO: multiple onset detection/library support?
 # TODO: use aubionotes?
 # TODO: investigate audio clicking of cuts?
 # TODO: normalize audio with pydub?
