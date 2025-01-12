@@ -2363,17 +2363,20 @@ export default function Home(props: { folders: any }) {
               display === "controls" ? styles.hide : ""
             }`}
           >
-            {props.folders[0]?.map((folder: any) => {
-              return (
-                <li
-                  className={folder === selectedFolder ? styles.selected : ""}
-                  key={folder}
-                  onClick={(e) => listClick(e, folder)}
-                >
-                  {folder}
-                </li>
-              );
-            })}
+            {
+              /* TODO: show break bpm in list? */
+              props.folders[0]?.map((folder: any) => {
+                return (
+                  <li
+                    className={folder === selectedFolder ? styles.selected : ""}
+                    key={folder}
+                    onClick={(e) => listClick(e, folder)}
+                  >
+                    {folder}
+                  </li>
+                );
+              })
+            }
           </ul>
         </div>
       </main>
