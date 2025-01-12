@@ -849,6 +849,7 @@ export default function Home(props: { folders: any }) {
     await drawLayer(layer);
   };
 
+  // TODO: reverse selection times and pieces?
   const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
