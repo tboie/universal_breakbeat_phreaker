@@ -1231,11 +1231,6 @@ export default function Home(props: { folders: any }) {
     });
 
     seq.sort((a, b) => a.time - b.time);
-
-    console.log(seq);
-    console.log(layer);
-    console.log(seq.filter((s) => s.layer === layer));
-
     findMatches(e, layer, true);
   };
 
