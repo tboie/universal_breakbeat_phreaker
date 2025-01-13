@@ -1197,6 +1197,7 @@ export default function Home(props: { folders: any }) {
   };
 
   // TODO: enable for layer 0
+  // TODO: fix duration and last note?
   const splitSelectionNotes = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     layer: number
@@ -1230,6 +1231,11 @@ export default function Home(props: { folders: any }) {
     });
 
     seq.sort((a, b) => a.time - b.time);
+
+    console.log(seq);
+    console.log(layer);
+    console.log(seq.filter((s) => s.layer === layer));
+
     findMatches(e, layer, true);
   };
 
