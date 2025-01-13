@@ -4,6 +4,7 @@
 # RUN THIS SCRIPT
 # CHANGE PATHS IN OTHER SCRIPTS
 # TODO: onset management from app?
+# TODO: quiet/loud pieces (aubioquiet)?
 
 # download audio:
 # playlist options:
