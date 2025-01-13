@@ -632,6 +632,7 @@ export default function Home(props: { folders: any }) {
     Tone.Transport.setLoopPoints(0, end);
     Tone.Transport.loop = true;
 
+    // TODO: midi out?
     part = new Tone.Part((time, value) => {
       if (value.player.loaded) {
         value.player.start(time);
@@ -2014,6 +2015,7 @@ export default function Home(props: { folders: any }) {
             Mute
           </button>
 
+          {/* rename? */}
           <button
             onClick={(e) => findMatches(e, selectedLayer, true)}
             disabled={
