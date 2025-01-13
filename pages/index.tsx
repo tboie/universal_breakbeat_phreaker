@@ -169,6 +169,7 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
+    // TODO: start end touch selection?
     // TODO: draw waveform outlines?
     // TODO: swap loop/selection handles?
     // TODO: pointerdown drag select pieces?
