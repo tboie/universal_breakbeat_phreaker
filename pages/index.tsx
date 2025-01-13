@@ -12,6 +12,7 @@ import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
 // TODO: library/onset(cut)/config management for another project?
+// TODO: keep scope on breakbeats? careful with UI scope?
 // For now: sound data can be set manually to be more than drum machine
 import dataPallet0 from "../public/pallets/0/data.json";
 import dataPallet1 from "../public/pallets/1/data.json";
@@ -169,6 +170,7 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
+    // TODO: touch drag pieces?
     // TODO: start end touch selection?
     // TODO: draw waveform outlines?
     // TODO: swap loop/selection handles?
