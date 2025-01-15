@@ -14,6 +14,21 @@ import JSZip from "jszip";
 // TODO: library/onset(cut)/config management for another project?
 // TODO: keep scope on breakbeats? careful with UI scope?
 // For now: sound data can be set manually to be more than drum machine
+
+// TODO: ultimate themed hardware/ui (arcade, futuristic, nature, geometry)?
+/*
+----------------------------------------------------------
+|                                                         |
+|                         Display                         |
+|                                                         |
+----------------------------------------------------------
+|                                                         |
+|                                                         |
+|                         Modules                         |
+|                                                         |
+|_________________________________________________________|
+*/
+
 import dataPallet0 from "../public/pallets/0/data.json";
 import dataPallet1 from "../public/pallets/1/data.json";
 import dataPallet2 from "../public/pallets/2/data.json";
