@@ -185,6 +185,7 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
+    // TODO: timeline plugin?
     // TODO: touch drag pieces?
     // TODO: start end touch selection?
     // TODO: draw waveform outlines?
