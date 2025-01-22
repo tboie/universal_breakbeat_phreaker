@@ -197,6 +197,7 @@ export default function Home(props: { folders: any }) {
     // TODO: zoom interaction?
     // TODO: record/tap rhythm?
     // TODO: display note choices?
+    // TODO: visualize pitch/freq?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
