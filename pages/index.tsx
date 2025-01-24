@@ -185,6 +185,7 @@ export default function Home(props: { folders: any }) {
   refSelectedLayer.current = selectedLayer;
 
   useEffect(() => {
+    // TODO: verify layered waveform UI works on build?
     // TODO: timeline plugin?
     // TODO: touch drag pieces?
     // TODO: start end touch selection?
@@ -1468,7 +1469,7 @@ export default function Home(props: { folders: any }) {
       // calibrate this? harmonics?
       else {
         // does creating a smaller pallet create diversity in selected sounds?
-        // TODO: refactor
+        // TODO: refactor & control?
         sounds = table.filter((r) => r.name !== selectedFolder);
         for (let i = 0; i < 150; i++) {
           const randSound = sounds[Math.floor(Math.random() * sounds.length)];
@@ -2272,6 +2273,7 @@ export default function Home(props: { folders: any }) {
               }
             />
 
+            {/* TODO: layer pitch? */}
             <input
               id="speed"
               type="range"
@@ -2286,6 +2288,7 @@ export default function Home(props: { folders: any }) {
               disabled={loading}
             />
 
+            {/* TODO: throttle/debounce to fix audible 0 volume? */}
             <input
               id="fader"
               type="range"
@@ -2389,7 +2392,7 @@ export default function Home(props: { folders: any }) {
             }`}
           >
             {
-              /* TODO: show break bpm in list? */
+              /* TODO: show break bpm/duration in list? */
               props.folders[0]?.map((folder: any) => {
                 return (
                   <li
