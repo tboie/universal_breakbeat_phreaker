@@ -2334,6 +2334,7 @@ export default function Home(props: { folders: any }) {
             {/* TODO: edit formula config values? (pallet size, findMatches random values) */}
 
             {/* TODO: onset threshold */}
+            {/*       min piece filter? */}
             {/*
             <input
               id="threshold"
