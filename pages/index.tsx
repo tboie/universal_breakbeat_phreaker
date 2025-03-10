@@ -11,6 +11,8 @@ import * as realtimeBpm from "realtime-bpm-analyzer";
 import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
+// TODO: quick & interesting rhythm/arrangement/audio combination ideas?
+//       export to DAW for fine-tuning/FX/further exploration? (feature scope?)
 // TODO: library/onset(cut)/config management for another project?
 // TODO: keep scope on breakbeats? careful with UI scope?
 // For now: sound data can be set manually to be more than drum machine
@@ -199,6 +201,8 @@ export default function Home(props: { folders: any }) {
     // TODO: record/tap rhythm?
     // TODO: display note choices?
     // TODO: visualize pitch/freq?
+    // TODO: adjust individual piece start/end times/duration?
+    // TODO: fill selection with beat times?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
@@ -873,6 +877,7 @@ export default function Home(props: { folders: any }) {
   };
 
   // TODO: reverse selection times and pieces?
+  // TODO: shuffle layer only?
   const shuffleClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -1109,6 +1114,7 @@ export default function Home(props: { folders: any }) {
   };
 
   // TODO: change note times by percent and findMatches without playBackRate change??
+  // TODO: random speed for notes like rand freq range note selection?
   const changeSpeed = (val: number) => {
     part.playbackRate = val;
     seq.forEach((s) => (s.player.playbackRate = val));
@@ -1989,6 +1995,8 @@ export default function Home(props: { folders: any }) {
         */}
 
         {/* layer button bar */}
+        {/* re order layers/set base freq layer? */}
+        {/* layer audio out? */}
         <div className={styles.toolbar}>
           <button
             className={`${selectedLayer === 0 ? styles.selected0 : ""}`}
@@ -2023,9 +2031,13 @@ export default function Home(props: { folders: any }) {
           </button>
         </div>
 
-        <div className={styles.toolbar}>
-          {/* Load and Save? */}
+        {/* Load/Save song? */}
 
+        {/* Export song to DAW/midi format? */}
+
+        {/* Save/Arrange patterns? */}
+
+        <div className={styles.toolbar}>
           <button
             onClick={(e) => erase(e, selectedLayer)}
             disabled={
@@ -2133,7 +2145,7 @@ export default function Home(props: { folders: any }) {
           </button>
           */}
 
-          {/* TODO: Add time marker? */}
+          {/* TODO: display timeline? */}
 
           <button
             onClick={(e) => uneraseClick(e)}
@@ -2198,7 +2210,6 @@ export default function Home(props: { folders: any }) {
           {/* TODO: re-visit trim feature? */}
         </div>
 
-        {/* layer button bar */}
         <div className={styles.toolbar}>
           <button
             id="download"
@@ -2386,7 +2397,7 @@ export default function Home(props: { folders: any }) {
             */}
           </div>
 
-          {/* TODO: display selected layer samples? */}
+          {/* TODO: display selected layer sample names? */}
           <ul
             className={`${styles.playlist} ${
               display === "controls" ? styles.hide : ""
