@@ -203,6 +203,7 @@ export default function Home(props: { folders: any }) {
     // TODO: visualize pitch/freq?
     // TODO: adjust individual piece start/end times/duration?
     // TODO: fill selection with beat times?
+    // TODO: create rhythm by touch drag and apply pieces using velocity/amplitude?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
