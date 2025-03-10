@@ -11,8 +11,8 @@ import * as realtimeBpm from "realtime-bpm-analyzer";
 import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
-// TODO: quick & interesting rhythm/arrangement/audio combination ideas?
-//       export to DAW for fine-tuning/FX/further exploration? (feature scope?)
+// TODO: interesting/simple rhythm/arrangement/audio combination/UI UX design ideas?
+// TODO: piece fine-tuning + exact export to DAW = ideal?
 // TODO: library/onset(cut)/config management for another project?
 // TODO: keep scope on breakbeats? careful with UI scope?
 // For now: sound data can be set manually to be more than drum machine
@@ -202,8 +202,10 @@ export default function Home(props: { folders: any }) {
     // TODO: display note choices?
     // TODO: visualize pitch/freq?
     // TODO: adjust individual piece start/end times/duration?
+    // TODO: adjust individual piece velocity/volume?
     // TODO: fill selection with beat times?
     // TODO: create rhythm by touch drag and apply pieces using velocity/amplitude?
+    // TODO: reset/undo?
     const initWaveSurfer = async () => {
       const WaveSurfer = (await import("wavesurfer.js")).default;
       const regions =
