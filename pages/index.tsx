@@ -12,6 +12,7 @@ import toWav from "audiobuffer-to-wav";
 import JSZip from "jszip";
 
 // TODO: interesting/simple rhythm/arrangement/audio combination/UI UX design ideas?
+// TODO: order features by impact?
 // TODO: piece fine-tuning + exact export to DAW = ideal?
 // TODO: library/onset(cut)/config management for another project?
 // TODO: keep scope on breakbeats? careful with UI scope?
